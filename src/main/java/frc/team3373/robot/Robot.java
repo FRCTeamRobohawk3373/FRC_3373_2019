@@ -10,6 +10,8 @@ package frc.team3373.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team3373.robot.SwerveControl.Side;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,6 +26,41 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  int LBdriveMotorID = 2;
+	int LBrotateMotorID = 1;
+	int LBEncHome = 590; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
+	int LBEncMin = 10;
+	int LBEncMax = 879;
+	
+	int LFdriveMotorID = 4;
+	int LFrotateMotorID = 3;
+	int LFEncHome = 602;
+	int LFEncMin = 11;
+	int LFEncMax = 889;
+	
+	int RBdriveMotorID = 8;
+	int RBrotateMotorID = 7;
+	int RBEncHome = 317;
+	int RBEncMin = 12;
+	int RBEncMax = 885;
+	
+	int RFdriveMotorID = 6;
+	int RFrotateMotorID = 5;
+	int RFEncHome = 65;
+	int RFEncMin = 9;
+	int RFEncMax = 891;
+	
+	double robotWidth = 22.75; // TODO change robot dimensions to match this years robot
+  double robotLength = 27.375;
+  
+  SwerveControl swerve;
+
+  SuperJoystick driver;
+  SuperJoystick shooter;
+	
+  SuperAHRS ahrs;
+  
+  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -33,6 +70,17 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(1);
+    ahrs=new SuperAHRS(SPI.Port.kMXP);
+    
+    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
+				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
+        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
+        
+    
+		  
   }
 
   /**
@@ -86,6 +134,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    driverControls();
+		
+  }
+
+  /**
+   * This function is called at the start of test mode.
+   */
+  @Override
+  public void testInit() {
   }
 
   /**
@@ -93,5 +150,61 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+  }
+
+  public void driverControls() {
+    //################################################
+    //####          shared Controls               ####
+    //################################################
+    if (driver.isStartPushed() && shooter.isStartPushed()) {
+      //auto get on HAB platform
+    }
+
+    //################################################
+    //####          Driver Controls               ####
+    //################################################
+
+    if(driver.getRawAxis(2)>.1){//FieldCentric
+			swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
+		}else if(driver.getRawAxis(3)>.1){//RobotCentric
+			swerve.controlMode(SwerveControl.DriveMode.RobotCentric);
+    } 
+
+    if(driver.isLBHeld()){//sniper
+			swerve.setDriveSpeed(0.3);
+		}else if(driver.isRBHeld()){//turbo
+			swerve.setDriveSpeed(0.7);
+    } else {//regular
+      swerve.setDriveSpeed(0.5);
+    }
+    
+    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
+    
+    switch (driver.getPOV()) {
+    case 0:
+      swerve.changeFront(Side.NORTH);
+      break;
+    case 90:
+      swerve.changeFront(Side.EAST);
+      break;
+    case 180:
+      swerve.changeFront(Side.SOUTH);
+      break;
+    case 270:
+      swerve.changeFront(Side.WEST);
+      break;
+    }
+    //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
+
+    //################################################
+    //####           Shooter Controls             ####
+    //################################################
+
+
+
+
+
+    driver.clearButtons();
+    shooter.clearButtons();
   }
 }
