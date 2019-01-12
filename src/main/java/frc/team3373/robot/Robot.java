@@ -164,10 +164,10 @@ public class Robot extends TimedRobot {
     //####          Driver Controls               ####
     //################################################
 
-    if(driver.getRawAxis(2)>.1){//FieldCentric
-			swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
-		}else if(driver.getRawAxis(3)>.1){//RobotCentric
-			swerve.controlMode(SwerveControl.DriveMode.RobotCentric);
+    if(driver.getRawAxis(2)>.5){//FieldCentric
+			swerve.controlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+		}else if(driver.getRawAxis(3)>.5){//RobotCentric
+			swerve.controlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
     } 
 
     if(driver.isLBHeld()){//sniper
@@ -194,6 +194,9 @@ public class Robot extends TimedRobot {
       swerve.changeFront(Side.WEST);
       break;
     }
+
+    if (driver.isXPushed())
+      swerve.resetOrentation();
     //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 
     //################################################

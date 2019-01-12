@@ -11,7 +11,7 @@ public class SwerveControl {
 	}
 	
 	enum DriveMode {
-		RobotCentric, FieldCentric, ObjectCentric;
+		ROBOTCENTRIC, FIELDCENTRIC, OBJECTCENTRIC;
 	}
 
 	private SwerveWheel FLWheel;
@@ -362,15 +362,16 @@ public class SwerveControl {
 
 	public void controlMode(DriveMode mode) {
 		switch (mode) {
-		case RobotCentric:
+		case ROBOTCENTRIC:
 			isFieldCentric = false;
 			isObjectCentric = false;
+			orientationOffset = 0;
 			break;
-		case FieldCentric:
+		case FIELDCENTRIC:
 			isFieldCentric = true;
 			isObjectCentric = false;
 			break;
-		case ObjectCentric:
+		case OBJECTCENTRIC:
 			isFieldCentric = false;
 			isObjectCentric = true;
 			break;
