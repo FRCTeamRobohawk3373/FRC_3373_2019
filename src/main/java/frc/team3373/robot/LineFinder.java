@@ -26,6 +26,8 @@ public class LineFinder {
         rightFirst = false;
         clockwise = false;
         step = 1;
+
+        mode = SearchMode.SEARCH_NONE;
     }
 
     public void searchLeft() {

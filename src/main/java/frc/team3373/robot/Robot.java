@@ -75,8 +75,8 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(1);
+    //driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(0);
 
     ahrs=new SuperAHRS(SPI.Port.kMXP);
 
