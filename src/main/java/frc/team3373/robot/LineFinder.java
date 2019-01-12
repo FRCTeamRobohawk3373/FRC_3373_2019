@@ -1,6 +1,7 @@
 package frc.team3373.robot;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LineFinder {
     private DigitalInput right; // back of robot
@@ -51,6 +52,15 @@ public class LineFinder {
     }
 
     public boolean lineUpdate() {
+        SmartDashboard.putBoolean("Front", left.get());
+        SmartDashboard.putBoolean("Back", right.get());
+        if (mode == SearchMode.SEARCH_LEFT) {
+            SmartDashboard.putString("Mode", "SEARCH_LEFT");
+        } else if (mode == SearchMode.SEARCH_RIGHT) {
+            SmartDashboard.putString("Mode", "SEARCH_RIGHT");
+        }else if (mode == SearchMode.SEARCH_NONE) {
+            SmartDashboard.putString("Mode", "SEARCH_NONE");
+        }
         switch (mode) {
         case SEARCH_LEFT:
             if (!left.get() && !right.get() && step == 1) {
@@ -58,7 +68,7 @@ public class LineFinder {
                 step = 2;
                 return false;
             } else if (left.get() && !right.get() && step == 2) {
-                System.out.println("Translate left");
+                //System.out.println("Translate left");
                 step = 3;
                 leftFirst = true;
                 return false;
@@ -76,7 +86,7 @@ public class LineFinder {
                 System.out.println("Translate right");
                 step = 5;
                 return false;
-            } else if (left.get() && step == 5 && !clockwise && leftFirst) {
+            } else if (!left.get() && step == 5 && !clockwise && leftFirst) {//check if works
                 searchCancel();
             }
             
