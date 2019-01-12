@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 //import frc.team3373.robot.SwerveControl.Side;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -65,12 +63,7 @@ public class Robot extends TimedRobot {
 	
   SuperAHRS ahrs;
 
-  //WPI_TalonSRX talonR;
-  //WPI_TalonSRX talonL;
-
-  DigitalInput limit;
-
-  //LineFinder linder;
+  LineFinder linder;
   
   /**
    * This function is run when the robot is first started up and should be
@@ -87,12 +80,7 @@ public class Robot extends TimedRobot {
 
     ahrs=new SuperAHRS(SPI.Port.kMXP);
 
-    limit = new DigitalInput(0);
-
-    //talonR = new WPI_TalonSRX(2);
-    //talonL = new WPI_TalonSRX(3);
-
-    //linder = new LineFinder(0, 1);
+    linder = new LineFinder(0, 1);
 
     /*swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
@@ -152,9 +140,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //driverControls();
-    //linder.Update();
-    System.out.println(limit.get());
+    driverControls();
+    linder.lineUpdate();
   }
 
   /**
@@ -171,11 +158,15 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
-  /*public void driverControls() {
+  public void driverControls() {
     if(shooter.isRBPushed()){
       linder.searchRight();
     } else if(shooter.isLBPushed()) {
       linder.searchLeft();
+    } else if(shooter.isXPushed()) {
+      linder.searchCancel();
     }
-  }*/
+
+    shooter.clearButtons();
+  }
 }
