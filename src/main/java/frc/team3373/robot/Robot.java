@@ -27,43 +27,44 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   int LBdriveMotorID = 2;
-	int LBrotateMotorID = 1;
-	int LBEncHome = 590; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
-	int LBEncMin = 10;
-	int LBEncMax = 879;
-	
-	int LFdriveMotorID = 4;
-	int LFrotateMotorID = 3;
-	int LFEncHome = 602;
-	int LFEncMin = 11;
-	int LFEncMax = 889;
-	
-	int RBdriveMotorID = 8;
-	int RBrotateMotorID = 7;
-	int RBEncHome = 317;
-	int RBEncMin = 12;
-	int RBEncMax = 885;
-	
-	int RFdriveMotorID = 6;
-	int RFrotateMotorID = 5;
-	int RFEncHome = 65;
-	int RFEncMin = 9;
-	int RFEncMax = 891;
-	
-	double robotWidth = 22.75; // TODO change robot dimensions to match this years robot
+  int LBrotateMotorID = 1;
+  int LBEncHome = 590; // Zero values (value when wheel is turned to default // zero- bolt hole facing
+                       // front.)
+  int LBEncMin = 10;
+  int LBEncMax = 879;
+
+  int LFdriveMotorID = 4;
+  int LFrotateMotorID = 3;
+  int LFEncHome = 602;
+  int LFEncMin = 11;
+  int LFEncMax = 889;
+
+  int RBdriveMotorID = 8;
+  int RBrotateMotorID = 7;
+  int RBEncHome = 317;
+  int RBEncMin = 12;
+  int RBEncMax = 885;
+
+  int RFdriveMotorID = 6;
+  int RFrotateMotorID = 5;
+  int RFEncHome = 65;
+  int RFEncMin = 9;
+  int RFEncMax = 891;
+
+  double robotWidth = 22.75; // TODO change robot dimensions to match this years robot
   double robotLength = 27.375;
-  
+
   SwerveControl swerve;
 
   SuperJoystick driver;
   SuperJoystick shooter;
-	
+
   SuperAHRS ahrs;
-  
-  
+
+  boolean hold = false;
   /**
-   * This function is run when the robot is first started up and should be
-   * used for any initialization code.
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
    */
   @Override
   public void robotInit() {
@@ -73,23 +74,22 @@ public class Robot extends TimedRobot {
 
     driver = new SuperJoystick(0);
     shooter = new SuperJoystick(1);
-    ahrs=new SuperAHRS(SPI.Port.kMXP);
-    
+    ahrs = new SuperAHRS(SPI.Port.kMXP);
+
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
-				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
-        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
-        
-    
-		  
+        LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
+        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
+
   }
 
   /**
-   * This function is called every robot packet, no matter the mode. Use
-   * this for items like diagnostics that you want ran during disabled,
-   * autonomous, teleoperated and test.
+   * This function is called every robot packet, no matter the mode. Use this for
+   * items like diagnostics that you want ran during disabled, autonomous,
+   * teleoperated and test.
    *
-   * <p>This runs after the mode specific periodic functions, but before
-   * LiveWindow and SmartDashboard integrated updating.
+   * <p>
+   * This runs after the mode specific periodic functions, but before LiveWindow
+   * and SmartDashboard integrated updating.
    */
   @Override
   public void robotPeriodic() {
@@ -97,14 +97,15 @@ public class Robot extends TimedRobot {
 
   /**
    * This autonomous (along with the chooser code above) shows how to select
-   * between different autonomous modes using the dashboard. The sendable
-   * chooser code works with the Java SmartDashboard. If you prefer the
-   * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-   * getString line to get the auto name from the text box below the Gyro
+   * between different autonomous modes using the dashboard. The sendable chooser
+   * code works with the Java SmartDashboard. If you prefer the LabVIEW Dashboard,
+   * remove all of the chooser code and uncomment the getString line to get the
+   * auto name from the text box below the Gyro
    *
-   * <p>You can add additional auto modes by adding additional comparisons to
-   * the switch structure below with additional strings. If using the
-   * SendableChooser make sure to add them to the chooser code above as well.
+   * <p>
+   * You can add additional auto modes by adding additional comparisons to the
+   * switch structure below with additional strings. If using the SendableChooser
+   * make sure to add them to the chooser code above as well.
    */
   @Override
   public void autonomousInit() {
@@ -119,13 +120,13 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+    case kCustomAuto:
+      // Put custom auto code here
+      break;
+    case kDefaultAuto:
+    default:
+      // Put default auto code here
+      break;
     }
   }
 
@@ -135,7 +136,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls();
-		
+
   }
 
   /**
@@ -150,36 +151,49 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    // System.out.println(ahrs.getFusedHeading());
+    //swerve.calibrateHome();
+    if (driver.getRawButton(1) && !hold) {
+      hold = true;
+      System.out.println("pressed");
+    }
+    if (!driver.getRawButton(1) && hold) {
+      hold = false;
+    }
   }
 
   public void driverControls() {
-    //################################################
-    //####          shared Controls               ####
-    //################################################
+    // ################################################
+    // #### shared Controls ####
+    // ################################################
     if (driver.isStartPushed() && shooter.isStartPushed()) {
-      //auto get on HAB platform
+      // auto get on HAB platform
     }
 
-    //################################################
-    //####          Driver Controls               ####
-    //################################################
+    // ################################################
+    // #### Driver Controls ####
+    // ################################################
 
-    if(driver.getRawAxis(2)>.5){//FieldCentric
-			swerve.controlMode(SwerveControl.DriveMode.FIELDCENTRIC);
-		}else if(driver.getRawAxis(3)>.5){//RobotCentric
-			swerve.controlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
-    } 
+    if (driver.isBHeld()) {
+      swerve.calculateAutoSwerveControl(0, .4, 0);
+    }
 
-    if(driver.isLBHeld()){//sniper
-			swerve.setDriveSpeed(0.3);
-		}else if(driver.isRBHeld()){//turbo
-			swerve.setDriveSpeed(0.7);
-    } else {//regular
+    if (driver.getRawAxis(2) > .5) {// FieldCentric
+      swerve.controlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+    } else if (driver.getRawAxis(3) > .5) {// RobotCentric
+      swerve.controlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+    }
+
+    if (driver.isLBHeld()) {// sniper
+      swerve.setDriveSpeed(0.3);
+    } else if (driver.isRBHeld()) {// turbo
+      swerve.setDriveSpeed(0.7);
+    } else {// regular
       swerve.setDriveSpeed(0.5);
     }
-    
+
     swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
-    
+
     switch (driver.getPOV()) {
     case 0:
       swerve.changeFront(Side.NORTH);
@@ -197,15 +211,11 @@ public class Robot extends TimedRobot {
 
     if (driver.isXPushed())
       swerve.resetOrentation();
-    //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
+    // swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 
-    //################################################
-    //####           Shooter Controls             ####
-    //################################################
-
-
-
-
+    // ################################################
+    // #### Shooter Controls ####
+    // ################################################
 
     driver.clearButtons();
     shooter.clearButtons();
