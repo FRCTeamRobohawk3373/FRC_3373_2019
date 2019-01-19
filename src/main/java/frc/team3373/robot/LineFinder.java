@@ -48,7 +48,7 @@ public class LineFinder {
         rightFirst = false;
         clockwise = false;
 
-        System.out.println("Stop");
+        SmartDashboard.putString("Command", "Stop");
     }
 
     public boolean lineUpdate() {
@@ -64,47 +64,47 @@ public class LineFinder {
         switch (mode) {
         case SEARCH_LEFT:
             if (!left.get() && !right.get() && step == 1) {
-                System.out.println("Translate left");
+                SmartDashboard.putString("Command", "Translate left");
                 step = 2;
                 return false;
             } else if (left.get() && !right.get() && step == 2) {
-                //System.out.println("Translate left");
+                //SmartDashboard.putString("Command", "Translate left");
                 step = 3;
                 leftFirst = true;
                 return false;
             } else if (!left.get() && step == 3 && leftFirst) {
                 if (right.get()) {
-                    System.out.println("Rotate counter-clockwise");
+                    SmartDashboard.putString("Command", "Rotate counter-clockwise");
                     clockwise = false;
                 } else {
-                    System.out.println("Rotate clockwise");
+                    SmartDashboard.putString("Command", "Rotate clockwise");
                     clockwise = true;
                 }
                 step = 4;
                 return false;
             } else if (!right.get() && step == 4 && !clockwise && leftFirst) {
-                System.out.println("Translate right");
+                SmartDashboard.putString("Command", "Translate right");
                 step = 5;
                 return false;
-            } else if (!left.get() && step == 5 && !clockwise && leftFirst) {//check if works
+            } else if (!left.get() && step == 5 && !clockwise && leftFirst) {
                 searchCancel();
             }
             
             else if (right.get() && step == 4 && clockwise && leftFirst) {
-                System.out.println("Translate left");
+                SmartDashboard.putString("Command", "Translate left");
                 step = 5;
                 return false;
-            } else if (left.get() && step == 4 && !clockwise && leftFirst) {
+            } else if (left.get() && step == 5 && clockwise && leftFirst) {
                 searchCancel();
             } 
             
             else if (!left.get() && right.get() && step == 2) {
-                System.out.println("Rotate counter-clockwise");
+                SmartDashboard.putString("Command", "Rotate counter-clockwise");
                 step = 3;
                 rightFirst = true;
                 return false;
             } else if (left.get() && step == 3 && rightFirst) {
-                System.out.println("Translate left");
+                SmartDashboard.putString("Command", "Translate left");
                 step = 4;
                 return false;
             } else if (right.get() && step == 4 && rightFirst) {
@@ -114,26 +114,26 @@ public class LineFinder {
             else {return false;}
         case SEARCH_RIGHT:
         if (!left.get() && !right.get() && step == 1) {
-            System.out.println("Translate right");
+            SmartDashboard.putString("Command", "Translate right");
             step = 2;
             return false;
         } else if (right.get() && !left.get() && step == 2) {
-            System.out.println("Translate right");
+            SmartDashboard.putString("Command", "Translate right");
             step = 3;
             rightFirst = true;
             return false;
         } else if (!right.get() && step == 3 && rightFirst) {
             if (left.get()) {
-                System.out.println("Rotate clockwise");
+                SmartDashboard.putString("Command", "Rotate counter-clockwise");
                 clockwise = true;
             } else {
-                System.out.println("Rotate counter-clockwise");
+                SmartDashboard.putString("Command", "Rotate clockwise");
                 clockwise = false;
             }
             step = 4;
             return false;
         } else if (!left.get() && step == 4 && clockwise && rightFirst) {
-            System.out.println("Translate left");
+            SmartDashboard.putString("Command", "Translate left");
             step = 5;
             return false;
         } else if (right.get() && step == 5 && clockwise && rightFirst) {
@@ -141,20 +141,20 @@ public class LineFinder {
         }
         
         else if (left.get() && step == 4 && !clockwise && rightFirst) {
-            System.out.println("Translate right");
+            SmartDashboard.putString("Command", "Translate right");
             step = 5;
             return false;
-        } else if (right.get() && step == 4 && clockwise && rightFirst) {
+        } else if (right.get() && step == 5 && !clockwise && rightFirst) {
             searchCancel();
         } 
         
         else if (!right.get() && left.get() && step == 2) {
-            System.out.println("Rotate clockwise");
+            SmartDashboard.putString("Command", "Rotate counter-clockwise");
             step = 3;
             leftFirst = true;
             return false;
         } else if (right.get() && step == 3 && leftFirst) {
-            System.out.println("Translate right");
+            SmartDashboard.putString("Command", "Translate right");
             step = 4;
             return false;
         } else if (left.get() && step == 4 && leftFirst) {
