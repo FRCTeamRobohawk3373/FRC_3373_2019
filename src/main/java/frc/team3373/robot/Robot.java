@@ -14,8 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.team3373.robot.SwerveControl.Side;
 import edu.wpi.first.wpilibj.SPI;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -75,8 +73,8 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    //driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(0);
+    driver = new SuperJoystick(0);
+    //shooter = new SuperJoystick(1);
 
     ahrs=new SuperAHRS(SPI.Port.kMXP);
 
@@ -159,14 +157,33 @@ public class Robot extends TimedRobot {
   }
 
   public void driverControls() {
-    if(shooter.isRBPushed()){
-      linder.searchRight();
-    } else if(shooter.isLBPushed()) {
-      linder.searchLeft();
-    } else if(shooter.isXPushed()) {
+    if(shooter.isBackHeld()){
+        if(driver.isDPadUpHeld()) {
+          linder.searchLeft(LineFinder.SearchDirection.UP);
+        } else if(driver.isDPadRightPushed()) {
+          linder.searchLeft(LineFinder.SearchDirection.RIGHT);
+        } else if(driver.isDPadDownPushed()) {
+          linder.searchLeft(LineFinder.SearchDirection.DOWN);
+        } else if(driver.isDPadLeftPushed()){
+          linder.searchLeft(LineFinder.SearchDirection.LEFT);
+        }
+    } else if(driver.isStartHeld()) {
+      if(driver.isDPadUpHeld()) {
+        linder.searchRight(LineFinder.SearchDirection.UP);
+      } else if(driver.isDPadRightPushed()) {
+        linder.searchRight(LineFinder.SearchDirection.RIGHT);
+      } else if(driver.isDPadDownPushed()) {
+        linder.searchRight(LineFinder.SearchDirection.DOWN);
+      } else if(driver.isDPadLeftPushed()){
+        linder.searchRight(LineFinder.SearchDirection.LEFT);
+      }
+    } else if(driver.isXPushed()) {
       linder.searchCancel();
     }
-
-    shooter.clearButtons();
+    
+    driver.clearButtons();
+    driver.clearDPad();
+    driver.clearStart();
+    driver.clearBack();
   }
 }
