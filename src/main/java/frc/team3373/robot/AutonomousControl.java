@@ -42,28 +42,45 @@ public class AutonomousControl {
 	
 	//Drives for x milliseconds at y angle and z speed
 	public void driveAtAngle(long milliseconds, float angle, double speed) {
-		swerve.drive(angle,speed);
+		swerve.calculateAutoSwerveControl(angle, speed, 0);
 		try {
 			Thread.sleep(milliseconds);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		swerve.drive(angle,0);
+		swerve.calculateAutoSwerveControl(angle, 0, 0);
 	}
 	
 	//Calls rotateRelative(angle, speed) until finished
 	public void rotateRelative(float angle, double speed) {
-		swerve.rotateRelative(angle, speed);
+		double initalAngle = ahrs.getRotation();
+		double targetAngle = initalAngle + angle;
+		if (targetAngle >= 360) {
+			targetAngle -= 360;
+		} else if (targetAngle < 0) {
+			targetAngle += 360;
+		}
+
+		// calculateAutoSwerveControl(0,0,);
 	}
 	
 	//Calls rotateAbsolute(angle, speed) until finished
 	public void rotateAbsolute(float angle, double speed) {
-		swerve.rotateAbsolute(angle, speed);
+		double initalAngle = ahrs.getRotation();
+		double targetAngle = angle;
+		if (targetAngle >= 360) {
+			targetAngle -= 360;
+		} else if (targetAngle < 0) {
+			targetAngle += 360;
+		}
+
+		// calculateAutoSwerveControl(0,0,);
 	}
 	
 	//Calls rotateroundObject(angle, distance, speed) until finished
 	public void rotateAroundObject(float angle, float distance, double speed) {
-		swerve.rotateAroundObject(angle, distance, speed);
+		swerve.setDistanceToObject(distance);
+		// calculateObjectControl(speed);
 	}
 	
 	public double getUltrasonicDistance() {
