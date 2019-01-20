@@ -165,9 +165,9 @@ public class Robot extends TimedRobot {
     //################################################
 
     if(driver.getRawAxis(2)>.5){//FieldCentric
-			swerve.controlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+			swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
 		}else if(driver.getRawAxis(3)>.5){//RobotCentric
-			swerve.controlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+			swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
     } 
 
     if(driver.isLBHeld()){//sniper

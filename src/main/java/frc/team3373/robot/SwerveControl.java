@@ -36,7 +36,7 @@ public class SwerveControl {
 	private boolean stoppedRotating = true;
 	private float targetRobotAngle = 0;
 
-	SuperAHRS ahrs;
+	private SuperAHRS ahrs;
 
 	public SwerveControl(int LFrotateMotorID, int LFdriveMotorID, int LFEncMin, int LFEncMax, int LFEncHome,
 			int LBrotateMotorID, int LBdriveMotorID, int LBEncMin, int LBEncMax, int LBEncHome, int RFrotateMotorID,
@@ -363,7 +363,7 @@ public class SwerveControl {
 		distanceToCenter = distance;
 	}
 
-	public void controlMode(DriveMode mode) {
+	public void setControlMode(DriveMode mode) {
 		switch (mode) {
 		case ROBOTCENTRIC:
 			isFieldCentric = false;
@@ -379,6 +379,15 @@ public class SwerveControl {
 			isObjectCentric = true;
 			break;
 		}
+	}
+	
+	public DriveMode getControlMode() {
+		if(isFieldCentric){
+			return DriveMode.FIELDCENTRIC;
+		}else if(isObjectCentric){
+			return DriveMode.OBJECTCENTRIC;
+		}
+		return DriveMode.ROBOTCENTRIC;
 	}
 
 	public void changeFront(Side side) {
