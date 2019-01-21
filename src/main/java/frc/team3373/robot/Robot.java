@@ -61,6 +61,9 @@ public class Robot extends TimedRobot {
 
   LineFinder linder;
   DistanceSensor dist;
+  DistanceSensor dist2;
+
+  Ultrasonic ultra;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -79,8 +82,11 @@ public class Robot extends TimedRobot {
 
     // linder = new LineFinder(0, 1, swerve);
 
-    dist = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
-        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
+    ultra = new Ultrasonic(1);
+
+    /*dist = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
+        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);*/
+    dist = new DistanceSensor(0, Constants.distanceTable2);
 
     /*
      * swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin,
@@ -164,6 +170,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    SmartDashboard.putNumber("Distance", ultra.getDistance());
+    SmartDashboard.putNumber("Raw Distance", ultra.getRawDistance());
   }
 
   public void driverControls() {

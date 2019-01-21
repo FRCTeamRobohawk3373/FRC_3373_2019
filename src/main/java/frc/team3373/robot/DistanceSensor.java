@@ -80,9 +80,3 @@ public class DistanceSensor {
     }
 
 }
-
-class SensorException extends Exception { // If sensor number is invalid
-    public SensorException(String message) {
-        super(message);
-    }
-}
