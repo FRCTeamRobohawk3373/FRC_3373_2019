@@ -15,6 +15,7 @@ public class SuperAHRS extends AHRS {
 		previousAccelerationZ = super.getWorldLinearAccelZ();
 		hasBumped = false;
 	}
+	
 	public float getRotation() {
 		float rotation;
 		rotation=(360-super.getYaw())%360;
@@ -26,6 +27,7 @@ public class SuperAHRS extends AHRS {
 		}*/
 		return rotation;
 	}
+
 	public float getRawRotation() {
 		return super.getYaw();
 	}

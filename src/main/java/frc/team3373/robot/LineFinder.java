@@ -26,7 +26,7 @@ public class LineFinder {
     private SearchDirection direction;
     private RotateDirection rdirection;
 
-    private SwerveControl.DriveMode drivemode;
+    private SwerveControl.DriveMode drivemode; //Stores previous swerve drivemode
 
     private AHRS ahrs;
 
@@ -85,7 +85,7 @@ public class LineFinder {
         missed = false;
         rotating = false;
 
-        swerve.calculateAutoSwerveControl(0, 0, 0);
+        swerve.calculateAutoSwerveControl(0, 0, 0); //Stops swerve
 
         swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
     }

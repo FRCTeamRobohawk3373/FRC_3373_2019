@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
   SuperAHRS ahrs;
 
   LineFinder linder;
-
   DistanceSensor dist;
   
   /**
@@ -78,15 +77,19 @@ public class Robot extends TimedRobot {
     driver = new SuperJoystick(0);
     //shooter = new SuperJoystick(1);
 
-    ahrs=new SuperAHRS(SPI.Port.kMXP);
+    //ahrs=new SuperAHRS(SPI.Port.kMXP);
 
     //linder = new LineFinder(0, 1, swerve);
 
-    dist = new DistanceSensor(0);
+    try {
+      dist = new DistanceSensor(0, 2);
+    } catch (SensorException e) {
+      e.printStackTrace();
+    }
 
-    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
+    /*swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
-        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
+        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);*/
   }
 
   /**
@@ -143,7 +146,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    joystickControls();
+    SmartDashboard.putNumber("Distance", dist.getDistance());
+    //joystickControls();
   }
 
   /**
@@ -151,8 +155,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
-    //System.out.println("Output: " + dist.lookupTable(2.5));
+    //swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
   }
 
   /**
@@ -160,19 +163,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    if (driver.isYHeld()) {
-      swerve.calculateAutoSwerveControl(0, 0.3, 0);
-    } else if (driver.isBHeld()){
-      swerve.calculateAutoSwerveControl(90, 0.3, 0);
-    } else if (driver.isAHeld()){
-      swerve.calculateAutoSwerveControl(180, 0.3, 0);
-    } else if (driver.isXHeld()){
-      swerve.calculateAutoSwerveControl(270, 0.3, 0);
-    } else {
-      swerve.calculateAutoSwerveControl(0, 0, 0);
-    }
-
-    driver.clearButtons();
   }
 
   public void driverControls() {
