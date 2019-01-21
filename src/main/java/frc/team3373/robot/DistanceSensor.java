@@ -27,6 +27,13 @@ public class DistanceSensor {
         {3.1, 3}
     };
 
+    private double a1 = 31.0509;
+    private double b1 = 1.89643;
+    private double c1 = 2.40458;
+    private double d1 = 2.89964;
+    private double e1 = 3.00817;
+    private double f1 = 0.0597594;
+
     private double[][] table2 = { //Data for sensor 2
         {0.43, 31},
         {0.45, 29},
@@ -51,6 +58,13 @@ public class DistanceSensor {
         {3.14, 3}
     };
 
+    private double a2 = 31.1277;
+    private double b2 = 2.03942;
+    private double c2 = 1.285;
+    private double d2 = 2.97952;
+    private double e2 = 3.08719;
+    private double f2 = 0.00183152;
+
     private AnalogInput sensor;
 
     private int number;
@@ -66,6 +80,23 @@ public class DistanceSensor {
     }
 
     public double getDistance() {
+        //return lookupTable(sensor.getAverageVoltage(), number);
+        double x = sensor.getAverageVoltage();
+
+        if (x < 0.42) {
+            return -2;
+        }
+
+        if (number == 1) {
+            return ((a1 * Math.pow(x, b1)) + c1) / ((d1 * Math.pow(x, e1)) + f1);
+        } else if (number == 2) {
+            return ((a2 * Math.pow(x, b2)) + c2) / ((d2 * Math.pow(x, e2)) + f2);
+        } else {
+            return -1;
+        }
+    }
+
+    public double getLookup() {
         return lookupTable(sensor.getAverageVoltage(), number);
     }
 

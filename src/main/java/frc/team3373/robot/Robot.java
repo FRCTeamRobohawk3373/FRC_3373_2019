@@ -147,6 +147,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     SmartDashboard.putNumber("Distance", dist.getDistance());
+    SmartDashboard.putNumber("Lookup", dist.getLookup());
     //joystickControls();
   }
 
