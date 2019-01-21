@@ -10,6 +10,7 @@ package frc.team3373.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team3373.autonomus.HABPlatformAuto;
 import frc.team3373.robot.SwerveControl.Side;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -28,7 +29,7 @@ public class Robot extends TimedRobot {
 
   int LBdriveMotorID = 2;
   int LBrotateMotorID = 1;
-  int LBEncHome = 590; // Zero values (value when wheel is turned to default // zero- bolt hole facing
+  int LBEncHome = 590; // Zero values (value when wheel is turned to default zero- bolt hole facing
                        // front.)
   int LBEncMin = 10;
   int LBEncMax = 879;
@@ -41,13 +42,13 @@ public class Robot extends TimedRobot {
 
   int RBdriveMotorID = 8;
   int RBrotateMotorID = 7;
-  int RBEncHome = 317;
+  int RBEncHome = 322;
   int RBEncMin = 12;
   int RBEncMax = 885;
 
   int RFdriveMotorID = 6;
   int RFrotateMotorID = 5;
-  int RFEncHome = 65;
+  int RFEncHome = 59;
   int RFEncMin = 9;
   int RFEncMax = 891;
 
@@ -62,6 +63,9 @@ public class Robot extends TimedRobot {
   SuperAHRS ahrs;
 
   boolean hold = false;
+
+  HABPlatformAuto HABauto;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -80,6 +84,7 @@ public class Robot extends TimedRobot {
         LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
         RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
 
+    HABauto = new HABPlatformAuto(driver);
   }
 
   /**
@@ -130,11 +135,19 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void teleopInit() {
+    ///swerve.calculateAutoSwerveControl(0, 0, .5);
+  }
+
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
+    if (driver.isAPushed()) {
+      HABauto.climb(20);
+    }
     driverControls();
 
   }
@@ -144,6 +157,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
+    swerve.calibrateHome();
   }
 
   /**
@@ -152,7 +166,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     // System.out.println(ahrs.getFusedHeading());
-    //swerve.calibrateHome();
+    // swerve.calibrateHome();
     if (driver.getRawButton(1) && !hold) {
       hold = true;
       System.out.println("pressed");
@@ -174,8 +188,14 @@ public class Robot extends TimedRobot {
     // #### Driver Controls ####
     // ################################################
 
+    //if (driver.isBPushed()) {
+    //  swerve.calculateAutoSwerveControl(0, 0, 0);
+    //}
+
     if (driver.isBHeld()) {
-      swerve.calculateAutoSwerveControl(0, .4, 0);
+      swerve.calculateAutoSwerveControl(0, 0, .2);
+    } else {
+      swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
     }
 
     if (driver.getRawAxis(2) > .5) {// FieldCentric
@@ -191,8 +211,6 @@ public class Robot extends TimedRobot {
     } else {// regular
       swerve.setDriveSpeed(0.5);
     }
-
-    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
 
     switch (driver.getPOV()) {
     case 0:

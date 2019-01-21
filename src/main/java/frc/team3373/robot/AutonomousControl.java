@@ -9,12 +9,14 @@ public class AutonomousControl {
 	SwerveControl swerve;
 	Ultrasonic ultra;
 	Object auto;
+	SuperJoystick joystick;
 	
 	//Initializes self and defines AHRS, swerve, and ultrasonic sensor
-	public AutonomousControl(SuperAHRS ah, SwerveControl swer, Ultrasonic ult) {
+	public AutonomousControl(SuperAHRS ah, SwerveControl swer, Ultrasonic ult, SuperJoystick joy) {
 		ahrs = ah;
 		swerve = swer;
 		ultra = ult;
+		joystick = joy;
 	}
 	
 	//Initializes auto by file name and passes in itself as a parameter
@@ -41,14 +43,18 @@ public class AutonomousControl {
 	}
 	
 	//Drives for x milliseconds at y angle and z speed
-	public void driveAtAngle(long milliseconds, float angle, double speed) {
+	public boolean driveAtAngle(long milliseconds, float angle, double speed) {
+		
 		swerve.calculateAutoSwerveControl(angle, speed, 0);
 		try {
 			Thread.sleep(milliseconds);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			swerve.calculateAutoSwerveControl(angle, 0, 0);
+			return false;
 		}
 		swerve.calculateAutoSwerveControl(angle, 0, 0);
+		return true;
 	}
 	
 	//Calls rotateRelative(angle, speed) until finished
