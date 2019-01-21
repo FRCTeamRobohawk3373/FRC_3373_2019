@@ -69,7 +69,6 @@ public class DistanceSensor {
         for (double[] data : table) {
             if (input < data[0]) {
                 m = (data[1] - pdata[1]) / (data[0] - pdata[0]);
-                System.out.println("Slope: " + m);
                 distance = (m * (input - data[0])) + data[1];
                 return distance;
             }
