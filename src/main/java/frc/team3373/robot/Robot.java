@@ -84,9 +84,9 @@ public class Robot extends TimedRobot {
 
     ultra = new Ultrasonic(1);
 
-    /*dist = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
-        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);*/
-    dist = new DistanceSensor(0, Constants.distanceTable2);
+    dist = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
+        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
+    //dist = new DistanceSensor(0, Constants.distanceTable2);
 
     /*
      * swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin,

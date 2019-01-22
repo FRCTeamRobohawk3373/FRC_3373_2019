@@ -1,6 +1,6 @@
 package frc.team3373.robot;
 
-import edu.wpi.first.wpilibj.AnalogInput;;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class DistanceSensor {
 
@@ -24,7 +24,7 @@ public class DistanceSensor {
 
         useLookup = true;
 
-        sensor.setAverageBits(16); // Sets how many readings should be averaged
+        sensor.setAverageBits(16); // Sets how many readings should be averaged, 2^bits
     }
 
     public DistanceSensor(int port, double a, double b, double c, double d, double e, double f) {
@@ -39,7 +39,7 @@ public class DistanceSensor {
 
         useLookup = false;
 
-        sensor.setAverageBits(16); // Sets how many readings should be averaged
+        sensor.setAverageBits(12); // Sets how many readings should be averaged
     }
 
     public double getDistance() {
@@ -50,8 +50,7 @@ public class DistanceSensor {
         }
 
         if (!useLookup) {
-            return ((a1 * Math.pow(x, b1)) + c1) / ((d1 * Math.pow(x, e1)) + f1); // Curve fit equation:
-            // y_1\sim\frac{ax_1^b+c}{dx_1^f+g} (Desmos)
+            return ((a1 * Math.pow(x, b1)) + c1) / ((d1 * Math.pow(x, e1)) + f1); // Curve fit equation: y_1\sim\frac{ax_1^b+c}{dx_1^f+g} (Desmos)
         } else {
             return lookupTable(sensor.getAverageVoltage());
         }

@@ -24,7 +24,6 @@ public class LineFinder {
 
     private SearchMode mode;
     private SearchDirection direction;
-    private RotateDirection rdirection;
 
     private SwerveControl.DriveMode drivemode; //Stores previous swerve drivemode
 
@@ -36,10 +35,6 @@ public class LineFinder {
 
     public enum SearchDirection {
         UP, RIGHT, LEFT, NONE
-    }
-
-    private enum RotateDirection {
-        CLOCKWISE, COUNTER_CLOCKWISE, NONE
     }
 
     public LineFinder(int lPort, int rPort, SwerveControl swerv) {
@@ -59,8 +54,6 @@ public class LineFinder {
         step = 1; //Counts what step the algorithm is on
 
         mode = SearchMode.NONE; //Keeps track of the search mode
-
-        rdirection = RotateDirection.NONE;
 
         direction = SearchDirection.NONE; //Keeps track of translation direction
     }
