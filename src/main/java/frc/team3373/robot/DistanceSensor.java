@@ -39,7 +39,7 @@ public class DistanceSensor {
 
         useLookup = false;
 
-        sensor.setAverageBits(12); // Sets how many readings should be averaged
+        sensor.setAverageBits(16); // Sets how many readings should be averaged
     }
 
     public double getDistance() {
