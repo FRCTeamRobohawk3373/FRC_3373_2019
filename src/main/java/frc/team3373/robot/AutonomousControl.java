@@ -66,7 +66,7 @@ public class AutonomousControl {
 	
 	//Calls rotateAbsolute(angle, speed) until finished
 	public void rotateAbsolute(float angle, double speed) {
-		double initalAngle = ahrs.getRotation();
+		double initialAngle = ahrs.getRotation();
 		double targetAngle = angle;
 		if (targetAngle >= 360) {
 			targetAngle -= 360;
@@ -77,7 +77,7 @@ public class AutonomousControl {
 		// calculateAutoSwerveControl(0,0,);
 	}
 	
-	//Calls rotateroundObject(angle, distance, speed) until finished
+	//Calls rotateAroundObject(angle, distance, speed) until finished
 	public void rotateAroundObject(float angle, float distance, double speed) {
 		swerve.setDistanceToObject(distance);
 		// calculateObjectControl(speed);
