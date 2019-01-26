@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
     distr = new DistanceSensor(1, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1,
         Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
 
-    lineup = new Lineup(distl, distr, shooter, swerve, 0);
+    lineup = new Lineup(distl, distr, driver, swerve, 0);
 
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
         LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
@@ -198,14 +198,13 @@ public class Robot extends TimedRobot {
      * (driver.isXPushed()) { linder.searchCancel(); }
      */
 
-    if (shooter.isAHeld() && shooter.isBackHeld()) {
+    if (driver.isAHeld() && driver.isBackHeld()) {
       lineup.run(Lineup.AlignDirection.LEFT);
-    } else if (shooter.isAHeld() && shooter.isStartHeld()) {
+    } else if (driver.isAHeld() && driver.isStartHeld()) {
       lineup.run(Lineup.AlignDirection.RIGHT);
     }
 
     driver.clearButtons();
-    driver.clearDPad();
     driver.clearStart();
     driver.clearBack();
   }
