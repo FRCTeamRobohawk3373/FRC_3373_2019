@@ -7,9 +7,12 @@
 
 package frc.team3373.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team3373.autonomous.Lineup;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -59,11 +62,18 @@ public class Robot extends TimedRobot {
 
   SuperAHRS ahrs;
 
-  LineFinder linder;
-  DistanceSensor dist;
-  DistanceSensor dist2;
+  // LineFinder linder;
+
+  Lineup lineup;
+
+  DistanceSensor distl;
+  DistanceSensor distr;
 
   Ultrasonic ultra;
+
+  AutonomousControl control;
+
+  DigitalInput line;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -76,25 +86,26 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     driver = new SuperJoystick(0);
-    // shooter = new SuperJoystick(1);
+    shooter = new SuperJoystick(1);
 
-    // ahrs=new SuperAHRS(SPI.Port.kMXP);
+    ahrs = new SuperAHRS(SPI.Port.kMXP);
 
     // linder = new LineFinder(0, 1, swerve);
 
+    line = new DigitalInput(3);
+
     ultra = new Ultrasonic(1);
 
-    dist = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
+    distl = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
         Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
-    //dist = new DistanceSensor(0, Constants.distanceTable2);
+    distr = new DistanceSensor(1, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1,
+        Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
 
-    /*
-     * swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin,
-     * LFEncMax, LFEncHome, LBrotateMotorID, LBdriveMotorID, LBEncMin, LBEncMax,
-     * LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
-     * RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax,
-     * RBEncHome,ahrs,robotWidth,robotLength);
-     */
+    lineup = new Lineup(distl, distr, shooter, swerve, 0);
+
+    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
+        LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
+        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
   }
 
   /**
@@ -108,8 +119,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    // driverControls();
-    // linder.lineUpdate();
 
   }
 
@@ -153,7 +162,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("Distance", dist.getDistance());
     // joystickControls();
   }
 
@@ -162,7 +170,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    // swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
   }
 
   /**
@@ -175,24 +182,26 @@ public class Robot extends TimedRobot {
   }
 
   public void driverControls() {
-    if (shooter.isBackHeld()) {
-      if (driver.isDPadUpHeld()) {
-        linder.searchLeft(LineFinder.SearchDirection.UP);
-      } else if (driver.isDPadRightPushed()) {
-        linder.searchLeft(LineFinder.SearchDirection.RIGHT);
-      } else if (driver.isDPadLeftPushed()) {
-        linder.searchLeft(LineFinder.SearchDirection.LEFT);
-      }
-    } else if (driver.isStartHeld()) {
-      if (driver.isDPadUpHeld()) {
-        linder.searchRight(LineFinder.SearchDirection.UP);
-      } else if (driver.isDPadRightPushed()) {
-        linder.searchRight(LineFinder.SearchDirection.RIGHT);
-      } else if (driver.isDPadLeftPushed()) {
-        linder.searchRight(LineFinder.SearchDirection.LEFT);
-      }
-    } else if (driver.isXPushed()) {
-      linder.searchCancel();
+    /*
+     * if (shooter.isBackHeld()) { if (driver.isDPadUpHeld()) {
+     * linder.searchLeft(LineFinder.SearchDirection.UP); } else if
+     * (driver.isDPadRightPushed()) {
+     * linder.searchLeft(LineFinder.SearchDirection.RIGHT); } else if
+     * (driver.isDPadLeftPushed()) {
+     * linder.searchLeft(LineFinder.SearchDirection.LEFT); } } else if
+     * (driver.isStartHeld()) { if (driver.isDPadUpHeld()) {
+     * linder.searchRight(LineFinder.SearchDirection.UP); } else if
+     * (driver.isDPadRightPushed()) {
+     * linder.searchRight(LineFinder.SearchDirection.RIGHT); } else if
+     * (driver.isDPadLeftPushed()) {
+     * linder.searchRight(LineFinder.SearchDirection.LEFT); } } else if
+     * (driver.isXPushed()) { linder.searchCancel(); }
+     */
+
+    if (shooter.isAHeld() && shooter.isBackHeld()) {
+      lineup.run(Lineup.AlignDirection.LEFT);
+    } else if (shooter.isAHeld() && shooter.isStartHeld()) {
+      lineup.run(Lineup.AlignDirection.RIGHT);
     }
 
     driver.clearButtons();

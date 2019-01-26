@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveControl {
 
-	enum Side {
+	public enum Side {
 		NORTH, SOUTH, EAST, WEST;
 	}
 	
-	enum DriveMode {
+	public enum DriveMode {
 		ROBOTCENTRIC, FIELDCENTRIC, OBJECTCENTRIC;
 	}
 
