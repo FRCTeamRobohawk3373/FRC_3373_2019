@@ -68,6 +68,11 @@ public class SwerveControl {
 		BRWheel = new SwerveWheel("BackRight", RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,
 				rotAngle);
 
+		FLWheel.setPID(Constants.FLP, Constants.FLI, Constants.FLD);
+		BLWheel.setPID(Constants.BLP, Constants.BLI, Constants.BLD);
+		FRWheel.setPID(Constants.FRP, Constants.FRI, Constants.FRD);
+		BRWheel.setPID(Constants.BRP, Constants.BRI, Constants.BRD);
+
 		wheelArray = new SwerveWheel[] { FLWheel, BLWheel, BRWheel, FRWheel };
 
 	}
@@ -225,7 +230,7 @@ public class SwerveControl {
 		translationalAngle = Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent));
 
 		
-		if (RX == 0) {
+		/*if (RX == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
 				stoppedRotating = false;
@@ -234,7 +239,7 @@ public class SwerveControl {
 			RX = rAxis;
 		} else {
 			stoppedRotating = true;
-		}
+		}*/
 		
 		 
 
@@ -436,8 +441,10 @@ public class SwerveControl {
 	}
 
 	public void printPositions() {
-		for (SwerveWheel wheel : wheelArray)
-			System.out.print(wheel.name + "'s position: " + wheel.getRawEncoderValue() + ", ");
+		for (SwerveWheel wheel : wheelArray) {
+			//System.out.print(wheel.name + "'s position: " + wheel.getRawEncoderValue() + ", ");
+			SmartDashboard.putNumber(wheel.name, wheel.getRawEncoderValue());
+		}
 		System.out.println();
 	}
 

@@ -4,10 +4,15 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveWheel {
 	WPI_TalonSRX rotateMotor; // The motor which spins the assembly
-	WPI_TalonSRX driveMotor; // The motor powering the wheel
+	CANSparkMax driveMotor; // The motor powering the wheel
 	
 	private double targetAngle=0;
 	private double targetSpeed=0;
@@ -22,8 +27,7 @@ public class SwerveWheel {
 	
 	public SwerveWheel(String Name,int rotateMotorID, int driveMotorID,int EncMin,int EncMax,int EncHome,double rotationAngle){
 		rotateMotor = new WPI_TalonSRX(rotateMotorID);
-		driveMotor = new WPI_TalonSRX(driveMotorID);
-		
+		driveMotor = new CANSparkMax(driveMotorID,MotorType.kBrushless);		
 		EMin = EncMin;
 		EMax=EncMax;
 		EHome=EncHome;
@@ -34,11 +38,19 @@ public class SwerveWheel {
 		
 		System.out.println(stepPerDegree);
 		rotateMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 0);
+		rotateMotor.setSensorPhase(false);
 		rotateMotor.setSelectedSensorPosition(rotateMotor.getSensorCollection().getAnalogInRaw(), 0, 0);
 		rotateMotor.overrideLimitSwitchesEnable(false);
+		rotateMotor.setInverted(false);
+		rotateMotor.configFeedbackNotContinuous(true, 0);
 		
 		rotateMotor.setNeutralMode(NeutralMode.Brake); // Activates brake mode
-		driveMotor.setNeutralMode(NeutralMode.Brake);
+		rotateMotor.configAllowableClosedloopError(0, 1);
+		rotateMotor.selectProfileSlot(0, 0);
+
+		
+		driveMotor.setIdleMode(IdleMode.kCoast);
+		driveMotor.setRampRate(1.0);
 	}
 	
 	public void setTargetAngle(double angle){
@@ -52,13 +64,19 @@ public class SwerveWheel {
 		targetSpeed=speed;
 	}
 	
-	public double getCurrentAngle(){
-		double deg = (rotateMotor.getSensorCollection().getAnalogInRaw()-EHome);
-		if(deg<0){
-			deg+=EMax;
-			deg-=EMin;
+	public double getCurrentAngle() {
+		double deg = (rotateMotor.getSensorCollection().getAnalogInRaw() - EHome);
+		if (deg < 0) {
+			deg += EMax;
+			deg -= EMin;
 		}
-		return deg/stepPerDegree;
+		return deg / stepPerDegree;
+	}
+	
+	public void setPID(double P,double I,double D) {
+		rotateMotor.config_kP(0, P);
+		rotateMotor.config_kI(0, I);
+		rotateMotor.config_kD(0, D);
 	}
 	
 	public double getRAngle(){
@@ -100,7 +118,7 @@ public class SwerveWheel {
 			target+=EMin;
 		}
 		//System.out.println(target);
-		
+		SmartDashboard.putNumber(name + "'s target angle'", target);
 		rotateMotor.set(ControlMode.Position,target);
 	}
 	

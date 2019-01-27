@@ -28,30 +28,30 @@ public class Robot extends TimedRobot {
 
   int LBdriveMotorID = 2;
 	int LBrotateMotorID = 1;
-	int LBEncHome = 590; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
+	int LBEncHome = 802; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
 	int LBEncMin = 10;
-	int LBEncMax = 879;
+	int LBEncMax = 897;
 	
 	int LFdriveMotorID = 4;
 	int LFrotateMotorID = 3;
-	int LFEncHome = 602;
+	int LFEncHome = 264;
 	int LFEncMin = 11;
-	int LFEncMax = 889;
+	int LFEncMax = 902;
 	
 	int RBdriveMotorID = 8;
 	int RBrotateMotorID = 7;
-	int RBEncHome = 317;
-	int RBEncMin = 12;
-	int RBEncMax = 885;
+	int RBEncHome = 866;
+	int RBEncMin = 10;
+	int RBEncMax = 898;
 	
 	int RFdriveMotorID = 6;
 	int RFrotateMotorID = 5;
-	int RFEncHome = 65;
-	int RFEncMin = 9;
-	int RFEncMax = 891;
+	int RFEncHome = 102;
+	int RFEncMin = 10;
+	int RFEncMax = 899;
 	
-	double robotWidth = 22.75; // TODO change robot dimensions to match this years robot
-  double robotLength = 27.375;
+	double robotWidth = 20.4375; // TODO change robot dimensions to match this years robot
+  double robotLength = 33.25;
   
   SwerveControl swerve;
 
@@ -59,8 +59,6 @@ public class Robot extends TimedRobot {
   SuperJoystick shooter;
 	
   SuperAHRS ahrs;
-  
-  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -78,9 +76,6 @@ public class Robot extends TimedRobot {
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
         RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
-        
-    
-		  
   }
 
   /**
@@ -135,7 +130,6 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls();
-		
   }
 
   /**
@@ -150,6 +144,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    swerve.printPositions();
+    
   }
 
   public void driverControls() {
@@ -171,11 +167,11 @@ public class Robot extends TimedRobot {
     } 
 
     if(driver.isLBHeld()){//sniper
-			swerve.setDriveSpeed(0.3);
+			swerve.setDriveSpeed(0.2);
 		}else if(driver.isRBHeld()){//turbo
 			swerve.setDriveSpeed(0.7);
     } else {//regular
-      swerve.setDriveSpeed(0.5);
+      swerve.setDriveSpeed(0.4);
     }
     
     swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
