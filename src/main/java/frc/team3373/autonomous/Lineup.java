@@ -2,17 +2,15 @@ package frc.team3373.autonomous;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.robot.DistanceSensor;
 import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SwerveControl;
-import frc.team3373.robot.Ultrasonic;
 
 public class Lineup {
 
     DistanceSensor dleft; // Right and left distance sensors
     DistanceSensor dright;
-
-    Ultrasonic ultra; // Not used
 
     SuperJoystick joystick; // Shooter joystick
 
@@ -24,6 +22,8 @@ public class Lineup {
 
     SwerveControl.DriveMode mode; // Holds previous swerve DriveMode
 
+    double speed;
+
     public static enum AlignDirection {
         RIGHT, LEFT, NONE
     }
@@ -31,6 +31,7 @@ public class Lineup {
     public Lineup(DistanceSensor dl, DistanceSensor dr, SuperJoystick driver, SwerveControl swerve, int linePort) {
         align = AlignDirection.NONE; // Initializes align and line sensor
         line = new DigitalInput(linePort);
+        speed = SmartDashboard.getNumber("Speed", 0.2);
     }
 
     public void run(AlignDirection al) {
@@ -47,10 +48,10 @@ public class Lineup {
                 if (dleft.getDistance() == dright.getDistance()) {
                     state = 2;
                 } else if (dleft.getDistance() > dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, 0.3); // Rotate clockwise
+                    swerve.calculateAutoSwerveControl(0, 0, speed); // Rotate clockwise
                     state++;
                 } else if (dleft.getDistance() < dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, -0.3); // Rotate counter-clockwise
+                    swerve.calculateAutoSwerveControl(0, 0, -speed); // Rotate counter-clockwise
                     state++;
                 }
                 break;
@@ -66,11 +67,11 @@ public class Lineup {
                 }
                 switch (align) {
                 case RIGHT:
-                    swerve.calculateAutoSwerveControl(0, 0.3, 0); // Drive right
+                    swerve.calculateAutoSwerveControl(0, speed, 0); // Drive right
                     state++;
                     break;
                 case LEFT:
-                    swerve.calculateAutoSwerveControl(180, 0.3, 0); // Drive left
+                    swerve.calculateAutoSwerveControl(180, speed, 0); // Drive left
                     state++;
                     break;
                 default:
