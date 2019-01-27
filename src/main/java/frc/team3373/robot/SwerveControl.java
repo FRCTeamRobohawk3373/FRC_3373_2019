@@ -9,7 +9,7 @@ public class SwerveControl {
 	public enum Side {
 		NORTH, SOUTH, EAST, WEST;
 	}
-	
+
 	public enum DriveMode {
 		ROBOTCENTRIC, FIELDCENTRIC, OBJECTCENTRIC;
 	}
@@ -79,12 +79,12 @@ public class SwerveControl {
 																										// Driving
 																										// Speed, rotate
 																										// speed
-		double translationalXComponent=0;
-		double translationalYComponent=0;
+		double translationalXComponent = 0;
+		double translationalYComponent = 0;
 		double translationalMagnitude;
 		double translationalAngle;
 
-		double rAxis=rotateSpeed;
+		double rAxis = rotateSpeed;
 		double rotateXComponent;
 		double rotateYComponent;
 
@@ -92,20 +92,20 @@ public class SwerveControl {
 		if (driveSpeed > 1) {
 			driveSpeed = 1;
 		}
-		
+
 		if (rotateSpeed > 1) {
 			rotateSpeed = 1;
-		} else if(rotateSpeed<-1){
+		} else if (rotateSpeed < -1) {
 			rotateSpeed = -1;
 		}
-		
+
 		if (driveAngle >= 360) {
-			driveAngle=driveAngle % 360;
+			driveAngle = driveAngle % 360;
 		} else if (driveAngle < 0) {
-			driveAngle=driveAngle % 360;
+			driveAngle = driveAngle % 360;
 			driveAngle += 360;
 		}
-		
+
 		if (rotateSpeed == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
@@ -113,10 +113,9 @@ public class SwerveControl {
 			}
 			rAxis = getRotationalCorrection();
 			rotateSpeed = rAxis;
-		}else{
+		} else {
 			stoppedRotating = true;
 		}
-		 
 
 		if (isFieldCentric) {
 			// if in field centric mode make offset equal to the current angle of the navX
@@ -227,7 +226,6 @@ public class SwerveControl {
 		// angle of joystick
 		translationalAngle = Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent));
 
-		
 		if (RX == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
@@ -238,8 +236,6 @@ public class SwerveControl {
 		} else {
 			stoppedRotating = true;
 		}
-		
-		 
 
 		if (isFieldCentric) {
 			// if in field centric mode make offset equal to the current angle of the navX
@@ -259,7 +255,7 @@ public class SwerveControl {
 		// calculates y component of translation vector
 		translationalYComponent = Math.sin(Math.toRadians(translationalAngle)) * translationalMagnitude;
 		// calculates x component of translation vector
-		translationalXComponent = Math.cos(Math.toRadians(translationalAngle)) * translationalMagnitude; 
+		translationalXComponent = Math.cos(Math.toRadians(translationalAngle)) * translationalMagnitude;
 		// calculates y component of translation vector
 
 		if (LY == 0 && LX == 0 && RX == 0) {
@@ -380,11 +376,11 @@ public class SwerveControl {
 			break;
 		}
 	}
-	
+
 	public DriveMode getControlMode() {
-		if(isFieldCentric){
+		if (isFieldCentric) {
 			return DriveMode.FIELDCENTRIC;
-		}else if(isObjectCentric){
+		} else if (isObjectCentric) {
 			return DriveMode.OBJECTCENTRIC;
 		}
 		return DriveMode.ROBOTCENTRIC;
@@ -464,9 +460,9 @@ public class SwerveControl {
 					if (previousValue == currentValue) {
 						sameNumberCount++;
 						if (sameNumberCount > 20) {
-							if(speed<.1)
+							if (speed < .1)
 								speed += 0.001;
-								wheel.rawRotate(speed);
+							wheel.rawRotate(speed);
 							sameNumberCount = 0;
 						}
 					} else {
@@ -485,7 +481,7 @@ public class SwerveControl {
 
 	public void calibrateHome() {
 		for (SwerveWheel wheel : wheelArray)
-			System.out.print(wheel.name + " Home: " + wheel.getRawEncoderValue()+" ");
+			System.out.print(wheel.name + " Home: " + wheel.getRawEncoderValue() + " ");
 		System.out.println();
 	}
 

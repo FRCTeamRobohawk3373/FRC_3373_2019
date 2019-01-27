@@ -27,9 +27,9 @@ public class Vision {
 	NetworkTableEntry CamChoice2;
 	NetworkTableEntry CamPreload;
 
-	//UsbCamera VideoCam;
-	//VideoSink server;
-	//CvSink cvsink1;
+	// UsbCamera VideoCam;
+	// VideoSink server;
+	// CvSink cvsink1;
 
 	private int camera1;
 	private int camera2;
@@ -49,12 +49,12 @@ public class Vision {
 		Vtable = inst.getTable("VisionData");
 		Ventry = Vtable.getEntry("Objects");
 		Ventry.addListener((event) -> dataRefresh(event), EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-		
-		//VideoCam = CameraServer.getInstance().startAutomaticCapture(0);
-		//cvsink1 = new CvSink("cam1cv");
-		//cvsink1.setSource(VideoCam);
-		//cvsink1.setEnabled(false);
-		//server = CameraServer.getInstance().getServer();
+
+		// VideoCam = CameraServer.getInstance().startAutomaticCapture(0);
+		// cvsink1 = new CvSink("cam1cv");
+		// cvsink1.setSource(VideoCam);
+		// cvsink1.setEnabled(false);
+		// server = CameraServer.getInstance().getServer();
 
 		// numCam = NumberOfCameras;
 		// numCamCO = NumberOfCamerasOnCoprocesser;
@@ -108,12 +108,12 @@ public class Vision {
 				preCam = -1;
 			}
 			if (num >= numCamCO) {
-				//server.setSource(VideoCam);
-				//cvsink1.setEnabled(false);
+				// server.setSource(VideoCam);
+				// cvsink1.setEnabled(false);
 				return;
 			} else {
 				try {
-					//server.setSource(null);
+					// server.setSource(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -139,10 +139,10 @@ public class Vision {
 		updatelights();
 		if (num < numCam && num != camera1 && num != camera2) {
 			if (num >= numCamCO) {
-				//cvsink1.setEnabled(true);
+				// cvsink1.setEnabled(true);
 				return;
 			} else {
-				//cvsink1.setEnabled(false);
+				// cvsink1.setEnabled(false);
 			}
 			CamPreload.setNumber(num);
 			preCam = num;
@@ -384,7 +384,8 @@ public class Vision {
 			e.printStackTrace();
 		}
 	}
-	public void updatelights(){
+
+	public void updatelights() {
 		if (RobotState.isAutonomous() || RobotState.isTest()) {
 			lights.set(true);
 		} else {

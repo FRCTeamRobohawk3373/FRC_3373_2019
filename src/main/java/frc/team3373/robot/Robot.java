@@ -7,12 +7,13 @@
 
 package frc.team3373.robot;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
-import edu.wpi.first.wpilibj.SPI;
+//import edu.wpi.first.wpilibj.SPI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -52,10 +53,10 @@ public class Robot extends TimedRobot {
   int RFEncMin = 9;
   int RFEncMax = 891;
 
-  double robotWidth = 22.75; // TODO change robot dimensions to match this years robot
+  double robotWidth = 22.75; // TODO change robot dimensions to match this year's robot
   double robotLength = 27.375;
 
-  SwerveControl swerve;
+  // SwerveControl swerve;
 
   SuperJoystick driver;
   SuperJoystick shooter;
@@ -75,6 +76,14 @@ public class Robot extends TimedRobot {
 
   DigitalInput line;
 
+  double[] voltages;
+
+  int count;
+
+  // AnalogInput cal;
+
+  boolean disabled;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -85,27 +94,41 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    voltages = new double[21];
+
     driver = new SuperJoystick(0);
     shooter = new SuperJoystick(1);
 
-    ahrs = new SuperAHRS(SPI.Port.kMXP);
+    count = 0;
+
+    // cal = new AnalogInput(0);
+
+    disabled = false;
+
+    // ahrs = new SuperAHRS(SPI.Port.kMXP);
 
     // linder = new LineFinder(0, 1, swerve);
 
-    line = new DigitalInput(3);
+    // line = new DigitalInput(3);
 
-    ultra = new Ultrasonic(1);
+    // ultra = new Ultrasonic(1);
 
-    distl = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
-        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
-    distr = new DistanceSensor(1, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1,
-        Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
-
-    lineup = new Lineup(distl, distr, driver, swerve, 0);
-
-    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
-        LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
-        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
+    distl = new DistanceSensor(0, Constants.distanceSensora3, Constants.distanceSensorb3, Constants.distanceSensorc3,
+        Constants.distanceSensord3, Constants.distanceSensore3, Constants.distanceSensorf3);
+    /*
+     * distr = new DistanceSensor(0, Constants.distanceSensora1,
+     * Constants.distanceSensorb1, Constants.distanceSensorc1,
+     * Constants.distanceSensord1, Constants.distanceSensore1,
+     * Constants.distanceSensorf1);
+     * 
+     * //lineup = new Lineup(distl, distr, driver, swerve, 0);
+     * 
+     * /*swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin,
+     * LFEncMax, LFEncHome, LBrotateMotorID, LBdriveMotorID, LBEncMin, LBEncMax,
+     * LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
+     * RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs,
+     * robotWidth, robotLength);
+     */
   }
 
   /**
@@ -170,6 +193,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
+    count = 0;
   }
 
   /**
@@ -177,8 +201,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    SmartDashboard.putNumber("Distance", ultra.getDistance());
-    SmartDashboard.putNumber("Raw Distance", ultra.getRawDistance());
+    SmartDashboard.putNumber("Distance", distl.getDistance());
+    /*
+     * if (driver.isAPushed() && !disabled) { voltages[count] =
+     * cal.getAverageVoltage(); count++; }
+     * 
+     * if (count == 21 && !disabled) { disabled = true; for (int i = 0; i < 21; i++)
+     * { System.out.println(voltages[i]); } }
+     * 
+     * driver.clearA();
+     */
   }
 
   public void driverControls() {
@@ -209,59 +241,41 @@ public class Robot extends TimedRobot {
     driver.clearBack();
   }
 
-  public void joystickControls() {
-    // ################################################
-    // #### shared Controls ####
-    // ################################################
-    /*
-     * if (driver.isStartPushed() && shooter.isStartPushed()) { //auto get on HAB
-     * platform }
-     */
-
-    // ################################################
-    // #### Driver Controls ####
-    // ################################################
-
-    if (driver.getRawAxis(2) > .5) {// FieldCentric
-      swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
-    } else if (driver.getRawAxis(3) > .5) {// RobotCentric
-      swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
-    }
-
-    if (driver.isLBHeld()) {// sniper
-      swerve.setDriveSpeed(0.3);
-    } else if (driver.isRBHeld()) {// turbo
-      swerve.setDriveSpeed(0.7);
-    } else {// regular
-      swerve.setDriveSpeed(0.5);
-    }
-
-    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
-
-    switch (driver.getPOV()) {
-    case 0:
-      swerve.changeFront(SwerveControl.Side.NORTH);
-      break;
-    case 90:
-      swerve.changeFront(SwerveControl.Side.EAST);
-      break;
-    case 180:
-      swerve.changeFront(SwerveControl.Side.SOUTH);
-      break;
-    case 270:
-      swerve.changeFront(SwerveControl.Side.WEST);
-      break;
-    }
-
-    if (driver.isXPushed())
-      swerve.resetOrentation();
-    // swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
-
-    // ################################################
-    // #### Shooter Controls ####
-    // ################################################
-
-    driver.clearButtons();
-    // shooter.clearButtons();
-  }
+  /*
+   * public void joystickControls() { //
+   * ################################################ // #### shared Controls ####
+   * // ################################################ /* if
+   * (driver.isStartPushed() && shooter.isStartPushed()) { //auto get on HAB
+   * platform }
+   * 
+   * 
+   * // ################################################ // #### Driver Controls
+   * #### // ################################################
+   * 
+   * if (driver.getRawAxis(2) > .5) {// FieldCentric
+   * swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC); } else if
+   * (driver.getRawAxis(3) > .5) {// RobotCentric
+   * swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC); }
+   * 
+   * if (driver.isLBHeld()) {// sniper swerve.setDriveSpeed(0.3); } else if
+   * (driver.isRBHeld()) {// turbo swerve.setDriveSpeed(0.7); } else {// regular
+   * swerve.setDriveSpeed(0.5); }
+   * 
+   * swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1),
+   * driver.getRawAxis(4));
+   * 
+   * switch (driver.getPOV()) { case 0:
+   * swerve.changeFront(SwerveControl.Side.NORTH); break; case 90:
+   * swerve.changeFront(SwerveControl.Side.EAST); break; case 180:
+   * swerve.changeFront(SwerveControl.Side.SOUTH); break; case 270:
+   * swerve.changeFront(SwerveControl.Side.WEST); break; }
+   * 
+   * if (driver.isXPushed()) swerve.resetOrentation(); //
+   * swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
+   * 
+   * // ################################################ // #### Shooter Controls
+   * #### // ################################################
+   * 
+   * driver.clearButtons(); // shooter.clearButtons(); }
+   */
 }

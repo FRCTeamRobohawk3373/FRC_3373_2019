@@ -14,39 +14,39 @@ public class Constants {
     public static double[][] distanceTable1 = { //Data for sensor 1
         {0.42, 31},
         {0.44, 29},
-        {0.48, 27},
-        {0.5, 25},
-        {0.56, 23},
-        {0.60, 21},
-        {0.64, 19},
-        {0.72, 17},
-        {0.78, 15},
-        {0.83, 14},
-        {0.87, 13},
-        {0.95, 12},
-        {1.03, 11},
-        {1.12, 10},
-        {1.22, 9},
-        {1.35, 8},
-        {1.51, 7},
-        {1.76, 6},
-        {2.0, 5},
-        {2.4, 4},
-        {3.1, 3}
+        {0.46, 27},
+        {0.48, 25},
+        {0.53, 23},
+        {0.56, 21},
+        {0.60, 19},
+        {0.65, 17},
+        {0.74, 15},
+        {0.79, 14},
+        {0.83, 13},
+        {0.89, 12},
+        {0.94, 11},
+        {1.04, 10},
+        {1.16, 9},
+        {1.29, 8},
+        {1.41, 7},
+        {1.63, 6},
+        {1.90, 5},
+        {2.40, 4},
+        {3.00, 3}
     };
 
-    public static double distanceSensora1 = 31.0509; //Constants for lineFit
-    public static double distanceSensorb1 = 1.89643;
-    public static double distanceSensorc1 = 2.40458;
-    public static double distanceSensord1 = 2.89964;
-    public static double distanceSensore1 = 3.00817;
-    public static double distanceSensorf1 = 0.0597594;
+    public static double distanceSensora1 = 31.1534; //Constants for lineFit
+    public static double distanceSensorb1 = 3.01684;
+    public static double distanceSensorc1 = 0.0477401;
+    public static double distanceSensord1 = 2.97265;
+    public static double distanceSensore1 = 4.14756;
+    public static double distanceSensorf1 = -0.00588378;
 
     public static double[][] distanceTable2 = { //Data for sensor 2
         {0.43, 31},
         {0.45, 29},
         {0.47, 27},
-        {0.5, 25},
+        {0.50, 25},
         {0.54, 23},
         {0.58, 21},
         {0.62, 19},
@@ -55,7 +55,7 @@ public class Constants {
         {0.79, 14},
         {0.85, 13},
         {0.91, 12},
-        {1.0, 11},
+        {1.00, 11},
         {1.08, 10},
         {1.18, 9},
         {1.32, 8},
@@ -72,4 +72,35 @@ public class Constants {
     public static double distanceSensord2 = 2.97952;
     public static double distanceSensore2 = 3.08719;
     public static double distanceSensorf2 = 0.00183152;
+
+    public static double[][] distanceTable3 = {
+        {0.39, 31},
+        {0.42, 29},
+        {0.44, 27},
+        {0.48, 25},
+        {0.51, 23},
+        {0.57, 21},
+        {0.57, 19},
+        {0.64, 17},
+        {0.70, 15},
+        {0.75, 14},
+        {0.79, 13},
+        {0.85, 12},
+        {0.93, 11},
+        {1.00, 10},
+        {1.10, 9},
+        {1.24, 8},
+        {1.35, 7},
+        {1.54, 6},
+        {1.73, 5},
+        {2.14, 4},
+        {2.76, 3}
+    };
+
+    public static double distanceSensora3 = 20.0191;
+    public static double distanceSensorb3 = -1.25134;
+    public static double distanceSensorc3 = 0.434041;
+    public static double distanceSensord3 = 4.29208;
+    public static double distanceSensore3 = -0.00667298;
+    public static double distanceSensorf3 = -2.24084;
 }

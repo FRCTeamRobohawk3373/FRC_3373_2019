@@ -9,47 +9,48 @@ import frc.team3373.robot.Ultrasonic;
 
 public class Lineup {
 
-    DistanceSensor dleft; //Right and left distance sensors
+    DistanceSensor dleft; // Right and left distance sensors
     DistanceSensor dright;
 
-    Ultrasonic ultra; //Not used
+    Ultrasonic ultra; // Not used
 
-    SuperJoystick joystick; //Shooter joystick
+    SuperJoystick joystick; // Shooter joystick
 
     SwerveControl swerve;
 
     DigitalInput line;
 
-    AlignDirection align; //Holds which way the line is from the robot
+    AlignDirection align; // Holds which way the line is from the robot
 
-    SwerveControl.DriveMode mode; //Holds previous swerve DriveMode
+    SwerveControl.DriveMode mode; // Holds previous swerve DriveMode
 
     public static enum AlignDirection {
         RIGHT, LEFT, NONE
     }
 
     public Lineup(DistanceSensor dl, DistanceSensor dr, SuperJoystick driver, SwerveControl swerve, int linePort) {
-        align = AlignDirection.NONE; //Initializes align and line sensor
+        align = AlignDirection.NONE; // Initializes align and line sensor
         line = new DigitalInput(linePort);
     }
 
     public void run(AlignDirection al) {
-        mode = swerve.getControlMode(); //Gets swerve control mode
+        mode = swerve.getControlMode(); // Gets swerve control mode
         swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
 
-        int state = 0; //Stores the step that the lineup is on
+        int state = 0; // Stores the step that the lineup is on
 
         align = al;
         while (!joystick.isXHeld() && !RobotState.isDisabled()) {
             switch (state) {
-            case 0: // Inital state: Checks which way the robot is rotated according to the distance sensors and rotates
+            case 0: // Inital state: Checks which way the robot is rotated according to the distance
+                    // sensors and rotates
                 if (dleft.getDistance() == dright.getDistance()) {
                     state = 2;
                 } else if (dleft.getDistance() > dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, 0.3); //Rotate clockwise
+                    swerve.calculateAutoSwerveControl(0, 0, 0.3); // Rotate clockwise
                     state++;
                 } else if (dleft.getDistance() < dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, -0.3); //Rotate counter-clockwise
+                    swerve.calculateAutoSwerveControl(0, 0, -0.3); // Rotate counter-clockwise
                     state++;
                 }
                 break;
@@ -65,11 +66,11 @@ public class Lineup {
                 }
                 switch (align) {
                 case RIGHT:
-                    swerve.calculateAutoSwerveControl(0, 0.3, 0); //Drive right
+                    swerve.calculateAutoSwerveControl(0, 0.3, 0); // Drive right
                     state++;
                     break;
                 case LEFT:
-                    swerve.calculateAutoSwerveControl(180, 0.3, 0); //Drive left
+                    swerve.calculateAutoSwerveControl(180, 0.3, 0); // Drive left
                     state++;
                     break;
                 default:
