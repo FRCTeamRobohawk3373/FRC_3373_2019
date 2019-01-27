@@ -10,6 +10,7 @@ package frc.team3373.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -59,6 +60,11 @@ public class Robot extends TimedRobot {
   SuperJoystick shooter;
 	
   SuperAHRS ahrs;
+
+  Lineup line;
+
+  DistanceSensor distl;
+  DistanceSensor distr;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -71,11 +77,16 @@ public class Robot extends TimedRobot {
 
     driver = new SuperJoystick(0);
     shooter = new SuperJoystick(1);
-    ahrs=new SuperAHRS(SPI.Port.kMXP);
+    ahrs = new SuperAHRS(SPI.Port.kMXP);
     
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
         RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
+
+    distl = new DistanceSensor(0, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
+    distl = new DistanceSensor(1, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2, Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
+
+    line = new Lineup(distl, distr, driver, swerve, 2);
   }
 
   /**
