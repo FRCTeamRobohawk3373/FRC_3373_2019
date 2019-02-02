@@ -7,13 +7,13 @@
 
 package frc.team3373.robot;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
+//import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
-//import edu.wpi.first.wpilibj.SPI;
+import frc.team3373.robot.SwerveControl.Side;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -28,61 +28,52 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  public enum ObjectType {
+    HATCH, CARGO
+  }
+
   int LBdriveMotorID = 2;
-  int LBrotateMotorID = 1;
-  int LBEncHome = 590; // Zero values (value when wheel is turned to default // zero- bolt hole facing
-                       // front.)
-  int LBEncMin = 10;
-  int LBEncMax = 879;
+	int LBrotateMotorID = 1;
+	int LBEncHome = 802; // Zero values (value when wheel is turned to default zero- bolt hole facing front.)
+	int LBEncMin = 10;
+	int LBEncMax = 897;
+	
+	int LFdriveMotorID = 4;
+	int LFrotateMotorID = 3;
+	int LFEncHome = 264;
+	int LFEncMin = 11;
+	int LFEncMax = 902;
+	
+	int RBdriveMotorID = 8;
+	int RBrotateMotorID = 7;
+	int RBEncHome = 866;
+	int RBEncMin = 10;
+	int RBEncMax = 898;
+	
+	int RFdriveMotorID = 6;
+	int RFrotateMotorID = 5;
+	int RFEncHome = 102;
+	int RFEncMin = 10;
+	int RFEncMax = 899;
+	
+	double robotWidth = 33.25; // TODO change robot dimensions to match this years robot
+  double robotLength = 20.4375;
 
-  int LFdriveMotorID = 4;
-  int LFrotateMotorID = 3;
-  int LFEncHome = 602;
-  int LFEncMin = 11;
-  int LFEncMax = 889;
-
-  int RBdriveMotorID = 8;
-  int RBrotateMotorID = 7;
-  int RBEncHome = 317;
-  int RBEncMin = 12;
-  int RBEncMax = 885;
-
-  int RFdriveMotorID = 6;
-  int RFrotateMotorID = 5;
-  int RFEncHome = 65;
-  int RFEncMin = 9;
-  int RFEncMax = 891;
-
-  double robotWidth = 22.75; // TODO change robot dimensions to match this year's robot
-  double robotLength = 27.375;
-
-  // SwerveControl swerve;
+  SwerveControl swerve;
 
   SuperJoystick driver;
   SuperJoystick shooter;
 
   SuperAHRS ahrs;
 
-  // LineFinder linder;
-
   Lineup lineup;
 
   DistanceSensor distl;
   DistanceSensor distr;
 
-  Ultrasonic ultra;
+  ObjectType object;
 
-  AutonomousControl control;
-
-  DigitalInput line;
-
-  double[] voltages;
-
-  int count;
-
-  // AnalogInput cal;
-
-  boolean disabled;
+  Claw claw;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -94,41 +85,31 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    voltages = new double[21];
+    // voltages = new double[21];
 
     driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(1);
+    //shooter = new SuperJoystick(1);
 
-    count = 0;
+    // count = 0;
 
     // cal = new AnalogInput(0);
 
-    disabled = false;
+    ahrs = new SuperAHRS(SPI.Port.kMXP);
 
-    // ahrs = new SuperAHRS(SPI.Port.kMXP);
+    distl = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
+        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
 
-    // linder = new LineFinder(0, 1, swerve);
+    distr = new DistanceSensor(1, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1,
+        Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
+        
+    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
+        LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
+        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
 
-    // line = new DigitalInput(3);
+    lineup = new Lineup(distl, distr, driver, swerve, 0);
 
-    // ultra = new Ultrasonic(1);
-
-    distl = new DistanceSensor(0, Constants.distanceSensora3, Constants.distanceSensorb3, Constants.distanceSensorc3,
-        Constants.distanceSensord3, Constants.distanceSensore3, Constants.distanceSensorf3);
-    /*
-     * distr = new DistanceSensor(0, Constants.distanceSensora1,
-     * Constants.distanceSensorb1, Constants.distanceSensorc1,
-     * Constants.distanceSensord1, Constants.distanceSensore1,
-     * Constants.distanceSensorf1);
-     * 
-     * //lineup = new Lineup(distl, distr, driver, swerve, 0);
-     * 
-     * /*swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin,
-     * LFEncMax, LFEncHome, LBrotateMotorID, LBdriveMotorID, LBEncMin, LBEncMax,
-     * LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
-     * RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs,
-     * robotWidth, robotLength);
-     */
+    object = ObjectType.HATCH;
+    
   }
 
   /**
@@ -185,7 +166,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    // joystickControls();
+    driverControls();
   }
 
   /**
@@ -193,7 +174,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    count = 0;
   }
 
   /**
@@ -201,81 +181,101 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    SmartDashboard.putNumber("Distance", distl.getDistance());
-    /*
-     * if (driver.isAPushed() && !disabled) { voltages[count] =
-     * cal.getAverageVoltage(); count++; }
-     * 
-     * if (count == 21 && !disabled) { disabled = true; for (int i = 0; i < 21; i++)
-     * { System.out.println(voltages[i]); } }
-     * 
-     * driver.clearA();
-     */
+    driverControls();
+
+    SmartDashboard.putNumber("Left", distl.getDistance());
+    SmartDashboard.putNumber("Right", distr.getDistance());
+    SmartDashboard.putNumber("Left Rounded", (double)Math.round(100 * distl.getDistance())/100);
+    SmartDashboard.putNumber("Right Rounded", (double)Math.round(100 * distr.getDistance())/100);
+    /* if (driver.isAPushed() && !disabled) {
+      voltages[count] = cal.getAverageVoltage();
+      count++;
+    }
+
+    if (count == 21 && !disabled) {
+      disabled = true;
+      for (int i = 0; i < 21; i++) {
+        System.out.println(voltages[i]);
+      }
+    }
+
+    driver.clearA(); */
+
   }
 
   public void driverControls() {
-    /*
-     * if (shooter.isBackHeld()) { if (driver.isDPadUpHeld()) {
-     * linder.searchLeft(LineFinder.SearchDirection.UP); } else if
-     * (driver.isDPadRightPushed()) {
-     * linder.searchLeft(LineFinder.SearchDirection.RIGHT); } else if
-     * (driver.isDPadLeftPushed()) {
-     * linder.searchLeft(LineFinder.SearchDirection.LEFT); } } else if
-     * (driver.isStartHeld()) { if (driver.isDPadUpHeld()) {
-     * linder.searchRight(LineFinder.SearchDirection.UP); } else if
-     * (driver.isDPadRightPushed()) {
-     * linder.searchRight(LineFinder.SearchDirection.RIGHT); } else if
-     * (driver.isDPadLeftPushed()) {
-     * linder.searchRight(LineFinder.SearchDirection.LEFT); } } else if
-     * (driver.isXPushed()) { linder.searchCancel(); }
-     */
+    // ################################################
+    // #### shared Controls ####
+    // ################################################
+    /* if (driver.isStartPushed() && shooter.isStartPushed()) {
+      //auto get on HAB platform
+    } */
 
-    if (driver.isAHeld() && driver.isBackHeld()) {
+    // ################################################
+    // #### Driver Controls ####
+    // ################################################
+    if (driver.isAHeld() && driver.isBackPushed()) {
       lineup.run(Lineup.AlignDirection.LEFT);
-    } else if (driver.isAHeld() && driver.isStartHeld()) {
+    } else if (driver.isAHeld() && driver.isStartPushed()) {
       lineup.run(Lineup.AlignDirection.RIGHT);
     }
 
+    if (driver.getRawAxis(2) > .5) {// FieldCentric
+      swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+    } else if (driver.getRawAxis(3) > .5) {// RobotCentric
+      swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+    }
+
+    if (driver.isLBHeld()) {// sniper
+      swerve.setDriveSpeed(0.2);
+    } else if (driver.isRBHeld()) {// turbo
+      swerve.setDriveSpeed(0.7);
+    } else {// regular
+      swerve.setDriveSpeed(0.4);
+    }
+
+    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
+
+    switch (driver.getPOV()) {
+    case 0:
+      swerve.changeFront(Side.NORTH);
+      break;
+    case 90:
+      swerve.changeFront(Side.EAST);
+      break;
+    case 180:
+      swerve.changeFront(Side.SOUTH);
+      break;
+    case 270:
+      swerve.changeFront(Side.WEST);
+      break;
+    }
+
+    
+
+     if (driver.isXPushed())
+      swerve.resetOrentation(); 
+    // swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
+
+    // ################################################
+    // #### Shooter Controls ####
+    // ################################################
+    /* if(shooter.isYPushed()) {
+      claw.grab(object);
+    } else if (shooter.isXPushed()) {
+      claw.drop(object);
+    }
+
+    if (shooter.isAPushed()) {
+      if (object == ObjectType.HATCH) {
+        object = ObjectType.CARGO;
+      } else {
+        object = ObjectType.HATCH;
+      }
+    } */
+
     driver.clearButtons();
-    driver.clearStart();
-    driver.clearBack();
+    //shooter.clearButtons();
   }
 
-  /*
-   * public void joystickControls() { //
-   * ################################################ // #### shared Controls ####
-   * // ################################################ /* if
-   * (driver.isStartPushed() && shooter.isStartPushed()) { //auto get on HAB
-   * platform }
-   * 
-   * 
-   * // ################################################ // #### Driver Controls
-   * #### // ################################################
-   * 
-   * if (driver.getRawAxis(2) > .5) {// FieldCentric
-   * swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC); } else if
-   * (driver.getRawAxis(3) > .5) {// RobotCentric
-   * swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC); }
-   * 
-   * if (driver.isLBHeld()) {// sniper swerve.setDriveSpeed(0.3); } else if
-   * (driver.isRBHeld()) {// turbo swerve.setDriveSpeed(0.7); } else {// regular
-   * swerve.setDriveSpeed(0.5); }
-   * 
-   * swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1),
-   * driver.getRawAxis(4));
-   * 
-   * switch (driver.getPOV()) { case 0:
-   * swerve.changeFront(SwerveControl.Side.NORTH); break; case 90:
-   * swerve.changeFront(SwerveControl.Side.EAST); break; case 180:
-   * swerve.changeFront(SwerveControl.Side.SOUTH); break; case 270:
-   * swerve.changeFront(SwerveControl.Side.WEST); break; }
-   * 
-   * if (driver.isXPushed()) swerve.resetOrentation(); //
-   * swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
-   * 
-   * // ################################################ // #### Shooter Controls
-   * #### // ################################################
-   * 
-   * driver.clearButtons(); // shooter.clearButtons(); }
-   */
 }

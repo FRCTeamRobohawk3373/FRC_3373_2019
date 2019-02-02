@@ -2,100 +2,148 @@ package frc.team3373.autonomous;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.robot.DistanceSensor;
 import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SwerveControl;
+import frc.team3373.robot.SwerveControl.DriveMode;
 
-public class Lineup {
+public class Lineup extends PIDSubsystem {
 
-    DistanceSensor dleft; // Right and left distance sensors
-    DistanceSensor dright;
+    private DistanceSensor dleft; // Right and left distance sensors
+    private DistanceSensor dright;
 
-    SuperJoystick joystick; // Shooter joystick
+    private SuperJoystick joystick; // Shooter joystick
 
-    SwerveControl swerve;
+    private SwerveControl swerve;
 
-    DigitalInput line;
+    private DigitalInput line;
 
-    AlignDirection align; // Holds which way the line is from the robot
-
-    SwerveControl.DriveMode mode; // Holds previous swerve DriveMode
-
-    double speed;
+    private double speed;
 
     public static enum AlignDirection {
-        RIGHT, LEFT, NONE
+        RIGHT, LEFT
     }
 
-    public Lineup(DistanceSensor dl, DistanceSensor dr, SuperJoystick driver, SwerveControl swerve, int linePort) {
-        align = AlignDirection.NONE; // Initializes align and line sensor
+    public Lineup(DistanceSensor dl, DistanceSensor dr, SuperJoystick driver, SwerveControl sw, int linePort) {
+        super("Lineup", 0.025, 0.0022, 0);
         line = new DigitalInput(linePort);
-        speed = SmartDashboard.getNumber("Speed", 0.2);
+        swerve = sw;
+        dleft = dl;
+        dright = dr;
+        joystick = driver;
+
+        getPIDController().setContinuous(false);
+        getPIDController().setInputRange(3, 32);
+        getPIDController().setOutputRange(-0.2, 0.2);
+    }
+
+    public void initDefaultCommand() {
+    }
+
+    @Override
+    protected double returnPIDInput() {
+        double rdist = (double)Math.round(100 * dright.getDistance())/100;
+        double ldist = (double)Math.round(100 * dleft.getDistance())/100;
+
+        if (rdist == -2.0 && ldist == -2.0) {
+            rdist = 0; 
+            ldist = 0;
+        } else if (ldist == -2.0) {
+            ldist = 32.0;
+        } else if (rdist == -2.0) {
+            rdist = 32.0;
+        }
+
+        return (rdist - ldist) + 2.8;
+    }
+
+    @Override
+    protected void usePIDOutput(double output) {
+        swerve.calculateAutoSwerveControl(0, 0, output);
     }
 
     public void run(AlignDirection al) {
-        mode = swerve.getControlMode(); // Gets swerve control mode
-        swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+        SmartDashboard.putBoolean("Aligned", false);
+
+        DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
+        swerve.setControlMode(DriveMode.ROBOTCENTRIC);
 
         int state = 0; // Stores the step that the lineup is on
 
-        align = al;
+        AlignDirection align = al; // Holds which way the line is from the robot
+
+        getPIDController().enable();
+        getPIDController().setAbsoluteTolerance(0.1);
+
+        int count = 0;
+
         while (!joystick.isXHeld() && !RobotState.isDisabled()) {
-            switch (state) {
-            case 0: // Inital state: Checks which way the robot is rotated according to the distance
-                    // sensors and rotates
-                if (dleft.getDistance() == dright.getDistance()) {
-                    state = 2;
-                } else if (dleft.getDistance() > dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, speed); // Rotate clockwise
-                    state++;
-                } else if (dleft.getDistance() < dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, -speed); // Rotate counter-clockwise
-                    state++;
-                }
-                break;
-            case 1: // Rotating: after distance sensors get the same length, stop swerve
-                if (dleft.getDistance() == dright.getDistance()) {
-                    swerve.calculateAutoSwerveControl(0, 0, 0);
-                    state++;
-                }
-                break;
-            case 2: // Rotation aligned: Drives in the direction the driver specifies
-                if (line.get()) {
-                    state = 4;
-                }
-                switch (align) {
-                case RIGHT:
-                    swerve.calculateAutoSwerveControl(0, speed, 0); // Drive right
-                    state++;
+            switch(state) {
+                case 0:
+                    if (getPIDController().onTarget() && count >= 200) {
+                        getPIDController().disable();
+                        swerve.calculateAutoSwerveControl(0, 0, 0);
+                        count = 0;
+                        state++;
+                    } else if (getPIDController().onTarget()) {
+                        count++;
+                    } else if (count != 0 && !getPIDController().onTarget()) {
+                        count = 0;
+                    }
                     break;
-                case LEFT:
-                    swerve.calculateAutoSwerveControl(180, speed, 0); // Drive left
-                    state++;
+                case 1:
+                    if (line.get()) {
+                        swerve.setControlMode(mode);
+                        SmartDashboard.putBoolean("Aligned", true);
+                        return;
+                    }
+                    switch(align) {
+                        case RIGHT:
+                            swerve.calculateAutoSwerveControl(0, 0.1, 0);
+                            state++;
+                            break;
+                        case LEFT:
+                            swerve.calculateAutoSwerveControl(180, 0.1, 0);
+                            state++;
+                            break;
+                        default:
+                            System.out.println("AlignDirection must be defined");
+                            swerve.setControlMode(mode);
+                            SmartDashboard.putBoolean("Aligned", true);
+                            return;
+                    }
                     break;
+                case 2:
+                    if (line.get() && count == 5) {
+                        state++;
+                    } else if (line.get()) {
+                        count++;
+                    } else if (count != 0 && !line.get()) {
+                        count = 0;
+                    }
+                    break;
+                case 3:
+                    getPIDController().setAbsoluteTolerance(0.05);
+                    getPIDController().enable();
+                    while(!joystick.isXHeld() && !RobotState.isDisabled()) {
+                        if (getPIDController().onTarget()) {
+                            getPIDController().disable();
+                            swerve.calculateAutoSwerveControl(0, 0, 0);
+                            swerve.setControlMode(mode);
+                            SmartDashboard.putBoolean("Aligned", true);
+                            return;
+                        }
+                    }
                 default:
-                    System.out.println("AlignDirection cannot be NONE");
-                    break;
-                }
-                break;
-            case 3: // Position aligning: if the line is seen, stop the swerve
-                if (line.get()) {
+                    System.out.println("State must be 0-3");
+                    getPIDController().disable();
                     swerve.calculateAutoSwerveControl(0, 0, 0);
-                    state++;
-                }
-                break;
-            case 4: // Aligned: resets swerve and align direction
-                swerve.calculateAutoSwerveControl(0, 0, 0);
-                swerve.setControlMode(mode);
-                align = AlignDirection.NONE;
-                return;
-            default:
-                System.out.println("Illegal state number");
-                return;
+                    swerve.setControlMode(mode);
+                    SmartDashboard.putBoolean("Aligned", true);
+                    return;
             }
         }
-        swerve.calculateAutoSwerveControl(0, 0, 0);
     }
-
 }

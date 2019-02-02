@@ -1,7 +1,6 @@
 package frc.team3373.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensor {
 
@@ -46,7 +45,7 @@ public class DistanceSensor {
     public double getDistance() {
         double x = sensor.getAverageVoltage();
 
-        if (x < 0.42) {
+        if (x < 0.42) { // Voltage is out of range
             return -2;
         }
 

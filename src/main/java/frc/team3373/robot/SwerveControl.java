@@ -1,16 +1,14 @@
 package frc.team3373.robot;
 
-import java.util.NoSuchElementException;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveControl {
 
-	public enum Side {
+	public static enum Side {
 		NORTH, SOUTH, EAST, WEST;
 	}
-
-	public enum DriveMode {
+	
+	public static enum DriveMode {
 		ROBOTCENTRIC, FIELDCENTRIC, OBJECTCENTRIC;
 	}
 
@@ -71,6 +69,11 @@ public class SwerveControl {
 		BRWheel = new SwerveWheel("BackRight", RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,
 				rotAngle);
 
+		FLWheel.setPID(Constants.FLP, Constants.FLI, Constants.FLD);
+		BLWheel.setPID(Constants.BLP, Constants.BLI, Constants.BLD);
+		FRWheel.setPID(Constants.FRP, Constants.FRI, Constants.FRD);
+		BRWheel.setPID(Constants.BRP, Constants.BRI, Constants.BRD);
+
 		wheelArray = new SwerveWheel[] { FLWheel, BLWheel, BRWheel, FRWheel };
 
 	}
@@ -79,12 +82,12 @@ public class SwerveControl {
 																										// Driving
 																										// Speed, rotate
 																										// speed
-		double translationalXComponent = 0;
-		double translationalYComponent = 0;
+		double translationalXComponent=0;
+		double translationalYComponent=0;
 		double translationalMagnitude;
 		double translationalAngle;
 
-		double rAxis = rotateSpeed;
+		double rAxis=rotateSpeed;
 		double rotateXComponent;
 		double rotateYComponent;
 
@@ -92,30 +95,31 @@ public class SwerveControl {
 		if (driveSpeed > 1) {
 			driveSpeed = 1;
 		}
-
+		
 		if (rotateSpeed > 1) {
 			rotateSpeed = 1;
-		} else if (rotateSpeed < -1) {
+		} else if(rotateSpeed<-1){
 			rotateSpeed = -1;
 		}
-
+		
 		if (driveAngle >= 360) {
-			driveAngle = driveAngle % 360;
+			driveAngle=driveAngle % 360;
 		} else if (driveAngle < 0) {
-			driveAngle = driveAngle % 360;
+			driveAngle=driveAngle % 360;
 			driveAngle += 360;
 		}
-
-		if (rotateSpeed == 0) {
+		
+		/*if (rotateSpeed == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
 				stoppedRotating = false;
 			}
 			rAxis = getRotationalCorrection();
 			rotateSpeed = rAxis;
-		} else {
+		}else{
 			stoppedRotating = true;
-		}
+		}*/
+		 
 
 		if (isFieldCentric) {
 			// if in field centric mode make offset equal to the current angle of the navX
@@ -226,7 +230,8 @@ public class SwerveControl {
 		// angle of joystick
 		translationalAngle = Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent));
 
-		if (RX == 0) {
+		
+		/*if (RX == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
 				stoppedRotating = false;
@@ -235,7 +240,9 @@ public class SwerveControl {
 			RX = rAxis;
 		} else {
 			stoppedRotating = true;
-		}
+		}*/
+		
+		 
 
 		if (isFieldCentric) {
 			// if in field centric mode make offset equal to the current angle of the navX
@@ -255,7 +262,7 @@ public class SwerveControl {
 		// calculates y component of translation vector
 		translationalYComponent = Math.sin(Math.toRadians(translationalAngle)) * translationalMagnitude;
 		// calculates x component of translation vector
-		translationalXComponent = Math.cos(Math.toRadians(translationalAngle)) * translationalMagnitude;
+		translationalXComponent = Math.cos(Math.toRadians(translationalAngle)) * translationalMagnitude; 
 		// calculates y component of translation vector
 
 		if (LY == 0 && LX == 0 && RX == 0) {
@@ -376,11 +383,11 @@ public class SwerveControl {
 			break;
 		}
 	}
-
+	
 	public DriveMode getControlMode() {
-		if (isFieldCentric) {
+		if(isFieldCentric){
 			return DriveMode.FIELDCENTRIC;
-		} else if (isObjectCentric) {
+		}else if(isObjectCentric){
 			return DriveMode.OBJECTCENTRIC;
 		}
 		return DriveMode.ROBOTCENTRIC;
@@ -435,9 +442,11 @@ public class SwerveControl {
 	}
 
 	public void printPositions() {
-		for (SwerveWheel wheel : wheelArray)
-			System.out.print(wheel.name + "'s position: " + wheel.getRawEncoderValue() + ", ");
-		System.out.println();
+		for (SwerveWheel wheel : wheelArray) {
+			//System.out.print(wheel.name + "'s position: " + wheel.getRawEncoderValue() + ", ");
+			SmartDashboard.putNumber(wheel.name, wheel.getRawEncoderValue());
+		}
+		//System.out.println();
 	}
 
 	public void calibrateMinMax() {
@@ -460,9 +469,9 @@ public class SwerveControl {
 					if (previousValue == currentValue) {
 						sameNumberCount++;
 						if (sameNumberCount > 20) {
-							if (speed < .1)
+							if(speed<.1)
 								speed += 0.001;
-							wheel.rawRotate(speed);
+								wheel.rawRotate(speed);
 							sameNumberCount = 0;
 						}
 					} else {
@@ -481,7 +490,7 @@ public class SwerveControl {
 
 	public void calibrateHome() {
 		for (SwerveWheel wheel : wheelArray)
-			System.out.print(wheel.name + " Home: " + wheel.getRawEncoderValue() + " ");
+			System.out.print(wheel.name + " Home: " + wheel.getRawEncoderValue()+" ");
 		System.out.println();
 	}
 
