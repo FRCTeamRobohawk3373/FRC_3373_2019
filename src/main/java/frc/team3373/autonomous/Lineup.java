@@ -63,7 +63,31 @@ public class Lineup extends PIDSubsystem {
         swerve.calculateAutoSwerveControl(0, 0, output);
     }
 
-    public void run(AlignDirection al) {
+    public void square() {
+        int count = 0;
+
+        DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
+        swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+
+        getPIDController().setAbsoluteTolerance(0.1); // Sets deadband for PID
+        getPIDController().enable(); // Enables PID loop
+
+        while (!joystick.isXHeld() && !RobotState.isDisabled()) {
+            if (getPIDController().onTarget() && count >= 200) { // If 200 or more samples are within the deadband,
+                                                                 // disable PID and return
+                getPIDController().disable();
+                swerve.calculateAutoSwerveControl(0, 0, 0);
+                swerve.setControlMode(mode);
+                return;
+            } else if (getPIDController().onTarget()) {
+                count++;
+            } else if (count != 0 && !getPIDController().onTarget()) {
+                count = 0;
+            }
+        }
+    }
+
+    public void align(AlignDirection al) {
         SmartDashboard.putBoolean("Aligned", false);
 
         DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
@@ -73,8 +97,8 @@ public class Lineup extends PIDSubsystem {
 
         AlignDirection align = al; // Holds which way the line is from the robot
 
-        getPIDController().enable(); // Enables PID loop
         getPIDController().setAbsoluteTolerance(0.1); // Sets deadband for PID
+        getPIDController().enable(); // Enables PID loop
 
         int count = 0; // Stores how many values have been tested
 
@@ -92,7 +116,8 @@ public class Lineup extends PIDSubsystem {
                     count = 0;
                 }
                 break;
-            case 1: // If the average distance is within the correct range, go to line finding. Else, go towards the right distance
+            case 1: // If the average distance is within the correct range, go to line finding.
+                    // Else, go towards the right distance
                 double dist = (dleft.getDistance() + dright.getDistance()) / 2;
                 if (dist < 12 && dist > 11) {
                     state = 3;

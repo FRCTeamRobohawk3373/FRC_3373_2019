@@ -430,7 +430,7 @@ public class SwerveControl {
 		rotateTarget = distance;
 	}
 
-	public void clearRotationTarge() {
+	public void clearRotationTarget() {
 		rotateTarget = 0;
 	}
 

@@ -215,9 +215,9 @@ public class Robot extends TimedRobot {
     // #### Driver Controls ####
     // ################################################
     if (driver.isAHeld() && driver.isBackPushed()) {
-      lineup.run(Lineup.AlignDirection.LEFT);
+      lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isAHeld() && driver.isStartPushed()) {
-      lineup.run(Lineup.AlignDirection.RIGHT);
+      lineup.align(Lineup.AlignDirection.RIGHT);
     }
 
     if (driver.getRawAxis(2) > .5) {// FieldCentric
