@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -74,6 +75,8 @@ public class Robot extends TimedRobot {
   ObjectType object;
 
   Claw claw;
+
+  Elevator elevator;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -181,7 +184,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    driverControls();
+    //driverControls();
+
+    SmartDashboard.putNumber("Y", driver.getRawAxis(5));
 
     SmartDashboard.putNumber("Left", distl.getDistance());
     SmartDashboard.putNumber("Right", distr.getDistance());
@@ -260,19 +265,35 @@ public class Robot extends TimedRobot {
     // ################################################
     // #### Shooter Controls ####
     // ################################################
-    /* if(shooter.isYPushed()) {
+    if(shooter.isYPushed()) {
       claw.grab(object);
     } else if (shooter.isXPushed()) {
       claw.drop(object);
     }
 
-    if (shooter.isAPushed()) {
-      if (object == ObjectType.HATCH) {
-        object = ObjectType.CARGO;
-      } else {
-        object = ObjectType.HATCH;
-      }
-    } */
+    if (shooter.isLBPushed()) {
+      object = ObjectType.HATCH;
+    } else if (shooter.isRBPushed()) {
+      object = ObjectType.CARGO;
+    }
+
+    if (shooter.getRawAxis(5) < -0.5){
+      claw.raise();
+    } else if (shooter.getRawAxis(5) > 0.5) {
+      claw.lower();
+    }
+
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.move(shooter.getRawAxis(1));
+    }
+
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(0, object);
+    } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
+      elevator.moveToHeight(1, object);
+    }  else if (shooter.isDPadUpPushed()) {
+      elevator.moveToHeight(2, object);
+    }
 
     driver.clearButtons();
     //shooter.clearButtons();

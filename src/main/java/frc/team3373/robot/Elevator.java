@@ -24,12 +24,8 @@ public class Elevator {
         joystick = shooter;
     }
 
-    public void raise() {
-        // Raise elevator
-    }
-
-    public void lower() {
-        // Lower elevator
+    public void move(double speed) {
+        // Move elevator
     }
 
     public void moveToHeight(int height, Robot.ObjectType obj) {

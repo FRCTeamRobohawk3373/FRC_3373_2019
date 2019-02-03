@@ -38,4 +38,12 @@ public class Claw {
             // Open arms
         }
     }
+
+    public void raise() {
+
+    }
+
+    public void lower() {
+        
+    }
 }
