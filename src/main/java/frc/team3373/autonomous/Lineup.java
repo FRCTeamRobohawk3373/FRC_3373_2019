@@ -20,8 +20,6 @@ public class Lineup extends PIDSubsystem {
 
     private DigitalInput line;
 
-    private double speed;
-
     public static enum AlignDirection {
         RIGHT, LEFT
     }
@@ -94,6 +92,28 @@ public class Lineup extends PIDSubsystem {
                     }
                     break;
                 case 1:
+                    double dist = (dleft.getDistance() + dright.getDistance()) / 2;
+                    if (dist < 12 && dist > 11) {
+                        state = 3;
+                    } else if (dist > 12) {
+                        System.out.println("Going forward");
+                        swerve.calculateAutoSwerveControl(90, 0.1, 0);
+                        state++;
+                    } else if (dist < 11) {
+                        System.out.println("Going backward");
+                        swerve.calculateAutoSwerveControl(270, 0.1, 0);
+                        state++;
+                    }
+                    break;
+                case 2:
+                    dist = (dleft.getDistance() + dright.getDistance()) / 2;
+                    if (dist < 12 && dist > 11) {
+                        System.out.println("Stopping");
+                        swerve.calculateAutoSwerveControl(0, 0, 0);
+                        state++;
+                    }
+                    break;
+                case 3:
                     if (line.get()) {
                         swerve.setControlMode(mode);
                         SmartDashboard.putBoolean("Aligned", true);
@@ -115,7 +135,7 @@ public class Lineup extends PIDSubsystem {
                             return;
                     }
                     break;
-                case 2:
+                case 4:
                     if (line.get() && count == 5) {
                         state++;
                     } else if (line.get()) {
@@ -124,7 +144,7 @@ public class Lineup extends PIDSubsystem {
                         count = 0;
                     }
                     break;
-                case 3:
+                case 5:
                     getPIDController().setAbsoluteTolerance(0.05);
                     getPIDController().enable();
                     while(!joystick.isXHeld() && !RobotState.isDisabled()) {
