@@ -27,6 +27,10 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  public enum ObjectType {
+    HATCH, CARGO
+  }
+
   int LBdriveMotorID = 2;
 	int LBrotateMotorID = 1;
 	int LBEncHome = 802; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
@@ -65,6 +69,12 @@ public class Robot extends TimedRobot {
 
   DistanceSensor distl;
   DistanceSensor distr;
+
+  ObjectType object;
+
+  Claw claw;
+
+  Elevator elevator;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -87,6 +97,8 @@ public class Robot extends TimedRobot {
     distl = new DistanceSensor(1, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2, Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
 
     line = new Lineup(distl, distr, driver, swerve, 2);
+
+    object = ObjectType.HATCH;
   }
 
   /**
@@ -210,9 +222,35 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
+    /* if(shooter.isYPushed()) {
+      claw.grab(object);
+    } else if (shooter.isXPushed()) {
+      claw.drop(object);
+    }
 
+    if (shooter.isLBPushed()) {
+      object = ObjectType.HATCH;
+    } else if (shooter.isRBPushed()) {
+      object = ObjectType.CARGO;
+    }
 
+    if (shooter.getRawAxis(5) < -0.5){
+      claw.raise();
+    } else if (shooter.getRawAxis(5) > 0.5) {
+      claw.lower();
+    }
 
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.move(shooter.getRawAxis(1));
+    }
+
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(0, object);
+    } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
+      elevator.moveToHeight(1, object);
+    }  else if (shooter.isDPadUpPushed()) {
+      elevator.moveToHeight(2, object);
+    } */
 
     driver.clearButtons();
     shooter.clearButtons();
