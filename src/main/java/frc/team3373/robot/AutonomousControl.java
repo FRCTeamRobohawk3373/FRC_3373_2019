@@ -12,15 +12,15 @@ import frc.team3373.robot.SwerveControl.Side;
 
 public class AutonomousControl {
 
-	public SuperAHRS ahrs;
-	public SwerveControl swerve;
-	public Ultrasonic ultra;
-	public Object auto;
-	public DistanceSensor distl;
-	public DistanceSensor distr;
-	public SuperJoystick shooter;
-	public SuperJoystick driver;
-	public DigitalInput line;
+	private SuperAHRS ahrs;
+	private SwerveControl swerve;
+	private Ultrasonic ultra;
+	private Object auto;
+	private DistanceSensor distl;
+	private DistanceSensor distr;
+	private SuperJoystick shooter;
+	private SuperJoystick driver;
+	private DigitalInput line;
 
 	//private PIDController pidAngle;
 	private PIDController pidRel;
@@ -177,6 +177,10 @@ public class AutonomousControl {
 		rotateAbsolute(270, 0.2);
 		driveForRotations(20, 90, 0.2);
 		rotateAbsolute(0, 0.2);
+	}
+
+	public SwerveControl getSwerve() {
+		return swerve;
 	}
 
 	// Calls rotateAbsolute(angle, speed) until finished
