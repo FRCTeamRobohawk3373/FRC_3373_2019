@@ -25,39 +25,38 @@ import frc.team3373.robot.SwerveControl;
  */
 public class HABPlatformAuto {
 
-    //AutonomousControl controller;
-    SuperJoystick joystick;
+    //private AutonomousControl controller;
+    private SuperJoystick joystick;
 
-    byte state = 0;
-    int count = 0;
+    private byte state = 0;
+    private int count = 0;
 
-    DigitalInput frontHome;
-    DigitalInput backHome;
+    private DigitalInput frontHome;
+    private DigitalInput backHome;
 
-    DistanceSensor frontSensor;
-    DistanceSensor backSensor;
+    private DistanceSensor frontSensor;
+    private DistanceSensor backSensor;
 
-    DoubleSolenoid frontSolenoid;
-    DoubleSolenoid backSolenoid;
+    private DoubleSolenoid frontSolenoid;
+    private DoubleSolenoid backSolenoid;
 
-    SwerveControl swerve;
+    private SwerveControl swerve;
 
-    WPI_TalonSRX driveMotor;
+    private WPI_TalonSRX driveMotor;
 
-    public HABPlatformAuto(SuperJoystick joy, SwerveControl sw, int talonid, int frontSolenoidFowardChannel,
+    private Lineup line;
+
+    public HABPlatformAuto(Lineup lineup, SuperJoystick joy, SwerveControl sw, int talonid, int frontSolenoidFowardChannel,
             int frontSolenoidReverseChannel, int backSolenoidFowardChannel, int backSolenoidReverseChannel,
             int frontLimitSwitch, int backLimitSwitch, int frontDistanceSensor, int backDistanceSensor) {
         // controller = control;
         joystick = joy;
         frontHome = new DigitalInput(frontLimitSwitch);
         backHome = new DigitalInput(backLimitSwitch);
+        line = lineup;
 
-        frontSensor = new DistanceSensor(frontDistanceSensor, Constants.distanceSensora1, Constants.distanceSensorb1,
-                Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1,
-                Constants.distanceSensorf1);
-        backSensor = new DistanceSensor(backDistanceSensor, Constants.distanceSensora1, Constants.distanceSensorb1,
-                Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1,
-                Constants.distanceSensorf1);
+        frontSensor = new DistanceSensor(frontDistanceSensor, 1);
+        backSensor = new DistanceSensor(backDistanceSensor, 1);
 
         frontSolenoid = new DoubleSolenoid(frontSolenoidFowardChannel, frontSolenoidReverseChannel);
         backSolenoid = new DoubleSolenoid(backSolenoidFowardChannel, backSolenoidReverseChannel);
@@ -82,6 +81,7 @@ public class HABPlatformAuto {
             switch (state) {
             case 0:// preclimb
                 SmartDashboard.putString("Current Step", "park Arms");
+                line.square();
                 state++;
                 break;
             case 1:// climb

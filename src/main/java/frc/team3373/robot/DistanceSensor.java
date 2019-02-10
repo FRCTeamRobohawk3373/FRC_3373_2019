@@ -10,12 +10,14 @@ public class DistanceSensor {
 
     private boolean useLookup = false;
 
-    private double a1;
-    private double b1;
-    private double c1;
-    private double d1;
-    private double e1;
-    private double f1;
+    private double a;
+    private double b;
+    private double c;
+    private double d;
+    private double e;
+    private double f;
+
+    Constants con = new Constants();
 
     public DistanceSensor(int port, double[][] lookupTable) {
         sensor = new AnalogInput(port);
@@ -27,15 +29,15 @@ public class DistanceSensor {
         sensor.setAverageBits(8); // Sets how many readings should be averaged, 2^bits
     }
 
-    public DistanceSensor(int port, double a, double b, double c, double d, double e, double f) {
+    public DistanceSensor(int port, int serial) {
         sensor = new AnalogInput(port);
 
-        a1 = a;
-        b1 = b;
-        c1 = c;
-        d1 = d;
-        e1 = e;
-        f1 = f;
+        a = Constants.distanceSensorValues[serial][0];
+        b = Constants.distanceSensorValues[serial][1];
+        c = Constants.distanceSensorValues[serial][2];
+        d = Constants.distanceSensorValues[serial][3];
+        e = Constants.distanceSensorValues[serial][4];
+        f = Constants.distanceSensorValues[serial][5];
 
         useLookup = false;
 
@@ -50,7 +52,7 @@ public class DistanceSensor {
         }
 
         if (!useLookup) {
-            return ((a1 * Math.pow(x, b1)) + c1) / ((d1 * Math.pow(x, e1)) + f1); // Curve fit equation:
+            return ((a * Math.pow(x, b)) + c) / ((d * Math.pow(x, e)) + f); // Curve fit equation:
                                                                                   // y_1\sim\frac{ax_1^b+c}{dx_1^f+g}
                                                                                   // (Desmos)
         } else {

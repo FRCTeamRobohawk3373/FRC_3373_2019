@@ -35,13 +35,6 @@ public class Constants {
         {3.00, 3}
     };
 
-    public static double distanceSensora1 = 31.1534; //Constants for lineFit
-    public static double distanceSensorb1 = 3.01684;
-    public static double distanceSensorc1 = 0.0477401;
-    public static double distanceSensord1 = 2.97265;
-    public static double distanceSensore1 = 4.14756;
-    public static double distanceSensorf1 = -0.00588378;
-
     public static double[][] distanceTable2 = { //Data for sensor 2
         {0.43, 31},
         {0.45, 29},
@@ -65,14 +58,7 @@ public class Constants {
         {2.51, 4},
         {3.14, 3}
     };
-
-    public static double distanceSensora2 = 31.1277;
-    public static double distanceSensorb2 = 2.03942;
-    public static double distanceSensorc2 = 1.285;
-    public static double distanceSensord2 = 2.97952;
-    public static double distanceSensore2 = 3.08719;
-    public static double distanceSensorf2 = 0.00183152;
-
+    
     public static double[][] distanceTable3 = {
         {0.39, 31},
         {0.42, 29},
@@ -97,14 +83,12 @@ public class Constants {
         {2.76, 3}
     };
 
-    public static double distanceSensora3 = 20.0191;
-    public static double distanceSensorb3 = -1.25134;
-    public static double distanceSensorc3 = 0.434041;
-    public static double distanceSensord3 = 4.29208;
-    public static double distanceSensore3 = -0.00667298;
-    public static double distanceSensorf3 = -2.24084;
-
-
+    public static double[][] distanceSensorValues = {
+        {},
+        {31.1534, 3.01684, 0.0477401, 2.97265, 4.14756, -0.00588378}, 
+        {31.1277, 2.03942, 1.285, 2.97952, 3.08719, 0.00183152},
+        {20.0191, -1.25134, 0.434041, 4.29208, -0.00667298, -2.24084}
+    };
 
     public static double FLP = 5;//close loop error =1
     public static double FLI = 0.001;
@@ -121,4 +105,20 @@ public class Constants {
     public static double BRP = 5;//close loop error =1
     public static double BRI = 0.0015;
     public static double BRD = 15;
+
+    public static double lineupP = 0.025;
+    public static double lineupI = 0.0022;
+    public static double lineupD = 0;
+
+    public static double angleP = 0;
+    public static double angleI = 0;
+    public static double angleD = 0;
+
+    public static double absP = 0;
+    public static double absI = 0;
+    public static double absD = 0;
+
+    public static double relP = 0.010575;
+    public static double relI = 0;
+    public static double relD = 0;
 }

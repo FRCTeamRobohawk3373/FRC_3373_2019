@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
-import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.DigitalInput;
+//import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -67,8 +68,6 @@ public class Robot extends TimedRobot {
 
   SuperAHRS ahrs;
 
-  Lineup lineup;
-
   DistanceSensor distl;
   DistanceSensor distr;
 
@@ -77,6 +76,9 @@ public class Robot extends TimedRobot {
   Claw claw;
 
   Elevator elevator;
+
+  AutonomousControl control;
+  DigitalInput line;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -97,19 +99,18 @@ public class Robot extends TimedRobot {
 
     // cal = new AnalogInput(0);
 
+    line = new DigitalInput(0);
+
     ahrs = new SuperAHRS(SPI.Port.kMXP);
 
-    distl = new DistanceSensor(0, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2,
-        Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
-
-    distr = new DistanceSensor(1, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1,
-        Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
-        
+    distl = new DistanceSensor(0, 2);
+    distr = new DistanceSensor(1, 1);
+    
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
         LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
         RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
 
-    lineup = new Lineup(distl, distr, driver, swerve, 0);
+    control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
 
     object = ObjectType.HATCH;
     
@@ -164,12 +165,28 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void teleopInit() {
+    SmartDashboard.setDefaultNumber("P", Constants.relP);
+    SmartDashboard.setDefaultNumber("I", Constants.relI);
+    SmartDashboard.setDefaultNumber("D", Constants.relD);
+    SmartDashboard.setDefaultNumber("PID Count", 0);
+    SmartDashboard.setDefaultNumber("PID Tolerance", 0.1);
+    SmartDashboard.setDefaultBoolean("Self-Disable", true);
+    SmartDashboard.setDefaultBoolean("Semi-Auto", false);
+    SmartDashboard.setDefaultNumber("Speed", 0.2);
+    SmartDashboard.setDefaultNumber("pOut Tolerance", 100);
+    SmartDashboard.setDefaultNumber("outCount", 100);
+    SmartDashboard.setDefaultNumber("Angle", 90);
+  }
+
   /**
    * This function is called periodically during operator control.
    */
   @Override
   public void teleopPeriodic() {
     driverControls();
+    SmartDashboard.putNumber("Yaw", ahrs.getYaw());
   }
 
   /**
@@ -186,7 +203,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //driverControls();
 
-    SmartDashboard.putNumber("Y", driver.getRawAxis(5));
+    if (driver.isAHeld()) {
+      control.square();
+    }
 
     SmartDashboard.putNumber("Left", distl.getDistance());
     SmartDashboard.putNumber("Right", distr.getDistance());
@@ -219,10 +238,20 @@ public class Robot extends TimedRobot {
     // ################################################
     // #### Driver Controls ####
     // ################################################
-    if (driver.isAHeld() && driver.isBackPushed()) {
+    /* if (driver.isAHeld() && driver.isBackPushed()) {
       lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isAHeld() && driver.isStartPushed()) {
       lineup.align(Lineup.AlignDirection.RIGHT);
+    } */ 
+
+    if (driver.isAHeld() && driver.isBackPushed()) {
+      control.lineup(Lineup.AlignDirection.LEFT);
+    } else if (driver.isAHeld() && driver.isStartPushed()) {
+      control.lineup(Lineup.AlignDirection.RIGHT);
+    }
+
+    if (driver.isBPushed()) {
+      control.rotateAbsolute((float)SmartDashboard.getNumber("Angle", 90), SmartDashboard.getNumber("Speed", 0.2));
     }
 
     if (driver.getRawAxis(2) > .5) {// FieldCentric
@@ -258,14 +287,14 @@ public class Robot extends TimedRobot {
 
     
 
-     if (driver.isXPushed())
+     if (driver.isYPushed())
       swerve.resetOrentation(); 
     // swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 
     // ################################################
     // #### Shooter Controls ####
     // ################################################
-    if(shooter.isYPushed()) {
+    /* if(shooter.isYPushed()) {
       claw.grab(object);
     } else if (shooter.isXPushed()) {
       claw.drop(object);
@@ -293,7 +322,7 @@ public class Robot extends TimedRobot {
       elevator.moveToHeight(1, object);
     }  else if (shooter.isDPadUpPushed()) {
       elevator.moveToHeight(2, object);
-    }
+    } */
 
     driver.clearButtons();
     //shooter.clearButtons();
