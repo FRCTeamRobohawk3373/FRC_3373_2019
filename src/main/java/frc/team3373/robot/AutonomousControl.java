@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
+import frc.team3373.robot.SwerveControl.DriveMode;
+import frc.team3373.robot.SwerveControl.Side;
 
 public class AutonomousControl {
 
@@ -22,7 +24,7 @@ public class AutonomousControl {
 
 	//private PIDController pidAngle;
 	private PIDController pidRel;
-	//private PIDController pidAbs;
+	private PIDController pidAbs;
 
 	private SuperPIDOutput swerveOut;
 	//private DistanceSensorPID distPID;
@@ -46,7 +48,7 @@ public class AutonomousControl {
 		//distPID = new DistanceSensorPID(distl, distr);
 
 		//pidAngle = new PIDController(Constants.angleP, Constants.angleI, Constants.angleD, this.ahrs, swerveOut);
-		//pidAbs = new PIDController(Constants.absP, Constants.absI, Constants.absD, this.ahrs, swerveOut);
+		pidAbs = new PIDController(Constants.absP, Constants.absI, Constants.absD, this.ahrs, swerveOut);
 		pidRel = new PIDController(Constants.relP, Constants.relI, Constants.relD, this.ahrs, swerveOut);
 
 		pidRel.setOutputRange(-0.2, 0.2);
@@ -89,6 +91,20 @@ public class AutonomousControl {
 			e.printStackTrace();
 		}
 		swerve.calculateAutoSwerveControl(angle, 0, 0);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void driveForRotations(double distance, float angle, double speed) {
+		swerve.resetTravelDistance();
+		swerve.calculateAutoSwerveControl(angle, speed, 0);
+		while (swerve.getTravelDistance() <= distance && !driver.isXHeld() && !RobotState.isDisabled()) {
+			swerve.calculateAutoSwerveControl(angle, speed, 0);
+		}
+		swerve.calculateAutoSwerveControl(0, 0, 0);
 	}
 
 	// Calls rotateRelative(angle, speed) until finished
@@ -108,13 +124,12 @@ public class AutonomousControl {
 		int outCount = 0;
 
 		double outputTolerance = SmartDashboard.getNumber("pOut Tolerance", 0.01); // 0.015
-		double outputCount = SmartDashboard.getNumber("outCount", 100); // 12500 or 7500
+		double outputCount = SmartDashboard.getNumber("outCount", 100); // 7500
 		double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
 
 		pidRel.setOutputRange(-speed, speed);
 		ahrs.setTargetAngle(targetAngle);
-		pidRel.setAbsoluteTolerance(SmartDashboard.getNumber("PID Tolerance", 0.1)); // 0.05
-
+		pidRel.setAbsoluteTolerance(0.1);
 		SmartDashboard.putBoolean("Semi-Auto", true);
 		pidRel.enable();
 		while (!driver.isXHeld() && !RobotState.isDisabled()) {
@@ -129,9 +144,11 @@ public class AutonomousControl {
 					return;
 				} else if (Math.abs(swerveOut.getPOutput()) < outputTolerance) {
 					outCount++;
+				} else if (outCount != 0 && !(Math.abs(swerveOut.getPOutput()) < outputTolerance)) {
+					outCount = 0;
 				}
 
-				if (pidRel.onTarget() && count >= countTolerance) { // If 200 or more samples are within the deadband, disable PID and return
+				/* if (pidRel.onTarget() && count >= countTolerance) { // If 200 or more samples are within the deadband, disable PID and return
 					pidRel.disable();
 					swerve.calculateAutoSwerveControl(0, 0, 0);
 					SmartDashboard.putNumber("onTarget Yaw", ahrs.getYaw());
@@ -141,7 +158,7 @@ public class AutonomousControl {
 					count++;
 				} else if (count != 0 && !pidRel.onTarget()) {
 					count = 0;
-				}
+				} */
 			}
 		}
 		pidRel.disable();
@@ -149,8 +166,22 @@ public class AutonomousControl {
 		SmartDashboard.putBoolean("Semi-Auto", false);
 	}
 
+	public void driveSquare() {
+		swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+		swerve.changeFront(Side.NORTH);
+		driveForRotations(20, 90, 0.2);
+		rotateAbsolute(90, 0.2);
+		driveForRotations(20, 90, 0.2);
+		rotateAbsolute(180, 0.2);
+		driveForRotations(20, 90, 0.2);
+		rotateAbsolute(270, 0.2);
+		driveForRotations(20, 90, 0.2);
+		rotateAbsolute(0, 0.2);
+	}
+
 	// Calls rotateAbsolute(angle, speed) until finished
 	public void rotateAbsolute(float angle, double speed) {
+		System.out.println("Starting turn");
 		double targetAngle = angle;
 		if (targetAngle >= 360) {
 			targetAngle -= 360;
@@ -161,23 +192,22 @@ public class AutonomousControl {
 		int count = 0;
 		int outCount = 0;
 
-		double outputTolerance = SmartDashboard.getNumber("pOut Tolerance", 0.01); // 0.015
-		double outputCount = SmartDashboard.getNumber("outCount", 100); // 12500 or 7500
-		double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
+		double outputTolerance = 0.015; // 0.015
+		double outputCount = 5000; // 12500 or 7500
+		double countTolerance = 6000; // 6000
 
-		pidRel.setOutputRange(-speed, speed);
+		pidAbs.setOutputRange(-speed, speed);
 		ahrs.setTargetAngle(targetAngle);
-		pidRel.setAbsoluteTolerance(SmartDashboard.getNumber("PID Tolerance", 0.1)); // 0.05
+		pidAbs.setAbsoluteTolerance(0.1); // 0.05
 
 		SmartDashboard.putBoolean("Semi-Auto", true);
-		pidRel.enable();
+		pidAbs.enable();
 		while (!driver.isXHeld() && !RobotState.isDisabled()) {
 			SmartDashboard.putNumber("Yaw", ahrs.getYaw());
-			SmartDashboard.putNumber("pOut", swerveOut.getPOutput());
 			if (SmartDashboard.getBoolean("Self-Disable", true)) {
 				if (swerveOut.getPOutput() == 0) {
 				} else if (Math.abs(swerveOut.getPOutput()) < outputTolerance && outCount >= outputCount) {
-					pidRel.disable();
+					pidAbs.disable();
 					swerve.calculateAutoSwerveControl(0, 0, 0);
 					SmartDashboard.putBoolean("Semi-Auto", false);
 					return;
@@ -185,20 +215,19 @@ public class AutonomousControl {
 					outCount++;
 				}
 
-				if (pidRel.onTarget() && count >= countTolerance) { // If 200 or more samples are within the deadband, disable PID and return
-					pidRel.disable();
+				if (pidAbs.onTarget() && count >= countTolerance) { // If 200 or more samples are within the deadband, disable PID and return
+					pidAbs.disable();
 					swerve.calculateAutoSwerveControl(0, 0, 0);
-					SmartDashboard.putNumber("onTarget Yaw", ahrs.getYaw());
 					SmartDashboard.putBoolean("Semi-Auto", false);
 					return;
-				} else if (pidRel.onTarget()) {
+				} else if (pidAbs.onTarget()) {
 					count++;
-				} else if (count != 0 && !pidRel.onTarget()) {
+				} else if (count != 0 && !pidAbs.onTarget()) {
 					count = 0;
 				}
 			}
 		}
-		pidRel.disable();
+		pidAbs.disable();
 		swerve.calculateAutoSwerveControl(0, 0, 0);
 		SmartDashboard.putBoolean("Semi-Auto", false);
 	}

@@ -1,7 +1,5 @@
 package frc.team3373.robot;
 
-import javax.swing.text.StyleContext.SmallAttributeSet;
-
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;

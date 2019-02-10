@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 //import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
@@ -80,6 +81,13 @@ public class Robot extends TimedRobot {
   AutonomousControl control;
   DigitalInput line;
 
+  Thread ahrsThread;
+
+  double[] voltages;
+  int count;
+  AnalogInput cal;
+  boolean disabled;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -90,16 +98,17 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    // voltages = new double[21];
+    voltages = new double[21];
 
     driver = new SuperJoystick(0);
     //shooter = new SuperJoystick(1);
 
-    // count = 0;
+    count = 0;
 
-    // cal = new AnalogInput(0);
+    cal = new AnalogInput(0);
 
-    line = new DigitalInput(0);
+
+    /* line = new DigitalInput(0);
 
     ahrs = new SuperAHRS(SPI.Port.kMXP);
 
@@ -110,9 +119,16 @@ public class Robot extends TimedRobot {
         LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
         RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
 
-    control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
+    control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line); */
 
     object = ObjectType.HATCH;
+
+    /* new Thread(()-> {
+      while(true){
+        SmartDashboard.putNumber("Yaw", ahrs.getYaw());
+        SmartDashboard.updateValues();
+      }
+    }).start(); */
     
   }
 
@@ -186,7 +202,10 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls();
-    SmartDashboard.putNumber("Yaw", ahrs.getYaw());
+    SmartDashboard.putNumber("Distance", swerve.getTravelDistance());
+    if (driver.isBackPushed()) {
+      swerve.resetTravelDistance();
+    }
   }
 
   /**
@@ -194,6 +213,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
+    count = 0;
   }
 
   /**
@@ -203,15 +223,10 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //driverControls();
 
-    if (driver.isAHeld()) {
+    /* if (driver.isAHeld()) {
       control.square();
-    }
-
-    SmartDashboard.putNumber("Left", distl.getDistance());
-    SmartDashboard.putNumber("Right", distr.getDistance());
-    SmartDashboard.putNumber("Left Rounded", (double)Math.round(100 * distl.getDistance())/100);
-    SmartDashboard.putNumber("Right Rounded", (double)Math.round(100 * distr.getDistance())/100);
-    /* if (driver.isAPushed() && !disabled) {
+    } */
+    if (driver.isAPushed() && !disabled) {
       voltages[count] = cal.getAverageVoltage();
       count++;
     }
@@ -223,7 +238,7 @@ public class Robot extends TimedRobot {
       }
     }
 
-    driver.clearA(); */
+    driver.clearA();
 
   }
 
@@ -251,7 +266,8 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isBPushed()) {
-      control.rotateAbsolute((float)SmartDashboard.getNumber("Angle", 90), SmartDashboard.getNumber("Speed", 0.2));
+      //control.rotateRelative((float)SmartDashboard.getNumber("Angle", 90), SmartDashboard.getNumber("Speed", 0.2));
+      control.driveSquare();
     }
 
     if (driver.getRawAxis(2) > .5) {// FieldCentric

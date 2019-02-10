@@ -366,6 +366,25 @@ public class SwerveControl {
 		distanceToCenter = distance;
 	}
 
+	public double getTravelDistance() {
+		double x = 0;
+		double y = 0;
+		for (SwerveWheel wheel : wheelArray) {
+			double[] distance = wheel.getPosition();
+			x += distance[0];
+			y += distance[1];
+		}
+		x = x / 4;
+		y = y / 4;
+		return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+	}
+
+	public void resetTravelDistance() {
+		for (SwerveWheel wheel : wheelArray) {
+			wheel.resetPosition();
+		}
+	}
+
 	public void setControlMode(DriveMode mode) {
 		switch (mode) {
 		case ROBOTCENTRIC:

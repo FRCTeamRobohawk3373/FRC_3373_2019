@@ -11,6 +11,27 @@ package frc.team3373.robot;
  * Add your docs here.
  */
 public class Constants {
+    public static double[][] distanceTable0 = {
+        {0.51, 25},
+        {0.57, 23},
+        {0.59, 21},
+        {0.61, 19},
+        {0.66, 17},
+        {0.73, 15},
+        {0.77, 14},
+        {0.83, 13},
+        {0.88, 12},
+        {0.94, 11},
+        {1.04, 10},
+        {1.15, 9},
+        {1.27, 8},
+        {1.48, 7},
+        {1.74, 6},
+        {2.04, 5},
+        {2.55, 4},
+        {3.09, 3}
+    };
+
     public static double[][] distanceTable1 = { //Data for sensor 1
         {0.42, 31},
         {0.44, 29},
@@ -84,7 +105,7 @@ public class Constants {
     };
 
     public static double[][] distanceSensorValues = {
-        {},
+        {21.1297, -1.86995, 15.6949, 0.0573428, 3.38124, 3.51125},
         {31.1534, 3.01684, 0.0477401, 2.97265, 4.14756, -0.00588378}, 
         {31.1277, 2.03942, 1.285, 2.97952, 3.08719, 0.00183152},
         {20.0191, -1.25134, 0.434041, 4.29208, -0.00667298, -2.24084}
@@ -114,7 +135,7 @@ public class Constants {
     public static double angleI = 0;
     public static double angleD = 0;
 
-    public static double absP = 0;
+    public static double absP = 0.010575;
     public static double absI = 0;
     public static double absD = 0;
 
