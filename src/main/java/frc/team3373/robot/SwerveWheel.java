@@ -24,6 +24,9 @@ public class SwerveWheel {
 	private boolean reverseDir=false;
 	
 	private double stepPerDegree;
+	private double positionOffset;
+
+	private double[] position;
 	
 	public SwerveWheel(String Name,int rotateMotorID, int driveMotorID,int EncMin,int EncMax,int EncHome,double rotationAngle){
 		rotateMotor = new WPI_TalonSRX(rotateMotorID);
@@ -33,6 +36,9 @@ public class SwerveWheel {
 		EHome=EncHome;
 		rotAngle=rotationAngle;
 		stepPerDegree= (EMax-EMin)/360.0;
+		positionOffset = 0;
+
+		position = new double[2];
 		
 		name = Name;
 		
@@ -55,6 +61,26 @@ public class SwerveWheel {
 	
 	public void setTargetAngle(double angle){
 		targetAngle=angle;
+	}
+
+	private void updatePosition() {
+		double encValue = driveMotor.getEncoder().getPosition() - positionOffset;
+		position[0] = encValue * Math.cos(targetAngle); // x
+		position[1] = encValue * Math.sin(targetAngle); // y
+
+		positionOffset = encValue;
+	}
+
+	public double[] getPosition() {
+		updatePosition();
+		return position;
+	}
+
+	public void resetPosition() {
+		positionOffset = driveMotor.getEncoder().getPosition();
+		position[0] = 0;
+		position[1] = 0;
+		updatePosition();
 	}
 	
 	public void setSpeed(double speed){

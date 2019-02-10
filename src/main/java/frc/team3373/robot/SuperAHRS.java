@@ -3,12 +3,15 @@ package frc.team3373.robot;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SuperAHRS extends AHRS {
 	// Reset function, get 0-360 rotation, bump detection (get bump), get altitude (starts at zero, positive numbers up)
 	
 	private double previousAccelerationZ;
 	private boolean hasBumped;
+
+	private double targetAngle;
 	
 	SuperAHRS (SPI.Port port) {
 		super(port);
@@ -45,5 +48,15 @@ public class SuperAHRS extends AHRS {
 	
 	public void resetBump() {
 		hasBumped = false;
+	}
+
+	public void setTargetAngle(double angle) {
+		targetAngle = angle;
+	}
+
+	@Override
+	public double pidGet() {
+		SmartDashboard.putNumber("pidInput", (super.getYaw() - targetAngle) + 0.5);
+		return (super.getYaw() - targetAngle) + 0.5;
 	}
 }

@@ -93,10 +93,8 @@ public class Robot extends TimedRobot {
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
         RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
 
-    distl = new DistanceSensor(0, Constants.distanceSensora1, Constants.distanceSensorb1, Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1, Constants.distanceSensorf1);
-    distl = new DistanceSensor(1, Constants.distanceSensora2, Constants.distanceSensorb2, Constants.distanceSensorc2, Constants.distanceSensord2, Constants.distanceSensore2, Constants.distanceSensorf2);
-
-    line = new Lineup(distl, distr, driver, swerve, 2);
+    distl = new DistanceSensor(0, 1);
+    distl = new DistanceSensor(1, 2);
 
     object = ObjectType.HATCH;
   }

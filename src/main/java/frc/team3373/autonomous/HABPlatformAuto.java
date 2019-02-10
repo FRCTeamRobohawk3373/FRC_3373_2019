@@ -52,12 +52,8 @@ public class HABPlatformAuto {
         frontHome = new DigitalInput(frontLimitSwitch);
         backHome = new DigitalInput(backLimitSwitch);
 
-        frontSensor = new DistanceSensor(frontDistanceSensor, Constants.distanceSensora1, Constants.distanceSensorb1,
-                Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1,
-                Constants.distanceSensorf1);
-        backSensor = new DistanceSensor(backDistanceSensor, Constants.distanceSensora1, Constants.distanceSensorb1,
-                Constants.distanceSensorc1, Constants.distanceSensord1, Constants.distanceSensore1,
-                Constants.distanceSensorf1);
+        frontSensor = new DistanceSensor(frontDistanceSensor, 1);
+        backSensor = new DistanceSensor(backDistanceSensor, 1);
 
         frontSolenoid = new DoubleSolenoid(frontSolenoidFowardChannel, frontSolenoidReverseChannel);
         backSolenoid = new DoubleSolenoid(backSolenoidFowardChannel, backSolenoidReverseChannel);
