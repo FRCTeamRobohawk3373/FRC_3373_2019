@@ -91,7 +91,7 @@ public class Robot extends TimedRobot {
     
     swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
 				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
-        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotWidth,robotLength);
+        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotLength,robotWidth);
 
     distl = new DistanceSensor(0, 1);
     distl = new DistanceSensor(1, 2);
