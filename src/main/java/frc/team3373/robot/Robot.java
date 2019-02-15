@@ -13,6 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 //import edu.wpi.first.wpilibj.RobotState;
@@ -62,21 +66,15 @@ public class Robot extends TimedRobot {
 	double robotWidth = 33.25; // TODO change robot dimensions to match this years robot
   double robotLength = 20.4375;
 
-  SwerveControl swerve;
+  // SwerveControl swerve;
 
-  SuperJoystick driver;
+  //SuperJoystick driver;
   SuperJoystick shooter;
 
-  SuperAHRS ahrs;
+  /* SuperAHRS ahrs;
 
   DistanceSensor distl;
   DistanceSensor distr;
-
-  ObjectType object;
-
-  Claw claw;
-
-  Elevator elevator;
 
   AutonomousControl control;
   DigitalInput line;
@@ -86,7 +84,11 @@ public class Robot extends TimedRobot {
   double[] voltages;
   int count;
   AnalogInput cal;
-  boolean disabled;
+  boolean disabled; */
+
+  ObjectType object;
+  Elevator elevator;
+
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -98,15 +100,20 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    voltages = new double[21];
+    //voltages = new double[21];
 
-    driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(0);
     //shooter = new SuperJoystick(1);
 
-    count = 0;
+    elevator = new Elevator(1, shooter, 0, 0);
 
-    cal = new AnalogInput(0);
+    object = ObjectType.HATCH;
 
+    //count = 0;
+
+    //cal = new AnalogInput(0);
+
+    // dial = new Dial(0, 1, 2, 3);
 
     /* line = new DigitalInput(0);
 
@@ -121,7 +128,7 @@ public class Robot extends TimedRobot {
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line); */
 
-    object = ObjectType.HATCH;
+    //object = ObjectType.HATCH;
 
     /* new Thread(()-> {
       while(true){
@@ -183,17 +190,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    SmartDashboard.setDefaultNumber("P", Constants.relP);
-    SmartDashboard.setDefaultNumber("I", Constants.relI);
-    SmartDashboard.setDefaultNumber("D", Constants.relD);
-    SmartDashboard.setDefaultNumber("PID Count", 0);
-    SmartDashboard.setDefaultNumber("PID Tolerance", 0.1);
-    SmartDashboard.setDefaultBoolean("Self-Disable", true);
-    SmartDashboard.setDefaultBoolean("Semi-Auto", false);
-    SmartDashboard.setDefaultNumber("Speed", 0.2);
-    SmartDashboard.setDefaultNumber("pOut Tolerance", 100);
-    SmartDashboard.setDefaultNumber("outCount", 100);
-    SmartDashboard.setDefaultNumber("Angle", 90);
   }
 
   /**
@@ -201,11 +197,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    driverControls();
-    SmartDashboard.putNumber("Distance", swerve.getTravelDistance());
-    if (driver.isBackPushed()) {
-      swerve.resetTravelDistance();
-    }
+    
   }
 
   /**
@@ -213,7 +205,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    count = 0;
+    SmartDashboard.setDefaultBoolean("Calibrating", false);
   }
 
   /**
@@ -222,11 +214,29 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     //driverControls();
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    elevator.move(shooter.getRawAxis(1));
 
-    /* if (driver.isAHeld()) {
-      control.square();
-    } */
-    if (driver.isAPushed() && !disabled) {
+    if (shooter.isAPushed()) {
+      elevator.calibrate();
+    }
+
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(0, object);
+    } else if(shooter.isDPadLeftPushed()) {
+      elevator.moveToHeight(1, object);
+    } else if(shooter.isDPadUpPushed()) {
+      elevator.moveToHeight(2, object);
+    }
+
+    if (shooter.isYPushed()) {
+      elevator.zero();
+    }
+
+    shooter.clearButtons();
+    shooter.clearDPad();
+
+    /* if (driver.isAPushed() && !disabled) {
       voltages[count] = cal.getAverageVoltage();
       count++;
     }
@@ -238,7 +248,7 @@ public class Robot extends TimedRobot {
       }
     }
 
-    driver.clearA();
+    driver.clearA(); */
 
   }
 
@@ -259,7 +269,7 @@ public class Robot extends TimedRobot {
       lineup.align(Lineup.AlignDirection.RIGHT);
     } */ 
 
-    if (driver.isAHeld() && driver.isBackPushed()) {
+    /* if (driver.isAHeld() && driver.isBackPushed()) {
       control.lineup(Lineup.AlignDirection.LEFT);
     } else if (driver.isAHeld() && driver.isStartPushed()) {
       control.lineup(Lineup.AlignDirection.RIGHT);
@@ -304,7 +314,7 @@ public class Robot extends TimedRobot {
     
 
      if (driver.isYPushed())
-      swerve.resetOrentation(); 
+      swerve.resetOrentation();  */
     // swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 
     // ################################################
@@ -340,7 +350,7 @@ public class Robot extends TimedRobot {
       elevator.moveToHeight(2, object);
     } */
 
-    driver.clearButtons();
+    //driver.clearButtons();
     //shooter.clearButtons();
   }
 
