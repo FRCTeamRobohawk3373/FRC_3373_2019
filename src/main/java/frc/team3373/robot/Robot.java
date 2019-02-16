@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
 
+import java.io.IOException;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -104,6 +106,13 @@ public class Robot extends TimedRobot {
 
     shooter = new SuperJoystick(0);
     //shooter = new SuperJoystick(1);
+    
+    try {
+      Constants.loadConstants();
+      Constants.saveConstants();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     elevator = new Elevator(1, shooter, 0, 0);
 
@@ -205,7 +214,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    SmartDashboard.setDefaultBoolean("Calibrating", false);
+    SmartDashboard.putBoolean("Calibrating", false);
+    SmartDashboard.putNumber("Inches", 0);
+    SmartDashboard.putNumber("Zero Inches", 5);
+    SmartDashboard.setDefaultNumber("P", 0.2);
+    SmartDashboard.setDefaultNumber("I", 0.001);
+    SmartDashboard.setDefaultNumber("D", 0);
   }
 
   /**
@@ -215,22 +229,33 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //driverControls();
     SmartDashboard.putNumber("Position", elevator.getPosition());
-    elevator.move(shooter.getRawAxis(1));
+    elevator.move(-shooter.getRawAxis(1));
 
     if (shooter.isAPushed()) {
       elevator.calibrate();
     }
 
     if (shooter.isDPadDownPushed()) {
-      elevator.moveToHeight(0, object);
+      elevator.moveToHeight(5);
     } else if(shooter.isDPadLeftPushed()) {
-      elevator.moveToHeight(1, object);
+      elevator.moveToHeight(10);
     } else if(shooter.isDPadUpPushed()) {
-      elevator.moveToHeight(2, object);
+      elevator.moveToHeight(15);
     }
+
+    /* if (shooter.isDPadDownPushed()) {
+      elevator.moveToPosition(0, object);
+    } else if(shooter.isDPadLeftPushed()) {
+      elevator.moveToPosition(1, object);
+    } else if(shooter.isDPadUpPushed()) {
+      elevator.moveToPosition(2, object);
+    } */
 
     if (shooter.isYPushed()) {
       elevator.zero();
+    }
+    if (shooter.isXPushed()) {
+      elevator.zero((int)SmartDashboard.getNumber("Zero Inches", 5));
     }
 
     shooter.clearButtons();

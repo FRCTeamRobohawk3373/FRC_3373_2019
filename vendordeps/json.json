@@ -1,0 +1,19 @@
+{
+    "fileName": "json.json",
+    "name": "Json",
+    "version": "20180813",
+    "uuid": "74498592-4319-4681-a6fd-799937ff3602",
+    "mavenUrls": [
+        "https://repo1.maven.org/maven2/"
+    ],
+    "jsonUrl": "",
+    "javaDependencies": [
+        {
+            "groupId": "org.json",
+            "artifactId": "json-java",
+            "version": "20180813"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
+}

@@ -3,6 +3,7 @@ package frc.team3373.robot;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 // import edu.wpi.first.wpilibj.AnalogInput;
@@ -15,18 +16,14 @@ public class Elevator {
 
     private SuperJoystick joystick;
 
-    private double cargoPosition1;
-    private double cargoPosition2;
-    private double cargoPosition3;
-
-    private double hatchPosition1;
-    private double hatchPosition2;
-    private double hatchPosition3;
-
     private double offset;
+
+    private final double slope = 4.883728566344149;
 
     private boolean calibrating;
     private int calStep;
+
+    private double x1, y1, x2, y2, calSlope = 0;
 
     // private AnalogInput leftLimit;
     // private AnalogInput rightLimit;
@@ -37,10 +34,13 @@ public class Elevator {
         joystick = shooter;
         calibrating = false;
 
+        motor.setIdleMode(IdleMode.kBrake);
+
         pid = motor.getPIDController();
         pid.setP(0.2);
         pid.setI(0.001);
-        pid.setOutputRange(-0.2, 0.2);
+        pid.setOutputRange(-0.1, 0.1);
+        motor.getEncoder().setPositionConversionFactor(slope);
 
         calStep = 0;
 
@@ -59,38 +59,26 @@ public class Elevator {
 
     public void calibrate() {
         if (!calibrating) {
+            motor.getEncoder().setPositionConversionFactor(1);
             SmartDashboard.putBoolean("Calibrating", true);
             calibrating = true;
             return;
         }
         switch(calStep) {
             case 0:
-                hatchPosition1 = motor.getEncoder().getPosition();
-                SmartDashboard.putNumber("hatchPosition1", hatchPosition1);
-                //cargoPosition1 = motor.getEncoder().getPosition();
+                x1 = motor.getEncoder().getPosition();
+                y1 = SmartDashboard.getNumber("Inches", 0);
                 calStep++;
-                SmartDashboard.putNumber("CalStep", calStep);
-                SmartDashboard.putNumber("Step", 1);
                 break;
             case 1:
-                hatchPosition2 = motor.getEncoder().getPosition();
-                SmartDashboard.putNumber("hatchPosition2", hatchPosition2);
-                //cargoPosition2 = motor.getEncoder().getPosition();
-                calStep++;
-                SmartDashboard.putNumber("CalStep", calStep);
-                SmartDashboard.putNumber("Step", 2);
-                break;
-            case 2:
-                hatchPosition3 = motor.getEncoder().getPosition();
-                SmartDashboard.putNumber("hatchPosition3", hatchPosition3);
-                //cargoPosition3 = motor.getEncoder().getPosition();
-                calStep++;
-                SmartDashboard.putNumber("CalStep", calStep);
-                SmartDashboard.putNumber("Step", 3);
-                break;
-            case 3:
-                SmartDashboard.putBoolean("Calibrating", false);
+                x2 = motor.getEncoder().getPosition();
+                y2 = SmartDashboard.getNumber("Inches", 0);
+                calSlope = (y2 - y1) / (x2 - x1);
+                SmartDashboard.putNumber("Slope", calSlope);
+                motor.getEncoder().setPositionConversionFactor(calSlope);
                 calStep = 0;
+                calibrating = false;
+                SmartDashboard.putBoolean("Calibrating", false);
                 break;
         }
     }
@@ -100,18 +88,29 @@ public class Elevator {
     }
 
     public void zero() {
-        offset = motor.getEncoder().getPosition();
+        motor.getEncoder().setPosition(0);
     }
 
-    public void moveToHeight(int height, Robot.ObjectType obj) {
+    public void zero(int inches) {
+        motor.getEncoder().setPosition(inches);
+    }
+
+    public void moveToHeight(double inches) {
+        pid.setP(SmartDashboard.getNumber("P", 0.2));
+        pid.setI(SmartDashboard.getNumber("I", 0.001));
+        pid.setD(SmartDashboard.getNumber("D", 0));
+        pid.setReference(inches, ControlType.kPosition);
+    }
+
+    public void moveToPosition(int height, Robot.ObjectType obj) {
         switch (height) {
         case 0:
             switch (obj) {
             case CARGO:
-                pid.setReference(cargoPosition1 + offset, ControlType.kPosition);
+                
                 break;
             case HATCH:
-                pid.setReference(hatchPosition1 + offset, ControlType.kPosition);
+                
                 break;
             default:
                 System.out.println("Object must be defined!");
@@ -121,10 +120,10 @@ public class Elevator {
         case 1:
             switch (obj) {
             case CARGO:
-                pid.setReference(cargoPosition2 + offset, ControlType.kPosition);
+                
                 break;
             case HATCH:
-                pid.setReference(hatchPosition2 + offset, ControlType.kPosition);
+                
                 break;
             default:
                 System.out.println("Object must be defined!");
@@ -134,10 +133,10 @@ public class Elevator {
         case 2:
             switch (obj) {
             case CARGO:
-                pid.setReference(cargoPosition3 + offset, ControlType.kPosition);
+                
                 break;
             case HATCH:
-                pid.setReference(hatchPosition3 + offset, ControlType.kPosition);
+                
                 break;
             default:
                 System.out.println("Object must be defined!");

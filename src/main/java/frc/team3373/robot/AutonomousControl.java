@@ -48,8 +48,8 @@ public class AutonomousControl {
 		//distPID = new DistanceSensorPID(distl, distr);
 
 		//pidAngle = new PIDController(Constants.angleP, Constants.angleI, Constants.angleD, this.ahrs, swerveOut);
-		pidAbs = new PIDController(Constants.absP, Constants.absI, Constants.absD, this.ahrs, swerveOut);
-		pidRel = new PIDController(Constants.relP, Constants.relI, Constants.relD, this.ahrs, swerveOut);
+		pidAbs = new PIDController(Constants.getNumber("angleP"), Constants.getNumber("angleI"), Constants.getNumber("angleD"), this.ahrs, swerveOut);
+		pidRel = new PIDController(Constants.getNumber("angleP"), Constants.getNumber("angleI"), Constants.getNumber("angleD"), this.ahrs, swerveOut);
 
 		pidRel.setOutputRange(-0.2, 0.2);
 		pidRel.setInputRange(-180, 180);

@@ -69,10 +69,10 @@ public class SwerveControl {
 		BRWheel = new SwerveWheel("BackRight", RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,
 				rotAngle);
 
-		FLWheel.setPID(Constants.FLP, Constants.FLI, Constants.FLD);
-		BLWheel.setPID(Constants.BLP, Constants.BLI, Constants.BLD);
-		FRWheel.setPID(Constants.FRP, Constants.FRI, Constants.FRD);
-		BRWheel.setPID(Constants.BRP, Constants.BRI, Constants.BRD);
+		FLWheel.setPID(Constants.getNumber("FLP"), Constants.getNumber("FLI"), Constants.getNumber("FLD"));
+		BLWheel.setPID(Constants.getNumber("BLP"), Constants.getNumber("BLI"), Constants.getNumber("BLD"));
+		FRWheel.setPID(Constants.getNumber("FRP"), Constants.getNumber("FRI"), Constants.getNumber("FRD"));
+		BRWheel.setPID(Constants.getNumber("BRP"), Constants.getNumber("BRI"), Constants.getNumber("BRD"));
 
 		wheelArray = new SwerveWheel[] { FLWheel, BLWheel, BRWheel, FRWheel };
 
