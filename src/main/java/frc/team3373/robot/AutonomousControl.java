@@ -48,8 +48,8 @@ public class AutonomousControl {
 		//distPID = new DistanceSensorPID(distl, distr);
 
 		//pidAngle = new PIDController(Constants.angleP, Constants.angleI, Constants.angleD, this.ahrs, swerveOut);
-		pidAbs = new PIDController(Constants.absP, Constants.absI, Constants.absD, this.ahrs, swerveOut);
-		pidRel = new PIDController(Constants.relP, Constants.relI, Constants.relD, this.ahrs, swerveOut);
+		pidAbs = new PIDController(Constants.getNumber("angleP"), Constants.getNumber("angleI"), Constants.getNumber("angleD"), this.ahrs, swerveOut);
+		pidRel = new PIDController(Constants.getNumber("angleP"), Constants.getNumber("angleI"), Constants.getNumber("angleD"), this.ahrs, swerveOut);
 
 		pidRel.setOutputRange(-0.2, 0.2);
 		pidRel.setInputRange(-180, 180);
@@ -120,12 +120,12 @@ public class AutonomousControl {
 			targetAngle += 360;
 		}
 
-		int count = 0;
+		//int count = 0;
 		int outCount = 0;
 
 		double outputTolerance = SmartDashboard.getNumber("pOut Tolerance", 0.01); // 0.015
 		double outputCount = SmartDashboard.getNumber("outCount", 100); // 7500
-		double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
+		//double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
 
 		pidRel.setOutputRange(-speed, speed);
 		ahrs.setTargetAngle(targetAngle);

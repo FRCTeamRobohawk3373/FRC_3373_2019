@@ -33,7 +33,7 @@ public class Lineup {
         dright = dr;
         output = new SuperPIDOutput(SuperPIDOutput.OutputType.ROTATE, sw);
         dist = new DistanceSensorPID(dleft, dright);
-        pid = new PIDController(Constants.lineupP, Constants.lineupI, Constants.lineupD, dist, output);
+        pid = new PIDController(Constants.getNumber("lineupP"), Constants.getNumber("lineupI"), Constants.getNumber("lineupD"), dist, output);
         this.line = line;
 
         pid.setAbsoluteTolerance(0.1);

@@ -1,13 +1,14 @@
 package frc.team3373.robot;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveControl {
 
-	public enum Side {
+	public static enum Side {
 		NORTH, SOUTH, EAST, WEST;
 	}
 	
-	public enum DriveMode {
+	public static enum DriveMode {
 		ROBOTCENTRIC, FIELDCENTRIC, OBJECTCENTRIC;
 	}
 
@@ -68,10 +69,10 @@ public class SwerveControl {
 		BRWheel = new SwerveWheel("BackRight", RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,
 				rotAngle);
 
-		FLWheel.setPID(Constants.FLP, Constants.FLI, Constants.FLD);
-		BLWheel.setPID(Constants.BLP, Constants.BLI, Constants.BLD);
-		FRWheel.setPID(Constants.FRP, Constants.FRI, Constants.FRD);
-		BRWheel.setPID(Constants.BRP, Constants.BRI, Constants.BRD);
+		FLWheel.setPID(Constants.getNumber("FLP"), Constants.getNumber("FLI"), Constants.getNumber("FLD"));
+		BLWheel.setPID(Constants.getNumber("BLP"), Constants.getNumber("BLI"), Constants.getNumber("BLD"));
+		FRWheel.setPID(Constants.getNumber("FRP"), Constants.getNumber("FRI"), Constants.getNumber("FRD"));
+		BRWheel.setPID(Constants.getNumber("BRP"), Constants.getNumber("BRI"), Constants.getNumber("BRD"));
 
 		wheelArray = new SwerveWheel[] { FLWheel, BLWheel, BRWheel, FRWheel };
 
@@ -108,7 +109,7 @@ public class SwerveControl {
 			driveAngle += 360;
 		}
 		
-		if (rotateSpeed == 0) {
+		/*if (rotateSpeed == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
 				stoppedRotating = false;
@@ -117,7 +118,7 @@ public class SwerveControl {
 			rotateSpeed = rAxis;
 		}else{
 			stoppedRotating = true;
-		}
+		}*/
 		 
 
 		if (isFieldCentric) {
@@ -464,7 +465,7 @@ public class SwerveControl {
 			//System.out.print(wheel.name + "'s position: " + wheel.getRawEncoderValue() + ", ");
 			SmartDashboard.putNumber(wheel.name, wheel.getRawEncoderValue());
 		}
-		System.out.println();
+		//System.out.println();
 	}
 
 	public void calibrateMinMax() {
