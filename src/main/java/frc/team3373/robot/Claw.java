@@ -8,6 +8,8 @@ public class Claw {
     private DoubleSolenoid lift;
     private DoubleSolenoid grab;
 
+    private Thread solThread;
+
     private boolean grabbed;
 
     public Claw(int PCM, int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
@@ -17,19 +19,21 @@ public class Claw {
 
     public void grab(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO) {
+            solThread.interrupt();
             grab.set(Value.kForward);
         } else if (obj == Robot.ObjectType.HATCH) {
             grab.set(Value.kReverse);
+            solThread.interrupt();
         }
     }
 
     public void drop(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO) {
             grab.set(Value.kReverse);
-            threadDisable(grab, Value.kForward);
+            // disableSolenoid(grab, Value.kForward);
         } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kForward);
-            threadDisable(grab, Value.kReverse);
+            // disableSolenoid(grab, Value.kReverse);
         }
     }
 
@@ -41,14 +45,14 @@ public class Claw {
         lift.set(Value.kReverse);
     }
 
-    private void threadDisable(DoubleSolenoid sol, Value value) {
-        new Thread(()-> {
+    private void disableSolenoid(DoubleSolenoid sol, Value value) {
+        solThread = new Thread(() -> {
             try {
                 Thread.sleep(500);
                 sol.set(value);
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         });
+        solThread.run();
     }
 }
