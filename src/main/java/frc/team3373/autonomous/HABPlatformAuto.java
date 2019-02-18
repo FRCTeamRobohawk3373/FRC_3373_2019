@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +20,7 @@ import frc.team3373.robot.Constants;
 import frc.team3373.robot.DistanceSensor;
 import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SwerveControl;
+import frc.team3373.robot.SwerveControl.DriveMode;
 
 /**
  * 
@@ -27,125 +29,150 @@ public class HABPlatformAuto {
 
     //AutonomousControl controller;
     SuperJoystick joystick;
+    SuperJoystick joystick2;
 
     byte state = 0;
     int count = 0;
 
-    DigitalInput frontHome;
-    DigitalInput backHome;
+    DigitalInput rightHome;
+    DigitalInput leftHome;
 
-    DistanceSensor frontSensor;
-    DistanceSensor backSensor;
+    DistanceSensor rightSensor;
+    DistanceSensor leftSensor;
 
-    DoubleSolenoid frontSolenoid;
-    DoubleSolenoid backSolenoid;
+    DoubleSolenoid rightSolenoid;
+    DoubleSolenoid leftSolenoid;
 
     SwerveControl swerve;
 
-    WPI_TalonSRX driveMotor;
+    Relay driveMotor;
 
-    public HABPlatformAuto(SuperJoystick joy, SwerveControl sw, int talonid, int frontSolenoidFowardChannel,
-            int frontSolenoidReverseChannel, int backSolenoidFowardChannel, int backSolenoidReverseChannel,
-            int frontLimitSwitch, int backLimitSwitch, int frontDistanceSensor, int backDistanceSensor) {
+    double driveSpeed;
+
+    public HABPlatformAuto(SuperJoystick joy, SuperJoystick joy2, SwerveControl sw, int relayid, int PCMid, int rightSolenoidFowardChannel, int rightSolenoidReverseChannel, int leftSolenoidFowardChannel, int leftSolenoidReverseChannel, int rightLimitSwitch, int leftLimitSwitch, int rightDistanceSensor, int leftDistanceSensor) {
         // controller = control;
         joystick = joy;
-        frontHome = new DigitalInput(frontLimitSwitch);
-        backHome = new DigitalInput(backLimitSwitch);
+        joystick2 = joy2;
 
-        frontSensor = new DistanceSensor(frontDistanceSensor, 1);
-        backSensor = new DistanceSensor(backDistanceSensor, 1);
+        rightHome = new DigitalInput(rightLimitSwitch);
+        leftHome = new DigitalInput(leftLimitSwitch);
 
-        frontSolenoid = new DoubleSolenoid(frontSolenoidFowardChannel, frontSolenoidReverseChannel);
-        backSolenoid = new DoubleSolenoid(backSolenoidFowardChannel, backSolenoidReverseChannel);
+        rightSensor = new DistanceSensor(rightDistanceSensor, 1);
+        leftSensor = new DistanceSensor(leftDistanceSensor, 1);
+
+        rightSolenoid = new DoubleSolenoid(PCMid,rightSolenoidFowardChannel, rightSolenoidReverseChannel);
+        leftSolenoid = new DoubleSolenoid(PCMid,leftSolenoidFowardChannel, leftSolenoidReverseChannel);
 
         swerve = sw;
 
-        driveMotor = new WPI_TalonSRX(talonid);
+        driveMotor = new Relay(relayid);
+
+        driveSpeed = .1;
     }
 
     public boolean climb(double climbHeight) {
         boolean frontDown = false;
         boolean backDown = false;
+
+        boolean frontAtHeight = false;
+        boolean backAtHeight = false;
+
+        double nextTargetHeight = 0;
         state = 0;
-        swerve.calculateAutoSwerveControl(0, 0, 0);
-        while (!joystick.isBackHeld() && !RobotState.isDisabled()) {
-            SmartDashboard.putNumber("frontDistance", frontSensor.getDistance());
-            SmartDashboard.putNumber("backDistance", backSensor.getDistance());
+        while ((!joystick.isXHeld() || !joystick2.isXHeld()) && !RobotState.isDisabled()) {
+            SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
+            SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
             SmartDashboard.putNumber("State", state);
-            SmartDashboard.putBoolean("frontLimit", frontHome.get());
-            SmartDashboard.putBoolean("backLimit", backHome.get());
+            SmartDashboard.putBoolean("rightLimit", rightHome.get());
+            SmartDashboard.putBoolean("leftLimit", leftHome.get());
 
             switch (state) {
             case 0:// preclimb
+                swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+                swerve.calculateAutoSwerveControl(0, 0, 0);
                 SmartDashboard.putString("Current Step", "park Arms");
                 state++;
                 break;
             case 1:// climb
                 SmartDashboard.putString("Current Step", "lifting");
-                frontSolenoid.set(Value.kForward);
-                backSolenoid.set(Value.kForward);
+                if (frontAtHeight && backAtHeight) { //checks that both the front and the back are at the height
+                    //if (joystick.isXPushed()) {
+                        if (nextTargetHeight >= climbHeight) {
+                            state++;
+                        }
+                        nextTargetHeight += 2;
+                        if (nextTargetHeight >= climbHeight) {
+                            nextTargetHeight = climbHeight;
+                        }
+                        frontAtHeight = false;
+                        backAtHeight = false;
+                // }
+                }
 
-                if (frontSensor.getDistance() > climbHeight) {
+                if (rightSensor.getDistance() >= nextTargetHeight) {//waits for the front sensor to reach the next height and stops the solenoid
                     System.out.print("stoping front");
-                    frontSolenoid.set(Value.kOff);
-                    frontDown = true;
+                    rightSolenoid.set(Value.kOff);
+                    frontAtHeight = true;
+                } else if (!frontAtHeight) {
+                    rightSolenoid.set(Value.kForward);
                 }
-                if (backSensor.getDistance() > climbHeight) {
+                
+                if (leftSensor.getDistance() >= nextTargetHeight) {//waits for the back sensor to reach the next height and stops the solenoid
                     System.out.print("stoping back");
-                    backSolenoid.set(Value.kOff);
-                    backDown = true;
+                    leftSolenoid.set(Value.kOff);
+                    backAtHeight = true;
 
-                }
-                if (frontDown && backDown) {
-                    state++;
+                } else if (!backAtHeight) {
+                    leftSolenoid.set(Value.kForward);
                 }
 
                 break;
             case 2:// Forward 1st stop
                 SmartDashboard.putString("Current Step", "driving 1st forward");
-                swerve.calculateAutoSwerveControl(90, .3, 0);
-                driveMotor.set(0.5);
-                if (frontSensor.getDistance() < 6) {
+                swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
+                driveMotor.set(Relay.Value.kForward);
+                if (rightSensor.getDistance() < 6 && rightSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
-                    driveMotor.set(0);
+                    driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");
                     state++;
                 }
                 break;
-            case 3:// Lift Font Axle
-                SmartDashboard.putString("Current Step", "lift front");
-                frontSolenoid.set(Value.kReverse);
-                if (!frontHome.get()) {
-                    frontSolenoid.set(Value.kOff);
-                    System.out.println("front up");
+            case 3:// Lift right Axle
+                SmartDashboard.putString("Current Step", "lift right");
+                rightSolenoid.set(Value.kReverse);
+                if (!rightHome.get()) {
+                    rightSolenoid.set(Value.kOff);
+                    System.out.println("right up");
                     state++;
                 }
                 break;
             case 4:// Forward 2nd stop
                 SmartDashboard.putString("Current Step", "driving 2nd forward");
-                swerve.calculateAutoSwerveControl(90, .3, 0);
-                driveMotor.set(0.5);
-                if (backSensor.getDistance() < 6) {
+                swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
+                driveMotor.set(Relay.Value.kForward);
+                if (leftSensor.getDistance() < 6 && leftSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
-                    driveMotor.set(0);
+                    driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");
                     state++;
                 }
                 break;
-            case 5:// Lift Back Axle
-                SmartDashboard.putString("Current Step", "lift back");
-                frontSolenoid.set(Value.kReverse);
-                if (!backHome.get()) {
-                    frontSolenoid.set(Value.kOff);
-                    System.out.println("back up");
+            case 5:// Lift left Axle
+                SmartDashboard.putString("Current Step", "lift left");
+                leftSolenoid.set(Value.kReverse);
+                if (!leftHome.get()) {
+                    leftSolenoid.set(Value.kOff);
+                    System.out.println("left up");
                     state++;
                 }
                 break;
             case 6:// Forward 3rd stop
                 SmartDashboard.putString("Current Step", "driving forward a little");
-                swerve.calculateAutoSwerveControl(90, .3, 0);
+                swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
                 count++;
-                if (count > 40) {
+
+                if (count > 100) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
                     state++;
                 }
@@ -156,9 +183,9 @@ public class HABPlatformAuto {
             }
             joystick.clearButtons();
         }
-        frontSolenoid.set(Value.kOff);
-        backSolenoid.set(Value.kOff);
-        driveMotor.set(0);
+        rightSolenoid.set(Value.kOff);
+        leftSolenoid.set(Value.kOff);
+        driveMotor.set(Relay.Value.kOff);
         swerve.calculateAutoSwerveControl(0, 0, 0);
         return false;
     }

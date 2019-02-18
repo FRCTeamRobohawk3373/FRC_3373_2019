@@ -8,14 +8,17 @@
 package frc.team3373.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
 
 import java.io.IOException;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -65,7 +68,7 @@ public class Robot extends TimedRobot {
   SwerveControl swerve;
 
   SuperJoystick driver;
-  //SuperJoystick shooter;
+  SuperJoystick shooter;
 	
   SuperAHRS ahrs;
 
@@ -80,6 +83,8 @@ public class Robot extends TimedRobot {
 
   Elevator elevator;
 
+  HABPlatformAuto HABauto;
+
   Compressor compressor;
   /**
    * This function is run when the robot is first started up and should be
@@ -91,25 +96,35 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     compressor = new Compressor(1);
+
     try {
-      Constants.loadDefaults();
+      Constants.loadConstants();
     } catch (IOException e) {
+      try {
+        Constants.loadDefaults();
+      } catch (IOException e1) {
+        System.out.println("Catastrophic load");
+        e1.printStackTrace();
+      }
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    try {
+    /*try {
       Constants.saveConstants();
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    }
+    }*/
 
     driver = new SuperJoystick(0);
-    //shooter = new SuperJoystick(1);
+    shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
-    swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID, BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID,FRdriveMotorID, FREncMin, FREncMax, FREncHome, BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
-
+    swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
+        BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID, FRdriveMotorID, FREncMin, FREncMax, FREncHome,
+        BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
+    //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
+    HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     //distl = new DistanceSensor(0, 1);
     //distl = new DistanceSensor(1, 2);
 
@@ -190,9 +205,13 @@ public class Robot extends TimedRobot {
     //################################################
     //####          shared Controls               ####
     //################################################
-   // if (driver.isStartPushed() && shooter.isStartPushed()) {
+    if (driver.isStartHeld() && shooter.isStartHeld()) {
+      HABauto.climb(23);
       //auto get on HAB platform
-   // }
+    } else if (driver.isBackHeld() && shooter.isBackHeld()) {
+      HABauto.climb(10);
+        //auto get on HAB platform
+    }
 
     //################################################
     //####          Driver Controls               ####
@@ -268,6 +287,6 @@ public class Robot extends TimedRobot {
     } */
 
     driver.clearButtons();
-   // shooter.clearButtons();
+    shooter.clearButtons();
   }
 }
