@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Filesystem;
 
 /**
  * Add your docs here.
@@ -30,6 +31,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Constants {
     private static final String path = "/home/lvuser/config/constants.json";
     private static final String backupPath = "home/lvuser/config/backup-constants.json";
+    private static final String defaultsPath = Filesystem.getDeployDirectory() + "/defaults.json";
     // private static final Object JSONArray = null;
     private static JSONObject constantsObject;
 
@@ -97,6 +99,21 @@ public class Constants {
     public static void removeValue(String name) { // Removes a number from the JSON object
         constantsObject.remove(name);
         NetworkTableInstance.getDefault().getTable("Constants").delete(name);
+    }
+
+    public static void loadDefaults() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File(defaultsPath)));
+        String st = "";
+        String bst = "";
+        while ((bst = br.readLine()) != null) {
+            st = st + bst;
+        }
+        br.close();
+        constantsObject = new JSONObject(st);
+        if (constantsObject != null) {
+            initialized = true;
+        }
+        display();
     }
 
     /*
