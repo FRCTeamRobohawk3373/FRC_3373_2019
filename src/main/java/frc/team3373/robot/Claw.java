@@ -18,32 +18,32 @@ public class Claw {
     public void grab(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO && grabbed) {
             grabbed = false;
-            // Open arms
+            grab.set(Value.kForward);
         } else if (obj == ObjectType.CARGO && !grabbed) {
             grabbed = true;
-            // Close arms
+            grab.set(Value.kReverse);
         } else if (obj == Robot.ObjectType.HATCH && grabbed) {
             grabbed = false;
-            // Close arms
+            grab.set(Value.kReverse);
         } else if (obj == ObjectType.HATCH && !grabbed) {
             grabbed = true;
-            // Open arms
+            grab.set(Value.kForward);
         }
     }
 
     public void drop(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO) {
-            // Close arms
+            grab.set(Value.kReverse);
         } else if (obj == ObjectType.HATCH) {
-            // Open arms
+            grab.set(Value.kForward);
         }
     }
 
     public void raise() {
-
+        lift.set(Value.kForward);
     }
 
     public void lower() {
-        
+        lift.set(Value.kReverse);
     }
 }

@@ -21,6 +21,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotState;
 //import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -109,12 +110,11 @@ public class Robot extends TimedRobot {
     
     try {
       Constants.loadConstants();
-      Constants.saveConstants();
     } catch (IOException e) {
       e.printStackTrace();
     }
 
-    elevator = new Elevator(1, shooter, 0, 0);
+    elevator = new Elevator(1, shooter);
 
     object = ObjectType.HATCH;
 
@@ -159,7 +159,24 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-
+    if (SmartDashboard.getBoolean("Update Constants", false)) {
+      Constants.updateValues();
+      SmartDashboard.putBoolean("Update Constants", false);
+    } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
+      try {
+        Constants.saveConstants();
+        SmartDashboard.putBoolean("Save Constants", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else if (SmartDashboard.getBoolean("Restore Backup", false) && RobotState.isTest()) {
+      try {
+        Constants.restoreBackup();
+        SmartDashboard.putBoolean("Restore Backup", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   /**
@@ -199,6 +216,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    elevator.resetCal();
+    //elevator.initPID();
+    elevator.zero();
   }
 
   /**
@@ -206,7 +227,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(10);
+    } else if(shooter.isDPadLeftPushed()) {
+      elevator.moveToHeight(25);
+    } else if(shooter.isDPadUpPushed()) {
+      elevator.moveToHeight(40);
+    } else if(shooter.isDPadRightPushed()) {
+      elevator.moveToHeight(Constants.getNumber("elevatorHeight"));
+    }
+
+    if (shooter.isAPushed()) {
+      elevator.zero();
+    }
+
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    elevator.refresh();
+
+    shooter.clearButtons();
+    shooter.clearDPad();
   }
 
   /**
@@ -216,10 +256,12 @@ public class Robot extends TimedRobot {
   public void testInit() {
     SmartDashboard.putBoolean("Calibrating", false);
     SmartDashboard.putNumber("Inches", 0);
-    SmartDashboard.putNumber("Zero Inches", 5);
-    SmartDashboard.setDefaultNumber("P", 0.2);
-    SmartDashboard.setDefaultNumber("I", 0.001);
-    SmartDashboard.setDefaultNumber("D", 0);
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    SmartDashboard.setDefaultBoolean("Save Constants", false);
+    SmartDashboard.setDefaultBoolean("Restore Backup", false);
+    SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    elevator.resetCal();
+    elevator.initPID();
   }
 
   /**
@@ -227,39 +269,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    //driverControls();
+    testControls();
+
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
-    elevator.move(-shooter.getRawAxis(1));
-
-    if (shooter.isAPushed()) {
-      elevator.calibrate();
-    }
-
-    if (shooter.isDPadDownPushed()) {
-      elevator.moveToHeight(5);
-    } else if(shooter.isDPadLeftPushed()) {
-      elevator.moveToHeight(10);
-    } else if(shooter.isDPadUpPushed()) {
-      elevator.moveToHeight(15);
-    }
-
-    /* if (shooter.isDPadDownPushed()) {
-      elevator.moveToPosition(0, object);
-    } else if(shooter.isDPadLeftPushed()) {
-      elevator.moveToPosition(1, object);
-    } else if(shooter.isDPadUpPushed()) {
-      elevator.moveToPosition(2, object);
-    } */
-
-    if (shooter.isYPushed()) {
-      elevator.zero();
-    }
-    if (shooter.isXPushed()) {
-      elevator.zero((int)SmartDashboard.getNumber("Zero Inches", 5));
-    }
-
-    shooter.clearButtons();
-    shooter.clearDPad();
 
     /* if (driver.isAPushed() && !disabled) {
       voltages[count] = cal.getAverageVoltage();
@@ -275,6 +288,33 @@ public class Robot extends TimedRobot {
 
     driver.clearA(); */
 
+  }
+
+  public void testControls() {
+    elevator.rawMovePID(-shooter.getRawAxis(1));
+
+    if (shooter.isAPushed()) {
+      elevator.calibrate();
+    }
+
+    if (shooter.isYPushed()) {
+      elevator.absoluteZero();
+    }
+
+    if (shooter.isBPushed()) {
+      elevator.moveToHeight(Constants.getNumber("elevatorHeight"));
+    }
+
+    if (shooter.isXPushed()) {
+      elevator.resetCal();
+    }
+
+    if (!SmartDashboard.getBoolean("Calibrating", false)){
+      elevator.refresh();
+    }
+
+    shooter.clearButtons();
+    shooter.clearDPad();
   }
 
   public void driverControls() {

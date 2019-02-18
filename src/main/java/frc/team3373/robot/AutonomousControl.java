@@ -120,12 +120,12 @@ public class AutonomousControl {
 			targetAngle += 360;
 		}
 
-		int count = 0;
+		//int count = 0;
 		int outCount = 0;
 
 		double outputTolerance = SmartDashboard.getNumber("pOut Tolerance", 0.01); // 0.015
 		double outputCount = SmartDashboard.getNumber("outCount", 100); // 7500
-		double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
+		//double countTolerance = SmartDashboard.getNumber("PID Count", 100); // 6000
 
 		pidRel.setOutputRange(-speed, speed);
 		ahrs.setTargetAngle(targetAngle);
