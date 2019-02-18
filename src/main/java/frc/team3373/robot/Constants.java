@@ -56,7 +56,11 @@ public class Constants {
     public static void saveConstants() throws IOException { // Copies constants.json to backup-constants.json and copies
                                                             // Json object to constants.json
         if (!isBackup) {
-            copy(path, backupPath);
+            try {
+                copy(path, backupPath);
+            } catch (NullPointerException e) {
+                System.out.println("No File, Creating New");
+            }
         } else {
             isBackup = false;
         }

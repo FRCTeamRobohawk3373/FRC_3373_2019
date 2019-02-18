@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
+
+import java.io.IOException;
+
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -31,37 +35,37 @@ public class Robot extends TimedRobot {
     HATCH, CARGO
   }
 
-  int LBdriveMotorID = 2;
-	int LBrotateMotorID = 1;
-	int LBEncHome = 802; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
-	int LBEncMin = 10;
-	int LBEncMax = 897;
+  int FRdriveMotorID = 2;
+	int FRrotateMotorID = 1;
+	int FREncHome = 357; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
+	int FREncMin = 10;
+	int FREncMax = 897;
 	
-	int LFdriveMotorID = 4;
-	int LFrotateMotorID = 3;
-	int LFEncHome = 264;
-	int LFEncMin = 11;
-	int LFEncMax = 902;
+	int BLdriveMotorID = 4;
+	int BLrotateMotorID = 3;
+	int BLEncHome = 265;
+	int BLEncMin = 11;
+	int BLEncMax = 902;
 	
-	int RBdriveMotorID = 8;
-	int RBrotateMotorID = 7;
-	int RBEncHome = 866;
-	int RBEncMin = 10;
-	int RBEncMax = 898;
+	int FLdriveMotorID = 8;
+	int FLrotateMotorID = 7;
+	int FLEncHome = 426;
+	int FLEncMin = 10;
+	int FLEncMax = 898;
 	
-	int RFdriveMotorID = 6;
-	int RFrotateMotorID = 5;
-	int RFEncHome = 102;
-	int RFEncMin = 10;
-	int RFEncMax = 899;
+	int BRdriveMotorID = 6;
+	int BRrotateMotorID = 5;
+	int BREncHome = 99;
+	int BREncMin = 10;
+	int BREncMax = 899;
 	
-	double robotWidth = 20.4375; // TODO change robot dimensions to match this years robot
-  double robotLength = 33.25;
+	double robotWidth = 22.25; // TODO change robot dimensions to match this years robot
+  double robotLength = 16.25;
   
   SwerveControl swerve;
 
   SuperJoystick driver;
-  SuperJoystick shooter;
+  //SuperJoystick shooter;
 	
   SuperAHRS ahrs;
 
@@ -75,6 +79,8 @@ public class Robot extends TimedRobot {
   Claw claw;
 
   Elevator elevator;
+
+  Compressor compressor;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -84,17 +90,28 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+    compressor = new Compressor(1);
+    try {
+      Constants.loadDefaults();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    try {
+      Constants.saveConstants();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 
     driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(1);
+    //shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
-    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
-				LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax,
-        RFEncHome, RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome,ahrs,robotLength,robotWidth);
+    swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID, BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID,FRdriveMotorID, FREncMin, FREncMax, FREncHome, BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
 
-    distl = new DistanceSensor(0, 1);
-    distl = new DistanceSensor(1, 2);
+    //distl = new DistanceSensor(0, 1);
+    //distl = new DistanceSensor(1, 2);
 
     object = ObjectType.HATCH;
   }
@@ -173,9 +190,9 @@ public class Robot extends TimedRobot {
     //################################################
     //####          shared Controls               ####
     //################################################
-    if (driver.isStartPushed() && shooter.isStartPushed()) {
+   // if (driver.isStartPushed() && shooter.isStartPushed()) {
       //auto get on HAB platform
-    }
+   // }
 
     //################################################
     //####          Driver Controls               ####
@@ -251,6 +268,6 @@ public class Robot extends TimedRobot {
     } */
 
     driver.clearButtons();
-    shooter.clearButtons();
+   // shooter.clearButtons();
   }
 }
