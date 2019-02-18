@@ -18,7 +18,9 @@ import frc.team3373.robot.SwerveControl.Side;
 import java.io.IOException;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 
 /**
@@ -72,7 +74,7 @@ public class Robot extends TimedRobot {
 	
   SuperAHRS ahrs;
 
-  Lineup line;
+  DigitalInput line;
 
   DistanceSensor distl;
   DistanceSensor distr;
@@ -86,6 +88,7 @@ public class Robot extends TimedRobot {
   HABPlatformAuto HABauto;
 
   Compressor compressor;
+  AutonomousControl control;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -125,8 +128,13 @@ public class Robot extends TimedRobot {
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    //distl = new DistanceSensor(0, 1);
-    //distl = new DistanceSensor(1, 2);
+    claw = new Claw(2, 0, 3, 2, 1);
+    
+    distl = new DistanceSensor(0, 2);
+    distr = new DistanceSensor(1, 3);
+    line = new DigitalInput(2);
+
+    control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
 
     object = ObjectType.HATCH;
   }
@@ -216,6 +224,11 @@ public class Robot extends TimedRobot {
     //################################################
     //####          Driver Controls               ####
     //################################################
+    if (driver.isAPushed()) {
+      control.lineup(Lineup.AlignDirection.LEFT);
+    } else if (driver.isBPushed()) {
+      control.lineup(Lineup.AlignDirection.RIGHT);
+    }
 
     if(driver.getRawAxis(2)>.5){//FieldCentric
 			swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
@@ -256,7 +269,7 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    /* if(shooter.isYPushed()) {
+    if(shooter.isYPushed()) {
       claw.grab(object);
     } else if (shooter.isXPushed()) {
       claw.drop(object);
@@ -274,11 +287,11 @@ public class Robot extends TimedRobot {
       claw.lower();
     }
 
-    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+    /* if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
       elevator.move(shooter.getRawAxis(1));
-    }
+    } */
 
-    if (shooter.isDPadDownPushed()) {
+    /* if (shooter.isDPadDownPushed()) {
       elevator.moveToHeight(0, object);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
       elevator.moveToHeight(1, object);

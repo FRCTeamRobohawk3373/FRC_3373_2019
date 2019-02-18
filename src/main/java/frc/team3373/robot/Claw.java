@@ -8,42 +8,51 @@ public class Claw {
     private DoubleSolenoid lift;
     private DoubleSolenoid grab;
 
+    private Thread solThread;
+
     private boolean grabbed;
 
-    public Claw(int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
-        lift = new DoubleSolenoid(liftForwardChannel, liftReverseChannel);
-        grab = new DoubleSolenoid(grabForwardChannel, grabReverseChannel);
+    public Claw(int PCM, int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
+        lift = new DoubleSolenoid(PCM, liftForwardChannel, liftReverseChannel);
+        grab = new DoubleSolenoid(PCM, grabForwardChannel, grabReverseChannel);
     }
 
     public void grab(Robot.ObjectType obj) {
-        if (obj == Robot.ObjectType.CARGO && grabbed) {
-            grabbed = false;
-            // Open arms
-        } else if (obj == ObjectType.CARGO && !grabbed) {
-            grabbed = true;
-            // Close arms
-        } else if (obj == Robot.ObjectType.HATCH && grabbed) {
-            grabbed = false;
-            // Close arms
-        } else if (obj == ObjectType.HATCH && !grabbed) {
-            grabbed = true;
-            // Open arms
+        if (obj == Robot.ObjectType.CARGO) {
+            solThread.interrupt();
+            grab.set(Value.kForward);
+        } else if (obj == Robot.ObjectType.HATCH) {
+            grab.set(Value.kReverse);
+            solThread.interrupt();
         }
     }
 
     public void drop(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO) {
-            // Close arms
+            grab.set(Value.kReverse);
+            // disableSolenoid(grab, Value.kForward);
         } else if (obj == ObjectType.HATCH) {
-            // Open arms
+            grab.set(Value.kForward);
+            // disableSolenoid(grab, Value.kReverse);
         }
     }
 
     public void raise() {
-
+        lift.set(Value.kForward);
     }
 
     public void lower() {
-        
+        lift.set(Value.kReverse);
+    }
+
+    private void disableSolenoid(DoubleSolenoid sol, Value value) {
+        solThread = new Thread(() -> {
+            try {
+                Thread.sleep(500);
+                sol.set(value);
+            } catch (InterruptedException e) {
+            }
+        });
+        solThread.run();
     }
 }
