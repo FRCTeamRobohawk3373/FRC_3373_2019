@@ -128,13 +128,14 @@ public class Robot extends TimedRobot {
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    claw = new Claw(2, 0, 3, 2, 1);
+    // claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
+    elevator = new Elevator(5, shooter);
 
     object = ObjectType.HATCH;
   }
@@ -269,7 +270,7 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    if(shooter.isYPushed()) {
+    /* if(shooter.isYPushed()) {
       claw.grab(object);
     } else if (shooter.isXPushed()) {
       claw.drop(object);
@@ -285,19 +286,19 @@ public class Robot extends TimedRobot {
       claw.raise();
     } else if (shooter.getRawAxis(5) > 0.5) {
       claw.lower();
+    } */
+
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.rawMovePID(shooter.getRawAxis(1));
     }
 
-    /* if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
-      elevator.move(shooter.getRawAxis(1));
-    } */
-
-    /* if (shooter.isDPadDownPushed()) {
-      elevator.moveToHeight(0, object);
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(10);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
-      elevator.moveToHeight(1, object);
+      elevator.moveToHeight(20);
     }  else if (shooter.isDPadUpPushed()) {
-      elevator.moveToHeight(2, object);
-    } */
+      elevator.moveToHeight(30);
+    }
 
     driver.clearButtons();
     shooter.clearButtons();
