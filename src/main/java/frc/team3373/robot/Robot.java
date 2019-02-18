@@ -119,8 +119,8 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }*/
 
-    driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(1);
+    //driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(0);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
@@ -150,6 +150,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if (SmartDashboard.getBoolean("Update Constants", false)) {
+      Constants.updateValues();
+      SmartDashboard.putBoolean("Update Constants", false);
+    } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
+      try {
+        Constants.saveConstants();
+        SmartDashboard.putBoolean("Save Constants", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else if (SmartDashboard.getBoolean("Restore Backup", false) && RobotState.isTest()) {
+      try {
+        Constants.restoreBackup();
+        SmartDashboard.putBoolean("Restore Backup", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
   }
 
   /**
@@ -186,6 +206,14 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void teleopInit() {
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    elevator.resetCal();
+    //elevator.initPID();
+    elevator.zero();
+  }
+
   /**
    * This function is called periodically during operator control.
    */
@@ -199,6 +227,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    SmartDashboard.setDefaultBoolean("Save Constants", false);
+    SmartDashboard.setDefaultBoolean("Restore Backup", false);
+    SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    elevator.resetCal();
+    elevator.initPID();
   }
 
   /**
@@ -278,8 +312,10 @@ public class Robot extends TimedRobot {
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
+      claw.drop(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
+      claw.drop(object);
     }
 
     if (shooter.getRawAxis(5) < -0.5){
