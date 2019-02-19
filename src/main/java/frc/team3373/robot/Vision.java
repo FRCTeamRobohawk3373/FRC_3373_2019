@@ -150,7 +150,7 @@ public class Vision {
 	}
 
 	// Detection
-
+	/*
 	public VisionObject getClosestObject(int id) {
 		int closest = -1;
 		double cdist = 100000.0;
@@ -165,7 +165,7 @@ public class Vision {
 			return null;
 		}
 		return objects.get(closest);
-	}
+	}*/
 
 	// Gets any object that is closest
 	public VisionObject getClosestObject() {
@@ -183,7 +183,7 @@ public class Vision {
 		}
 		return objects.get(closest);
 	}
-
+	/*
 	// Gets objects with a lower distance and the same id as parameters
 	public ArrayList<VisionObject> getObjectsInRange(int id, double distance) {
 		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
@@ -197,14 +197,14 @@ public class Vision {
 			return null;
 		}
 		return inRange;
-	}
+	}*/
 
-	// Gets objects with a lower distance than parameter
-	public ArrayList<VisionObject> getObjectsInRange(double distance) {
+	// Gets objects within a range of distance in inches
+	public ArrayList<VisionObject> getObjectsInRange(double max, double min) {
 		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
 		for (int i = 0; i < objects.size(); i++) {
 			VisionObject object = objects.get(i);
-			if (object.distance < distance) {
+			if (object.distance < max && object.distance > min) {
 				inRange.add(object);
 			}
 		}
@@ -214,6 +214,21 @@ public class Vision {
 		return inRange;
 	}
 
+	public ArrayList<VisionObject> getObjectsInRotation(double max, double min) {
+		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
+		for (int i = 0; i < objects.size(); i++) {
+			VisionObject object = objects.get(i);
+			if (object.rotation < max && object.rotation > min) {
+				inRange.add(object);
+			}
+		}
+		if (inRange.size() == 0) {
+			return null;
+		}
+		return inRange;
+	}
+
+	/*
 	// Gets object with highest score for id
 	public VisionObject getBestObject(int id) {
 		int best = -1;
@@ -257,15 +272,15 @@ public class Vision {
 		}
 		VisionObject bestInRange = getBestObject(inRange);
 		return bestInRange;
-	}
-
+	}*/
+	
 	// Gets object with x absolute value closest to zero (center of screen)
-	public VisionObject getObjectClosestToCenter(int id) {
+	public VisionObject getObjectClosestToCenter() {
 		int closest = -1;
 		double cx = 2.0;
 		for (int i = 0; i < objects.size(); i++) {
 			VisionObject object = objects.get(i);
-			if (object.id == id && Math.abs(object.X) < cx) {
+			if (Math.abs(object.X) < cx) {
 				closest = i;
 				cx = Math.abs(object.X);
 			}
@@ -292,7 +307,7 @@ public class Vision {
 		}
 		return objects.get(closest);
 	}
-
+	/*
 	// Gets object with absolute x value closest to zero with distance less than
 	// in parameters
 	public VisionObject getObjectClosestToCenterInRange(int id, double distance) {
@@ -313,7 +328,7 @@ public class Vision {
 		VisionObject closestInRange = getObjectClosestToCenter(inRange);
 		return closestInRange;
 	}
-
+	
 	// Gets objects with a score greater than parameters
 	public ArrayList<VisionObject> getObjectsInScore(int id, int score) {
 		ArrayList<VisionObject> inScore = new ArrayList<VisionObject>();
@@ -355,7 +370,7 @@ public class Vision {
 			return null;
 		}
 		return inScoreInRange;
-	}
+	}*/
 
 	public int size() {
 		return objects.size();
@@ -376,8 +391,7 @@ public class Vision {
 				objectData[i] = objectData[i].replace("[", "");
 				objectData[i] = objectData[i].replace("]", "");
 				String[] data = objectData[i].split(", ");
-				objects.add(new VisionObject(Integer.parseInt(data[0]), Integer.parseInt(data[1]),
-						Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4])));
+				objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[4]), Double.parseDouble(data[5])));
 				// System.out.print(" : ");
 			}
 		} catch (Exception e) {

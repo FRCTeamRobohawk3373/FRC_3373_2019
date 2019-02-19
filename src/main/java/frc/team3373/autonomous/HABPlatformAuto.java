@@ -78,6 +78,8 @@ public class HABPlatformAuto {
         boolean backAtHeight = false;
 
         double nextTargetHeight = 0;
+        double diff;
+
         state = 0;
         while ((!joystick.isXHeld() || !joystick2.isXHeld()) && !RobotState.isDisabled()) {
             SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
@@ -95,7 +97,7 @@ public class HABPlatformAuto {
                 break;
             case 1:// climb
                 SmartDashboard.putString("Current Step", "lifting");
-                if (frontAtHeight && backAtHeight) { //checks that both the front and the back are at the height
+                /*if (frontAtHeight && backAtHeight) { //checks that both the front and the back are at the height
                     //if (joystick.isXPushed()) {
                         if (nextTargetHeight >= climbHeight) {
                             state++;
@@ -108,7 +110,7 @@ public class HABPlatformAuto {
                         backAtHeight = false;
                 // }
                 }
-
+                
                 if (rightSensor.getDistance() >= nextTargetHeight) {//waits for the front sensor to reach the next height and stops the solenoid
                     System.out.print("stoping front");
                     rightSolenoid.set(Value.kOff);
@@ -121,10 +123,40 @@ public class HABPlatformAuto {
                     System.out.print("stoping back");
                     leftSolenoid.set(Value.kOff);
                     backAtHeight = true;
-
+                
                 } else if (!backAtHeight) {
                     leftSolenoid.set(Value.kForward);
+                }*/
+                diff = rightSensor.getDistance()-leftSensor.getDistance();
+                if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
+                    if(diff>1){
+                        rightSolenoid.set(Value.kOff);
+                    } else {
+                        rightSolenoid.set(Value.kForward);
+                    }
+                    frontAtHeight = false;
+                } else {
+                    System.out.print("stoping right");
+                    rightSolenoid.set(Value.kOff);
+                    frontAtHeight = true;
                 }
+                
+                if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
+                    if(diff<-1){
+                         leftSolenoid.set(Value.kOff);
+                    } else {
+                        leftSolenoid.set(Value.kForward);
+                    }
+                    backAtHeight = false;
+                } else {
+                    System.out.print("stoping left");
+                    leftSolenoid.set(Value.kOff);
+                    backAtHeight = true;
+                }
+
+                if (frontAtHeight && backAtHeight) 
+                    state++;
+
 
                 break;
             case 2:// Forward 1st stop
