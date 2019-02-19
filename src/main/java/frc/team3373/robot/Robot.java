@@ -335,26 +335,30 @@ public class Robot extends TimedRobot {
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
+      elevator.moveToPosition(0, object);
       SmartDashboard.putString("Object", "HATCH");
       claw.release(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
+      elevator.moveToPosition(0, object);
       SmartDashboard.putString("Object", "CARGO");
       claw.release(object);
     }
 
-    if (shooter.getRawAxis(5) < -0.5){
+    if (shooter.getRawAxis(1) < -0.5){
       claw.raise();
-    } else if (shooter.getRawAxis(5) > 0.5) {
+    } else if (shooter.getRawAxis(1) > 0.5) {
       claw.lower();
     }
 
     if (shooter.isDPadDownPushed()) {
-      elevator.moveToHeight(10);
+      elevator.moveToPosition(0, object);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
-      elevator.moveToHeight(20);
+      elevator.moveToPosition(1, object);
     }  else if (shooter.isDPadUpPushed()) {
-      elevator.moveToHeight(30);
+      elevator.moveToPosition(2, object);
+    } else if(shooter.isBPushed()){
+      elevator.moveToHeight(19);
     }
 
     driver.clearButtons();
@@ -362,8 +366,8 @@ public class Robot extends TimedRobot {
   }
 
   private void testControls() {
-    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
-      elevator.rawMovePID(-shooter.getRawAxis(1));
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(5)) > 0.05) {
+      elevator.rawMovePID(-shooter.getRawAxis(5));
     }
 
     swerve.printPositions();
