@@ -119,8 +119,8 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }*/
 
-    driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(1);
+    //driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(0);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
@@ -128,13 +128,14 @@ public class Robot extends TimedRobot {
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    claw = new Claw(2, 0, 3, 2, 1);
+    // claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
+    elevator = new Elevator(5, shooter);
 
     object = ObjectType.HATCH;
   }
@@ -149,6 +150,26 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    if (SmartDashboard.getBoolean("Update Constants", false)) {
+      Constants.updateValues();
+      SmartDashboard.putBoolean("Update Constants", false);
+    } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
+      try {
+        Constants.saveConstants();
+        SmartDashboard.putBoolean("Save Constants", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else if (SmartDashboard.getBoolean("Restore Backup", false) && RobotState.isTest()) {
+      try {
+        Constants.restoreBackup();
+        SmartDashboard.putBoolean("Restore Backup", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
   }
 
   /**
@@ -185,6 +206,14 @@ public class Robot extends TimedRobot {
     }
   }
 
+  @Override
+  public void teleopInit() {
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    elevator.resetCal();
+    //elevator.initPID();
+    elevator.zero();
+  }
+
   /**
    * This function is called periodically during operator control.
    */
@@ -198,6 +227,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    SmartDashboard.setDefaultBoolean("Save Constants", false);
+    SmartDashboard.setDefaultBoolean("Restore Backup", false);
+    SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    elevator.resetCal();
+    elevator.initPID();
   }
 
   /**
@@ -269,7 +304,7 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    if(shooter.isYPushed()) {
+    /* if(shooter.isYPushed()) {
       claw.grab(object);
     } else if (shooter.isXPushed()) {
       claw.drop(object);
@@ -277,27 +312,29 @@ public class Robot extends TimedRobot {
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
+      claw.drop(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
+      claw.drop(object);
     }
 
     if (shooter.getRawAxis(5) < -0.5){
       claw.raise();
     } else if (shooter.getRawAxis(5) > 0.5) {
       claw.lower();
+    } */
+
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.rawMovePID(shooter.getRawAxis(1));
     }
 
-    /* if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
-      elevator.move(shooter.getRawAxis(1));
-    } */
-
-    /* if (shooter.isDPadDownPushed()) {
-      elevator.moveToHeight(0, object);
+    if (shooter.isDPadDownPushed()) {
+      elevator.moveToHeight(10);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
-      elevator.moveToHeight(1, object);
+      elevator.moveToHeight(20);
     }  else if (shooter.isDPadUpPushed()) {
-      elevator.moveToHeight(2, object);
-    } */
+      elevator.moveToHeight(30);
+    }
 
     driver.clearButtons();
     shooter.clearButtons();

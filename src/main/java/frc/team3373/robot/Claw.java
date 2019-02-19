@@ -17,23 +17,23 @@ public class Claw {
         grab = new DoubleSolenoid(PCM, grabForwardChannel, grabReverseChannel);
     }
 
-    public void grab(Robot.ObjectType obj) {
-        if (obj == Robot.ObjectType.CARGO) {
+    public void grab(ObjectType obj) {
+        if (obj == ObjectType.CARGO) {
             solThread.interrupt();
             grab.set(Value.kForward);
-        } else if (obj == Robot.ObjectType.HATCH) {
+        } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kReverse);
             solThread.interrupt();
         }
     }
 
-    public void drop(Robot.ObjectType obj) {
-        if (obj == Robot.ObjectType.CARGO) {
+    public void drop(ObjectType obj) {
+        if (obj == ObjectType.CARGO) {
             grab.set(Value.kReverse);
-            // disableSolenoid(grab, Value.kForward);
+            disableSolenoid(grab, Value.kForward);
         } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kForward);
-            // disableSolenoid(grab, Value.kReverse);
+            disableSolenoid(grab, Value.kReverse);
         }
     }
 
