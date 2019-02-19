@@ -154,10 +154,10 @@ public class Elevator {
         case 0:
             switch (obj) {
             case CARGO:
-
+                moveToHeight(27.5);
                 break;
             case HATCH:
-
+                moveToHeight(19.0);
                 break;
             default:
                 System.out.println("Object must be defined!");
@@ -167,10 +167,10 @@ public class Elevator {
         case 1:
             switch (obj) {
             case CARGO:
-
+                moveToHeight(55.5);
                 break;
             case HATCH:
-
+                moveToHeight(47);
                 break;
             default:
                 System.out.println("Object must be defined!");
@@ -180,10 +180,10 @@ public class Elevator {
         case 2:
             switch (obj) {
             case CARGO:
-
+                moveToHeight(83.5);
                 break;
             case HATCH:
-
+                moveToHeight(75);
                 break;
             default:
                 System.out.println("Object must be defined!");
