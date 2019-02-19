@@ -7,10 +7,6 @@
 
 package frc.team3373.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
@@ -19,9 +15,12 @@ import java.io.IOException;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -89,6 +88,7 @@ public class Robot extends TimedRobot {
 
   Compressor compressor;
   AutonomousControl control;
+  Solenoid armRelease;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -112,15 +112,9 @@ public class Robot extends TimedRobot {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    /*try {
-      Constants.saveConstants();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }*/
 
-    //driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(0);
+    driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
@@ -128,7 +122,7 @@ public class Robot extends TimedRobot {
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    // claw = new Claw(2, 0, 3, 2, 1);
+    claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
@@ -138,6 +132,11 @@ public class Robot extends TimedRobot {
     elevator = new Elevator(5, shooter);
 
     object = ObjectType.HATCH;
+
+    armRelease = new Solenoid(1, 7);
+    armRelease.set(true);
+    elevator.absoluteZero();
+    SmartDashboard.putString("Object", "HATCH");
   }
 
   /**
@@ -167,9 +166,13 @@ public class Robot extends TimedRobot {
       } catch (IOException e) {
         e.printStackTrace();
       }
+    } else if (SmartDashboard.getBoolean("Restore Defaults", false)) {
+      try {
+        Constants.loadDefaults();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
-    SmartDashboard.putNumber("Rotations", elevator.getRotations());
-    SmartDashboard.putNumber("Position", elevator.getPosition());
   }
 
   /**
@@ -211,7 +214,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.setDefaultBoolean("Update Constants", false);
     elevator.resetCal();
     //elevator.initPID();
-    elevator.zero();
+    // elevator.zero();
   }
 
   /**
@@ -220,6 +223,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls();
+    elevator.refresh();
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    SmartDashboard.putNumber("Left Distance", distl.getDistance());
+    SmartDashboard.putNumber("Right Distance", distr.getDistance());
   }
 
   /**
@@ -231,6 +239,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.setDefaultBoolean("Save Constants", false);
     SmartDashboard.setDefaultBoolean("Restore Backup", false);
     SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    SmartDashboard.setDefaultBoolean("Restore Defaults", false);
     elevator.resetCal();
     elevator.initPID();
   }
@@ -240,8 +249,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    SmartDashboard.putNumber("Left Distance", distl.getDistance());
+    SmartDashboard.putNumber("Right Distance", distr.getDistance());
     swerve.printPositions();
-    
+    testControls();
+    elevator.refresh();
   }
 
   public void driverControls() {
@@ -304,28 +318,26 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    /* if(shooter.isYPushed()) {
+    if(shooter.isYPushed()) {
       claw.grab(object);
-    } else if (shooter.isXPushed()) {
-      claw.drop(object);
+    } else if (shooter.isAPushed()) {
+      claw.release(object);
     }
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
-      claw.drop(object);
+      SmartDashboard.putString("Object", "HATCH");
+      claw.release(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
-      claw.drop(object);
+      SmartDashboard.putString("Object", "CARGO");
+      claw.release(object);
     }
 
     if (shooter.getRawAxis(5) < -0.5){
       claw.raise();
     } else if (shooter.getRawAxis(5) > 0.5) {
       claw.lower();
-    } */
-
-    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
-      elevator.rawMovePID(shooter.getRawAxis(1));
     }
 
     if (shooter.isDPadDownPushed()) {
@@ -338,5 +350,30 @@ public class Robot extends TimedRobot {
 
     driver.clearButtons();
     shooter.clearButtons();
+  }
+
+  private void testControls() {
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.rawMovePID(-shooter.getRawAxis(1));
+    }
+
+    swerve.printPositions();
+
+    if (shooter.isAPushed()) {
+      elevator.calibrate();
+    } else if (shooter.isXPushed()) {
+      elevator.resetCal();
+    }
+
+    if (shooter.isBPushed()) {
+      elevator.moveToHeight(Constants.getNumber("elevatorHeight"));
+    }
+
+    if (shooter.isYPushed()) {
+      elevator.absoluteZero();
+    }
+    
+    shooter.clearButtons();
+    shooter.clearDPad();
   }
 }

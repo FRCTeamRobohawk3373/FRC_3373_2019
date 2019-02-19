@@ -32,6 +32,7 @@ public class Elevator {
     private CANDigitalInput forwardLimit;
 
     private boolean zeroing;
+    private boolean zeroed;
 
     public Elevator(int motorID, SuperJoystick shooter) {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
@@ -47,15 +48,15 @@ public class Elevator {
         slope = Constants.getNumber("elevatorSlope");
 
         reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen);
-        forwardLimit = motor.getForwardLimitSwitch(LimitSwitchPolarity.kNormallyClosed);
 
         calStep = 0;
 
         zeroing = false;
+        zeroed = false;
 
+        motor.set(0);
+        absoluteZero();
         reverseLimit.enableLimitSwitch(false);
-        forwardLimit.enableLimitSwitch(false);
-        System.out.println(reverseLimit.isLimitSwitchEnabled());
         // leftLimit = new AnalogInput(leftLimitPort);
         // rightLimit = new AnalogInput(rightLimitPort);
     }
@@ -69,7 +70,7 @@ public class Elevator {
     public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
         pid.setOutputRange(-0.1, 0.1);
         if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1 && RobotState.isTest()) {
-            position += increment * 0.075;
+            position += increment * 0.16525;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
                 position = Constants.getNumber("elevatorMaxRotations");
             pid.setReference(position, ControlType.kPosition);
@@ -96,16 +97,19 @@ public class Elevator {
 
         if (zeroing && !reverseLimit.get()) {
             motor.set(0);
-            // motor.setIdleMode(IdleMode.kCoast);
+            motor.setIdleMode(IdleMode.kCoast);
         } else if (zeroing && reverseLimit.get()) {
             zeroing = false;
             absoluteZero();
             motor.setIdleMode(IdleMode.kBrake);
         }
 
-        if (reverseLimit.get()) {
+        if (reverseLimit.get() && !zeroed) {
             absoluteZero();
             zeroing = false;
+            zeroed = true;
+        } else if (!reverseLimit.get() && zeroed) {
+            zeroed = false;
         }
     }
 

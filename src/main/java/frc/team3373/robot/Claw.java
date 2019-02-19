@@ -19,21 +19,23 @@ public class Claw {
 
     public void grab(ObjectType obj) {
         if (obj == ObjectType.CARGO) {
-            solThread.interrupt();
+            if (solThread != null)
+                solThread.interrupt();
             grab.set(Value.kForward);
         } else if (obj == ObjectType.HATCH) {
+            if (solThread != null)
+                solThread.interrupt();
             grab.set(Value.kReverse);
-            solThread.interrupt();
         }
     }
 
-    public void drop(ObjectType obj) {
+    public void release(ObjectType obj) {
         if (obj == ObjectType.CARGO) {
             grab.set(Value.kReverse);
-            disableSolenoid(grab, Value.kForward);
+            disableSolenoid(grab, Value.kOff);
         } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kForward);
-            disableSolenoid(grab, Value.kReverse);
+            disableSolenoid(grab, Value.kOff);
         }
     }
 
