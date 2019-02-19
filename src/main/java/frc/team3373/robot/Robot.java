@@ -364,7 +364,9 @@ public class Robot extends TimedRobot {
     }
 
     driver.clearButtons();
+    driver.clearDPad();
     shooter.clearButtons();
+    shooter.clearDPad();
   }
 
   private void testControls() {
