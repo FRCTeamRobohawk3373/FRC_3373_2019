@@ -119,7 +119,7 @@
     "angleD": 0,
     
     "elevatorP":0.3, 
-    "elevatorI": 0.001,
+    "elevatorI": 1.42E-6,
     "elevatorD": 0,
     "elevatorFF": 0,
     "elevatorSlope": 3.2561692994318894,

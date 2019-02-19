@@ -7,10 +7,6 @@
 
 package frc.team3373.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.robot.SwerveControl.Side;
@@ -19,9 +15,11 @@ import java.io.IOException;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -98,7 +96,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    compressor = new Compressor(1);
+    //compressor = new Compressor(1);
 
     try {
       Constants.loadConstants();
@@ -119,8 +117,8 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }*/
 
-    //driver = new SuperJoystick(0);
-    shooter = new SuperJoystick(0);
+    driver = new SuperJoystick(0);
+    shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
@@ -138,6 +136,7 @@ public class Robot extends TimedRobot {
     elevator = new Elevator(5, shooter);
 
     object = ObjectType.HATCH;
+    elevator.absoluteZero();
   }
 
   /**
@@ -164,6 +163,12 @@ public class Robot extends TimedRobot {
       try {
         Constants.restoreBackup();
         SmartDashboard.putBoolean("Restore Backup", false);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else if (SmartDashboard.getBoolean("Restore Defaults", false)) {
+      try {
+        Constants.loadDefaults();
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -211,7 +216,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.setDefaultBoolean("Update Constants", false);
     elevator.resetCal();
     //elevator.initPID();
-    elevator.zero();
+    // elevator.zero();
   }
 
   /**
@@ -220,6 +225,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls();
+    elevator.refresh();
   }
 
   /**
@@ -231,6 +237,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.setDefaultBoolean("Save Constants", false);
     SmartDashboard.setDefaultBoolean("Restore Backup", false);
     SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    SmartDashboard.setDefaultBoolean("Restore Defaults", false);
     elevator.resetCal();
     elevator.initPID();
   }
@@ -241,7 +248,8 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     swerve.printPositions();
-    
+    testControls();
+    elevator.refresh();
   }
 
   public void driverControls() {
@@ -324,10 +332,6 @@ public class Robot extends TimedRobot {
       claw.lower();
     } */
 
-    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
-      elevator.rawMovePID(shooter.getRawAxis(1));
-    }
-
     if (shooter.isDPadDownPushed()) {
       elevator.moveToHeight(10);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
@@ -338,5 +342,30 @@ public class Robot extends TimedRobot {
 
     driver.clearButtons();
     shooter.clearButtons();
+  }
+
+  private void testControls() {
+    if (RobotState.isTest() && Math.abs(shooter.getRawAxis(1)) > 0.05) {
+      elevator.rawMovePID(-shooter.getRawAxis(1));
+    }
+
+    swerve.printPositions();
+
+    if (shooter.isAPushed()) {
+      elevator.calibrate();
+    } else if (shooter.isXPushed()) {
+      elevator.resetCal();
+    }
+
+    if (shooter.isBPushed()) {
+      elevator.moveToHeight(Constants.getNumber("elevatorHeight"));
+    }
+
+    if (shooter.isYPushed()) {
+      elevator.absoluteZero();
+    }
+    
+    shooter.clearButtons();
+    shooter.clearDPad();
   }
 }

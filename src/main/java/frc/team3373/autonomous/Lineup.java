@@ -85,10 +85,19 @@ public class Lineup {
 
         while (!joystick.isXHeld() && !RobotState.isDisabled()) {
             switch (state) {
-            case 0: // If 200 or more samples are within the deadband, disable PID and go to case 1
+                case 0: // When line is sensed for a certain number of times, go to case 5
+                    if (line.get() && count == 3) {
+                        state++;
+                    } else if (line.get()) {
+                        count++;
+                    } else if (count != 0 && !line.get()) {
+                        count = 0;
+                    }
+                    break;
+            case 1: // If 200 or more samples are within the deadband, disable PID and go to case 1
                 square();
                 break;
-            case 1: // If the average distance is within the correct range, go to line finding.
+            case 2: // If the average distance is within the correct range, go to line finding.
                     // Else, go towards the right distance
                 double dist = (dleft.getDistance() + dright.getDistance()) / 2;
                 if (dist < 12 && dist > 11) {
@@ -103,7 +112,7 @@ public class Lineup {
                     state++;
                 }
                 break;
-            case 2: // If the average distance is within the correct range, go to line finding
+            case 3: // If the average distance is within the correct range, go to line finding
                 dist = (dleft.getDistance() + dright.getDistance()) / 2;
                 if (dist < 12 && dist > 11) {
                     System.out.println("Stopping");
@@ -111,7 +120,7 @@ public class Lineup {
                     state++;
                 }
                 break;
-            case 3: // If line is sensed, return. Else, search in the specified direction
+            case 4: // If line is sensed, return. Else, search in the specified direction
                 if (line.get()) {
                     swerve.setControlMode(mode);
                     SmartDashboard.putBoolean("Aligned", true);
@@ -131,15 +140,6 @@ public class Lineup {
                     swerve.setControlMode(mode);
                     SmartDashboard.putBoolean("Aligned", true);
                     return;
-                }
-                break;
-            case 4: // When line is sensed for a certain number of times, go to case 5
-                if (line.get() && count == 3) {
-                    state++;
-                } else if (line.get()) {
-                    count++;
-                } else if (count != 0 && !line.get()) {
-                    count = 0;
                 }
                 break;
             case 5: // Fine tune squaring with PID

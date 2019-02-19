@@ -47,14 +47,14 @@ public class Elevator {
         slope = Constants.getNumber("elevatorSlope");
 
         reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen);
-        forwardLimit = motor.getForwardLimitSwitch(LimitSwitchPolarity.kNormallyClosed);
 
         calStep = 0;
 
         zeroing = false;
 
+        motor.set(0);
+        absoluteZero();
         reverseLimit.enableLimitSwitch(false);
-        forwardLimit.enableLimitSwitch(false);
         System.out.println(reverseLimit.isLimitSwitchEnabled());
         // leftLimit = new AnalogInput(leftLimitPort);
         // rightLimit = new AnalogInput(rightLimitPort);
@@ -96,7 +96,7 @@ public class Elevator {
 
         if (zeroing && !reverseLimit.get()) {
             motor.set(0);
-            // motor.setIdleMode(IdleMode.kCoast);
+            motor.setIdleMode(IdleMode.kCoast);
         } else if (zeroing && reverseLimit.get()) {
             zeroing = false;
             absoluteZero();
