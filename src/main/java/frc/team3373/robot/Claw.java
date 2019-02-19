@@ -32,7 +32,6 @@ public class Claw {
     public void release(ObjectType obj) {
         if (obj == ObjectType.CARGO) {
             grab.set(Value.kReverse);
-            disableSolenoid(grab, Value.kOff);
         } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kForward);
             disableSolenoid(grab, Value.kOff);

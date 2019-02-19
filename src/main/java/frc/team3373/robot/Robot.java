@@ -331,6 +331,8 @@ public class Robot extends TimedRobot {
       claw.grab(object);
     } else if (shooter.isAPushed()) {
       claw.release(object);
+    } else if (!shooter.isYHeld() && object == ObjectType.CARGO) {
+      claw.grab(ObjectType.CARGO);
     }
 
     if (shooter.isLBPushed()) {
