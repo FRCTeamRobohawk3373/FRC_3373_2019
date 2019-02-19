@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -87,6 +88,7 @@ public class Robot extends TimedRobot {
 
   Compressor compressor;
   AutonomousControl control;
+  Solenoid armRelease;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -96,7 +98,7 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    //compressor = new Compressor(1);
+    compressor = new Compressor(1);
 
     try {
       Constants.loadConstants();
@@ -126,7 +128,7 @@ public class Robot extends TimedRobot {
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    // claw = new Claw(2, 0, 3, 2, 1);
+    claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
@@ -136,7 +138,11 @@ public class Robot extends TimedRobot {
     elevator = new Elevator(5, shooter);
 
     object = ObjectType.HATCH;
+
+    armRelease = new Solenoid(1, 7);
+    armRelease.set(true);
     elevator.absoluteZero();
+    SmartDashboard.putString("Object", "HATCH");
   }
 
   /**
@@ -173,8 +179,6 @@ public class Robot extends TimedRobot {
         e.printStackTrace();
       }
     }
-    SmartDashboard.putNumber("Rotations", elevator.getRotations());
-    SmartDashboard.putNumber("Position", elevator.getPosition());
   }
 
   /**
@@ -226,6 +230,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     driverControls();
     elevator.refresh();
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    SmartDashboard.putNumber("Left Distance", distl.getDistance());
+    SmartDashboard.putNumber("Right Distance", distr.getDistance());
   }
 
   /**
@@ -247,6 +255,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    SmartDashboard.putNumber("Left Distance", distl.getDistance());
+    SmartDashboard.putNumber("Right Distance", distr.getDistance());
     swerve.printPositions();
     testControls();
     elevator.refresh();
@@ -312,25 +324,27 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    /* if(shooter.isYPushed()) {
+    if(shooter.isYPushed()) {
       claw.grab(object);
-    } else if (shooter.isXPushed()) {
-      claw.drop(object);
+    } else if (shooter.isAPushed()) {
+      claw.release(object);
     }
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
-      claw.drop(object);
+      SmartDashboard.putString("Object", "HATCH");
+      claw.release(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
-      claw.drop(object);
+      SmartDashboard.putString("Object", "CARGO");
+      claw.release(object);
     }
 
     if (shooter.getRawAxis(5) < -0.5){
       claw.raise();
     } else if (shooter.getRawAxis(5) > 0.5) {
       claw.lower();
-    } */
+    }
 
     if (shooter.isDPadDownPushed()) {
       elevator.moveToHeight(10);

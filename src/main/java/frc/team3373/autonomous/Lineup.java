@@ -38,7 +38,7 @@ public class Lineup {
 
         pid.setAbsoluteTolerance(0.1);
         pid.setContinuous(false);
-        pid.setOutputRange(-0.2, 0.2);
+        pid.setOutputRange(-0.25, 0.25);
         pid.setInputRange(3, 32);
     }
 
@@ -78,14 +78,38 @@ public class Lineup {
 
         AlignDirection align = al; // Holds which way the line is from the robot
 
-        pid.setAbsoluteTolerance(0.1); // Sets deadband for PID
-        pid.enable(); // Enables PID loop
+        pid.setAbsoluteTolerance(Constants.getNumber("lineupTolerance", 0.2)); // Sets deadband for PID
 
         int count = 0; // Stores how many values have been tested
+        pid.setP(Constants.getNumber("lineupP", 0.1)); // TODO: Remove
+        pid.setI(Constants.getNumber("lineupI", 0));
+        pid.setD(Constants.getNumber("lineupD", 0));
 
         while (!joystick.isXHeld() && !RobotState.isDisabled()) {
             switch (state) {
-                case 0: // When line is sensed for a certain number of times, go to case 5
+                case 0: // If line is sensed, return. Else, search in the specified direction
+                    if (line.get()) {
+                        swerve.setControlMode(mode);
+                        SmartDashboard.putBoolean("Aligned", true);
+                        return;
+                    }
+                    switch (align) {
+                    case RIGHT:
+                        swerve.calculateAutoSwerveControl(0, 0.1, 0);
+                        state++;
+                        break;
+                    case LEFT:
+                        swerve.calculateAutoSwerveControl(180, 0.1, 0);
+                        state++;
+                        break;
+                    default:
+                        System.out.println("AlignDirection must be defined");
+                        swerve.setControlMode(mode);
+                        SmartDashboard.putBoolean("Aligned", true);
+                        return;
+                    }
+                    break;
+                case 1: // When line is sensed for a certain number of times, go to case 5
                     if (line.get() && count == 3) {
                         state++;
                     } else if (line.get()) {
@@ -94,10 +118,10 @@ public class Lineup {
                         count = 0;
                     }
                     break;
-            case 1: // If 200 or more samples are within the deadband, disable PID and go to case 1
+            case 2: // If 200 or more samples are within the deadband, disable PID and go to case 1
                 square();
                 break;
-            case 2: // If the average distance is within the correct range, go to line finding.
+            case 3: // If the average distance is within the correct range, go to line finding.
                     // Else, go towards the right distance
                 double dist = (dleft.getDistance() + dright.getDistance()) / 2;
                 if (dist < 12 && dist > 11) {
@@ -112,7 +136,7 @@ public class Lineup {
                     state++;
                 }
                 break;
-            case 3: // If the average distance is within the correct range, go to line finding
+            case 4: // If the average distance is within the correct range, go to line finding
                 dist = (dleft.getDistance() + dright.getDistance()) / 2;
                 if (dist < 12 && dist > 11) {
                     System.out.println("Stopping");
@@ -120,7 +144,7 @@ public class Lineup {
                     state++;
                 }
                 break;
-            case 4: // If line is sensed, return. Else, search in the specified direction
+            case 5: // Fine tune squaring with PID
                 if (line.get()) {
                     swerve.setControlMode(mode);
                     SmartDashboard.putBoolean("Aligned", true);
@@ -128,31 +152,16 @@ public class Lineup {
                 }
                 switch (align) {
                 case RIGHT:
-                    swerve.calculateAutoSwerveControl(0, 0.1, 0);
-                    state++;
+                    swerve.calculateAutoSwerveControl(180, 0.1, 0);
                     break;
                 case LEFT:
-                    swerve.calculateAutoSwerveControl(180, 0.1, 0);
-                    state++;
+                    swerve.calculateAutoSwerveControl(0, 0.1, 0);
                     break;
                 default:
                     System.out.println("AlignDirection must be defined");
                     swerve.setControlMode(mode);
                     SmartDashboard.putBoolean("Aligned", true);
                     return;
-                }
-                break;
-            case 5: // Fine tune squaring with PID
-                pid.setAbsoluteTolerance(0.05);
-                pid.enable();
-                while (!joystick.isXHeld() && !RobotState.isDisabled()) {
-                    if (pid.onTarget()) {
-                        pid.disable();
-                        swerve.calculateAutoSwerveControl(0, 0, 0);
-                        swerve.setControlMode(mode);
-                        SmartDashboard.putBoolean("Aligned", true);
-                        return;
-                    }
                 }
             default:
                 System.out.println("State must be 0-3");

@@ -2,6 +2,8 @@ package frc.team3373.robot;
 
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DistanceSensorPID implements PIDSource {
     DistanceSensor dleft;
@@ -19,6 +21,7 @@ public class DistanceSensorPID implements PIDSource {
     public double pidGet() {
         double rdist = (double) Math.round(100 * dright.getDistance()) / 100; // Rounds values of distance sensors
         double ldist = (double) Math.round(100 * dleft.getDistance()) / 100;
+        /*if (RobotState.isTest()) {*/SmartDashboard.putNumber("Left Distance", dleft.getDistance());SmartDashboard.putNumber("Right Distance", dright.getDistance());//}
 
         if (rdist == -2.0 && ldist == -2.0) { // If the sensors are out of range, do nothing
             rdist = 0;
