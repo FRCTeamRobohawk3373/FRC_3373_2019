@@ -89,6 +89,8 @@ public class Robot extends TimedRobot {
   Compressor compressor;
   AutonomousControl control;
   Solenoid armRelease;
+
+  double rotateSpeedMod = .5;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -243,6 +245,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.setDefaultBoolean("Restore Backup", false);
     SmartDashboard.setDefaultNumber("Calibration Length", 1);
     SmartDashboard.setDefaultBoolean("Restore Defaults", false);
+    SmartDashboard.putNumber("Inches", 10);
     elevator.resetCal();
     elevator.initPID();
   }
@@ -289,14 +292,17 @@ public class Robot extends TimedRobot {
     } 
 
     if(driver.isLBHeld()){//sniper
-			swerve.setDriveSpeed(0.2);
+      swerve.setDriveSpeed(0.2);
+      rotateSpeedMod=.5;
 		}else if(driver.isRBHeld()){//turbo
-			swerve.setDriveSpeed(0.7);
+      swerve.setDriveSpeed(0.7);
+      rotateSpeedMod=.5;
     } else {//regular
       swerve.setDriveSpeed(0.4);
+      rotateSpeedMod = .5;
     }
     
-    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4));
+    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4)*rotateSpeedMod);
     
     switch (driver.getPOV()) {
     case 0:

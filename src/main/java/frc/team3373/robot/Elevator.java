@@ -198,6 +198,7 @@ public class Elevator {
     public void calibrate() {
         if (!calibrating) {
             SmartDashboard.putBoolean("Calibrating", true);
+            System.out.println("Starting Calibration");
             calibrating = true;
             calLength = (int) SmartDashboard.getNumber("Calibration Length", 2);
             calInches = (int) SmartDashboard.getNumber("Inches", 10);
