@@ -112,12 +112,6 @@ public class Robot extends TimedRobot {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    /*try {
-      Constants.saveConstants();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }*/
 
     driver = new SuperJoystick(0);
     shooter = new SuperJoystick(1);
