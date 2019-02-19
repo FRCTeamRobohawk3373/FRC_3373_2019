@@ -172,6 +172,9 @@ public class Robot extends TimedRobot {
       } catch (IOException e) {
         e.printStackTrace();
       }
+    } else {
+      SmartDashboard.putBoolean("Save Constants", false);
+      SmartDashboard.putBoolean("Restore Backup", false);
     }
   }
 

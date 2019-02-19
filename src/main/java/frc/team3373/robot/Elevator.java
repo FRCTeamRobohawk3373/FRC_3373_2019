@@ -38,13 +38,13 @@ public class Elevator {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
         calibrating = false;
 
-        motor.setIdleMode(IdleMode.kBrake);
+        motor.setIdleMode(IdleMode.kCoast);
 
         pid = motor.getPIDController();
         pid.setP(Constants.getNumber("elevatorP"));
         pid.setI(Constants.getNumber("elevatorI"));
         pid.setD(Constants.getNumber("elevatorD"));
-        pid.setOutputRange(-0.05, 0.05); // TODO: Change speed for robot
+        pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2)); // TODO: Change speed for robot
         slope = Constants.getNumber("elevatorSlope");
 
         reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen);
@@ -68,9 +68,9 @@ public class Elevator {
     }
 
     public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
-        pid.setOutputRange(-0.1, 0.1);
+        pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
         if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1 && RobotState.isTest()) {
-            position += increment * 0.16525;
+            position += increment * 0.5;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
                 position = Constants.getNumber("elevatorMaxRotations");
             pid.setReference(position, ControlType.kPosition);
@@ -80,10 +80,8 @@ public class Elevator {
 
     public void refresh() { // Fail-safes and zero checks
         SmartDashboard.putBoolean("reverseLimit", reverseLimit.get());
-        if (motor.getEncoder().getPosition() >= Constants.getNumber("elevatorMaxRotations")
-                && position > Constants.getNumber("elevatorMaxRotations")) {
-            position = Constants.getNumber("elevatorMaxRotations");
-            pid.setReference(position, ControlType.kPosition);
+        if (motor.getEncoder().getPosition() >= Constants.getNumber("elevatorMaxRotations")) {
+            motor.set(0);
         }
 
         if (motor.getEncoder().getPosition() < 0 && position < 0) {
@@ -97,11 +95,9 @@ public class Elevator {
 
         if (zeroing && !reverseLimit.get()) {
             motor.set(0);
-            motor.setIdleMode(IdleMode.kCoast);
         } else if (zeroing && reverseLimit.get()) {
             zeroing = false;
             absoluteZero();
-            motor.setIdleMode(IdleMode.kBrake);
         }
 
         if (reverseLimit.get() && !zeroed) {
@@ -141,7 +137,7 @@ public class Elevator {
         if (inches < 0)
             inches = 0;
         if (inches >= 0 && inches <= Constants.getNumber("elevatorMaxHeight")) {
-            pid.setOutputRange(-0.05, 0.075);
+            pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
             slope = Constants.getNumber("elevatorSlope", 3.12);
             pid.setP(Constants.getNumber("elevatorP", 0.2)); // TODO: Remove
             pid.setI(Constants.getNumber("elevatorI"));

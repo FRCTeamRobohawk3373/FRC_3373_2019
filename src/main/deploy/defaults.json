@@ -110,8 +110,8 @@
     "BRI": 0.0015,
     "BRD": 15,
 
-    "lineupP": 0.025,
-    "lineupI": 0.0022,
+    "lineupP": 0.046,
+    "lineupI": 0.0027,
     "lineupD": 0,
 
     "angleP": 0.010575,
@@ -123,8 +123,9 @@
     "elevatorD": 0,
     "elevatorFF": 0,
     "elevatorSlope": 3.2561692994318894,
-    "elevatorSpeed": 0.025,
-    "elevatorMaxRotations": 22.5,
+    "elevatorMaxSpeed": 0.2,
+    "elevatorMinSpeed": -0.2,
+    "elevatorMaxRotations": 530,
     "elevatorMaxHeight": 70,
     "elevatorMinHeight": 0,
     "elevatorHeight": 40
