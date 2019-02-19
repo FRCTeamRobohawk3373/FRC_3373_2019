@@ -29,6 +29,14 @@ public class Claw {
         }
     }
 
+    public void open() {
+        grab.set(Value.kReverse);
+    }
+
+    public void close() {
+        grab.set(Value.kForward);
+    }
+
     public void release(ObjectType obj) {
         if (obj == ObjectType.CARGO) {
             grab.set(Value.kReverse);
