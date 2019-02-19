@@ -328,21 +328,14 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    if(shooter.isYPushed()) {
-      if (object == ObjectType.CARGO) {
-        // claw.close();
-      } else if (object == ObjectType.HATCH) {
-        claw.open();
-      }
-    } else if (shooter.isAPushed()) {
-      if (object == ObjectType.CARGO) {
-        claw.open();
-        cargoOpen = true;
-      } else if (object == ObjectType.HATCH) {
-        claw.close();
-      }
-    } else if (!shooter.isYHeld() && object == ObjectType.CARGO && cargoOpen) {
+    if(shooter.isYPushed() && object == ObjectType.HATCH) {
+      claw.open();
+    } else if (shooter.isAPushed() && object == ObjectType.HATCH) {
       claw.close();
+    } else if (!shooter.isAHeld() && object == ObjectType.CARGO) {
+      claw.close();
+    } else if (shooter.isAHeld() && object == ObjectType.CARGO) {
+      claw.open();
     }
 
     if (shooter.isLBPushed()) {
