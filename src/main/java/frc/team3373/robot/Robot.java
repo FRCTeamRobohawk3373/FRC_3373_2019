@@ -283,16 +283,16 @@ public class Robot extends TimedRobot {
     
     switch (driver.getPOV()) {
     case 0:
-      swerve.changeFront(Side.NORTH);
+      swerve.changeFront(Side.WEST);
       break;
     case 90:
-      swerve.changeFront(Side.EAST);
+      swerve.changeFront(Side.NORTH);
       break;
     case 180:
-      swerve.changeFront(Side.SOUTH);
+      swerve.changeFront(Side.EAST);
       break;
     case 270:
-      swerve.changeFront(Side.WEST);
+      swerve.changeFront(Side.SOUTH);
       break;
     }
 
