@@ -55,8 +55,14 @@ public class HABPlatformAuto {
         rightHome = new DigitalInput(rightLimitSwitch);
         leftHome = new DigitalInput(leftLimitSwitch);
 
-        rightSensor = new DistanceSensor(rightDistanceSensor, 1);
+        rightSensor = new DistanceSensor(rightDistanceSensor, 0);
         leftSensor = new DistanceSensor(leftDistanceSensor, 1);
+
+        SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
+        SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
+
+        SmartDashboard.putBoolean("leftSolenoid", false);
+        SmartDashboard.putBoolean("leftSolenoid", false);
 
         rightSolenoid = new DoubleSolenoid(PCMid,rightSolenoidFowardChannel, rightSolenoidReverseChannel);
         leftSolenoid = new DoubleSolenoid(PCMid,leftSolenoidFowardChannel, leftSolenoidReverseChannel);
@@ -127,9 +133,11 @@ public class HABPlatformAuto {
                 }*/
                 diff = rightSensor.getDistance()-leftSensor.getDistance();
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
-                    if(diff>1){
+                    if (diff > .5) {
+                        SmartDashboard.putBoolean("rightSolenoid", false);
                         rightSolenoid.set(Value.kOff);
                     } else {
+                        SmartDashboard.putBoolean("rightSolenoid", true);
                         rightSolenoid.set(Value.kForward);
                     }
                     frontAtHeight = false;
@@ -140,9 +148,11 @@ public class HABPlatformAuto {
                 }
                 
                 if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
-                    if(diff<-1){
-                         leftSolenoid.set(Value.kOff);
+                    if (diff < -.5) {
+                        SmartDashboard.putBoolean("leftSolenoid", false);
+                        leftSolenoid.set(Value.kOff);
                     } else {
+                        SmartDashboard.putBoolean("lefttSolenoid", true);
                         leftSolenoid.set(Value.kForward);
                     }
                     backAtHeight = false;
@@ -161,7 +171,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putString("Current Step", "driving 1st forward");
                 swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
                 driveMotor.set(Relay.Value.kForward);
-                if (rightSensor.getDistance() < 6 && rightSensor.getDistance() >=0) {
+                if (rightSensor.getDistance() < 10 && rightSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
                     driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");
@@ -181,7 +191,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putString("Current Step", "driving 2nd forward");
                 swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
                 driveMotor.set(Relay.Value.kForward);
-                if (leftSensor.getDistance() < 6 && leftSensor.getDistance() >=0) {
+                if (leftSensor.getDistance() < 10 && leftSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
                     driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");
