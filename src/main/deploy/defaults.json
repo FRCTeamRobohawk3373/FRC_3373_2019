@@ -110,23 +110,23 @@
     "BRI": 0.0015,
     "BRD": 15,
 
-    "lineupP": 0.046,
-    "lineupI": 0.0027,
+    "lineupP": 0.038,
+    "lineupI": 0.0032,
     "lineupD": 0,
 
     "angleP": 0.010575,
     "angleI": 1.42E-6,
     "angleD": 0,
     
-    "elevatorP":0.3, 
-    "elevatorI": 1.42E-6,
+    "elevatorP":0.2, 
+    "elevatorI": 0,
     "elevatorD": 0,
     "elevatorFF": 0,
-    "elevatorSlope": 3.2561692994318894,
-    "elevatorMaxSpeed": 0.2,
-    "elevatorMinSpeed": -0.2,
+    "elevatorSlope": 0.1296420001272515,
+    "elevatorMaxSpeed": 0.4,
+    "elevatorMinSpeed": -0.25,
     "elevatorMaxRotations": 530,
     "elevatorMaxHeight": 70,
-    "elevatorMinHeight": 0,
+    "elevatorMinHeight": 19.5,
     "elevatorHeight": 40
 }

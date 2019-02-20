@@ -250,6 +250,10 @@ public class AutonomousControl {
 		lineup.align(align);
 	}
 
+	public void rocketLineup(Lineup.AlignDirection align) {
+		lineup.rocketAlign(align);
+	}
+
 	public void square() {
 		lineup.square();
 	}
