@@ -32,7 +32,8 @@ public class Elevator {
     private CANDigitalInput forwardLimit;
 
     private boolean zeroing;
-    private boolean zeroed;
+    //private boolean zeroed;
+    private boolean release=true;
 
     public Elevator(int motorID, SuperJoystick shooter) {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
@@ -52,7 +53,7 @@ public class Elevator {
         calStep = 0;
 
         zeroing = false;
-        zeroed = false;
+        //zeroed = false;
 
         motor.set(0);
         absoluteZero();
@@ -95,17 +96,18 @@ public class Elevator {
 
         if (zeroing && !reverseLimit.get()) {
             motor.set(0);
-        } else if (zeroing && reverseLimit.get()) {
+        } /*else if (zeroing && reverseLimit.get()) {
             zeroing = false;
             absoluteZero();
-        }
+        }*/
 
-        if (reverseLimit.get() && !zeroed) {
+        if (reverseLimit.get()) {
             absoluteZero();
+            release = false;
             zeroing = false;
-            zeroed = true;
-        } else if (!reverseLimit.get() && zeroed) {
-            zeroed = false;
+        } else if (!reverseLimit.get() && !release) {
+            absoluteZero();
+            release = true;
         }
     }
 

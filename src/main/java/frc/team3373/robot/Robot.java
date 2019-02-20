@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -179,6 +180,10 @@ public class Robot extends TimedRobot {
       SmartDashboard.putBoolean("Save Constants", false);
       SmartDashboard.putBoolean("Restore Backup", false);
     }
+    SmartDashboard.putNumber("roll", ahrs.getRoll());
+    SmartDashboard.putNumber("Pitch", ahrs.getPitch());
+
+    SmartDashboard.putBoolean("isCompressing", compressor.enabled());
   }
 
   /**
@@ -270,7 +275,7 @@ public class Robot extends TimedRobot {
     //####          shared Controls               ####
     //################################################
     if (driver.isStartHeld() && shooter.isStartHeld()) {
-      HABauto.climb(23);
+      HABauto.climb(25.5);
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
       HABauto.climb(10);
