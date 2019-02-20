@@ -92,6 +92,7 @@ public class Robot extends TimedRobot {
   Solenoid armRelease;
 
   double rotateSpeedMod = .5;
+  private boolean cargoOpen;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -332,12 +333,14 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    if(shooter.isYPushed()) {
-      claw.grab(object);
-    } else if (shooter.isAPushed()) {
-      claw.release(object);
-    } else if (!shooter.isYHeld() && object == ObjectType.CARGO) {
-      claw.grab(ObjectType.CARGO);
+    if(shooter.isYPushed() && object == ObjectType.HATCH) {
+      claw.open();
+    } else if (shooter.isAPushed() && object == ObjectType.HATCH) {
+      claw.close();
+    } else if (!shooter.isAHeld() && object == ObjectType.CARGO) {
+      claw.close();
+    } else if (shooter.isAHeld() && object == ObjectType.CARGO) {
+      claw.open();
     }
 
     if (shooter.isLBPushed()) {
@@ -349,7 +352,7 @@ public class Robot extends TimedRobot {
       object = ObjectType.CARGO;
       elevator.moveToPosition(0, object);
       SmartDashboard.putString("Object", "CARGO");
-      claw.release(object);
+      claw.grab(object);
     }
 
     if (shooter.getRawAxis(1) < -0.5){
