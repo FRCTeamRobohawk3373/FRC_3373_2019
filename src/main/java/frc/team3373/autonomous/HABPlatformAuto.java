@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.team3373.robot.AutonomousControl;
 import frc.team3373.robot.Constants;
 import frc.team3373.robot.DistanceSensor;
+import frc.team3373.robot.SuperAHRS;
 import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SwerveControl;
 import frc.team3373.robot.SwerveControl.DriveMode;
@@ -45,10 +46,17 @@ public class HABPlatformAuto {
 
     Relay driveMotor;
 
+    SuperAHRS ahrs;
+
     double driveSpeed;
 
-    public HABPlatformAuto(SuperJoystick joy, SuperJoystick joy2, SwerveControl sw, int relayid, int PCMid, int rightSolenoidFowardChannel, int rightSolenoidReverseChannel, int leftSolenoidFowardChannel, int leftSolenoidReverseChannel, int rightLimitSwitch, int leftLimitSwitch, int rightDistanceSensor, int leftDistanceSensor) {
+    public HABPlatformAuto(SuperJoystick joy, SuperJoystick joy2, SwerveControl sw, SuperAHRS AHRS, int relayid, int PCMid,
+            int rightSolenoidFowardChannel, int rightSolenoidReverseChannel, int leftSolenoidFowardChannel,
+            int leftSolenoidReverseChannel, int rightLimitSwitch, int leftLimitSwitch, int rightDistanceSensor,
+            int leftDistanceSensor) {
         // controller = control;
+        ahrs = AHRS;
+
         joystick = joy;
         joystick2 = joy2;
 
@@ -62,10 +70,11 @@ public class HABPlatformAuto {
         SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
 
         SmartDashboard.putBoolean("leftSolenoid", false);
-        SmartDashboard.putBoolean("leftSolenoid", false);
+        SmartDashboard.putBoolean("rightSolenoid", false);
+        SmartDashboard.putNumber("Differance", 0);
 
-        rightSolenoid = new DoubleSolenoid(PCMid,rightSolenoidFowardChannel, rightSolenoidReverseChannel);
-        leftSolenoid = new DoubleSolenoid(PCMid,leftSolenoidFowardChannel, leftSolenoidReverseChannel);
+        rightSolenoid = new DoubleSolenoid(PCMid, rightSolenoidFowardChannel, rightSolenoidReverseChannel);
+        leftSolenoid = new DoubleSolenoid(PCMid, leftSolenoidFowardChannel, leftSolenoidReverseChannel);
 
         swerve = sw;
 
@@ -73,6 +82,15 @@ public class HABPlatformAuto {
 
         driveSpeed = .1;
     }
+
+    public void update() {
+        SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
+        SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
+        SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
+        SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
+    }
+
+
 
     public boolean climb(double climbHeight) {
         boolean frontDown = false;
@@ -84,8 +102,10 @@ public class HABPlatformAuto {
         double nextTargetHeight = 0;
         double diff;
 
+        double offset = ahrs.getPitch();
+
         state = 0;
-        while ((!joystick.isXHeld() || !joystick2.isXHeld()) && !RobotState.isDisabled()) {
+        while (!joystick.isXHeld() && !joystick2.isXHeld() && !RobotState.isDisabled()) {
             SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
             SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
             SmartDashboard.putNumber("State", state);
@@ -101,6 +121,31 @@ public class HABPlatformAuto {
                 break;
             case 1:// climb
                 SmartDashboard.putString("Current Step", "lifting");
+
+                //if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
+                    leftSolenoid.set(Value.kForward);
+                    //backAtHeight = false;
+                //} else {
+               //    System.out.print("stoping left");
+               //     leftSolenoid.set(Value.kOff);
+               //     backAtHeight = true;
+               // }
+
+                //if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
+                    rightSolenoid.set(Value.kForward);
+                    //frontAtHeight = false;
+                //} else {
+               //     System.out.print("stoping right");
+                //    rightSolenoid.set(Value.kOff);
+                //    frontAtHeight = true;
+                //}
+                
+                
+
+                //if (frontAtHeight && backAtHeight) 
+                //    state++;
+
+
                 /*if (frontAtHeight && backAtHeight) { //checks that both the front and the back are at the height
                     //if (joystick.isXPushed()) {
                         if (nextTargetHeight >= climbHeight) {
@@ -131,9 +176,10 @@ public class HABPlatformAuto {
                 } else if (!backAtHeight) {
                     leftSolenoid.set(Value.kForward);
                 }*/
-                diff = rightSensor.getDistance()-leftSensor.getDistance();
+                /*diff = -(ahrs.getPitch() + offset);//rightSensor.getDistance()-leftSensor.getDistance();
+                SmartDashboard.putNumber("Differance", diff);
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
-                    if (diff > .5) {
+                    if (diff > 1) {
                         SmartDashboard.putBoolean("rightSolenoid", false);
                         rightSolenoid.set(Value.kOff);
                     } else {
@@ -148,7 +194,7 @@ public class HABPlatformAuto {
                 }
                 
                 if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
-                    if (diff < -.5) {
+                    if (diff < -1) {
                         SmartDashboard.putBoolean("leftSolenoid", false);
                         leftSolenoid.set(Value.kOff);
                     } else {
@@ -163,7 +209,7 @@ public class HABPlatformAuto {
                 }
 
                 if (frontAtHeight && backAtHeight) 
-                    state++;
+                    state++;*/
 
 
                 break;

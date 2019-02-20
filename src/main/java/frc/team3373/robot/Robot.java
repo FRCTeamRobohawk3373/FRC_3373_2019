@@ -85,6 +85,8 @@ public class Robot extends TimedRobot {
 
   Elevator elevator;
 
+  Vision vis;
+
   HABPlatformAuto HABauto;
 
   Compressor compressor;
@@ -121,11 +123,13 @@ public class Robot extends TimedRobot {
     shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
+    vis = new Vision();
+
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
         BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID, FRdriveMotorID, FREncMin, FREncMax, FREncHome,
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
-    HABauto = new HABPlatformAuto(driver, shooter, swerve, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
+    HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
@@ -184,6 +188,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
     SmartDashboard.putBoolean("isCompressing", compressor.enabled());
+    
   }
 
   /**
@@ -233,6 +238,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    HABauto.update();
     driverControls();
     elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
@@ -275,7 +281,7 @@ public class Robot extends TimedRobot {
     //####          shared Controls               ####
     //################################################
     if (driver.isStartHeld() && shooter.isStartHeld()) {
-      HABauto.climb(25.5);
+      System.out.println(HABauto.climb(25.5));
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
       HABauto.climb(10);
@@ -300,13 +306,19 @@ public class Robot extends TimedRobot {
     if(driver.isLBHeld()){//sniper
       swerve.setDriveSpeed(0.2);
       rotateSpeedMod=.5;
-		}else if(driver.isRBHeld()){//turbo
+		}else if(driver.isRBHeld() && elevator.getPosition()<20){//turbo
       swerve.setDriveSpeed(0.7);
       rotateSpeedMod=.5;
     } else {//regular
-      swerve.setDriveSpeed(0.4);
+      if(elevator.getPosition()<40)
+        swerve.setDriveSpeed(0.4);
+      else {
+        swerve.setDriveSpeed(0.2);
+      }
       rotateSpeedMod = .5;
     }
+
+    
     
     swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4)*rotateSpeedMod);
     
@@ -325,7 +337,7 @@ public class Robot extends TimedRobot {
       break;
     }
 
-    if (driver.isXPushed())
+    if (driver.isYPushed())
       swerve.resetOrentation();
     //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 

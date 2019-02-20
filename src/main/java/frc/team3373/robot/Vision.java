@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 //import edu.wpi.cscore.CvSink;
 //import edu.wpi.cscore.UsbCamera;
 //import edu.wpi.cscore.VideoSink;
@@ -27,7 +29,7 @@ public class Vision {
 	NetworkTableEntry CamChoice2;
 	NetworkTableEntry CamPreload;
 
-	//UsbCamera VideoCam;
+	UsbCamera VideoCam;
 	//VideoSink server;
 	//CvSink cvsink1;
 
@@ -50,8 +52,9 @@ public class Vision {
 		Ventry = Vtable.getEntry("Objects");
 		Ventry.addListener((event) -> dataRefresh(event), EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 		
-		//VideoCam = CameraServer.getInstance().startAutomaticCapture(0);
-		//cvsink1 = new CvSink("cam1cv");
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(640, 480);
+
 		//cvsink1.setSource(VideoCam);
 		//cvsink1.setEnabled(false);
 		//server = CameraServer.getInstance().getServer();
