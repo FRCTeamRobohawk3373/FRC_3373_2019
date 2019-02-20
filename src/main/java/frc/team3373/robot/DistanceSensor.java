@@ -28,6 +28,8 @@ public class DistanceSensor {
 
         useLookup = true;
 
+        sensor.setAccumulatorCenter(1401);
+        sensor.setAccumulatorDeadband(1056);
         sensor.setAverageBits(8); // Sets how many readings should be averaged, 2^bits
     }
 
