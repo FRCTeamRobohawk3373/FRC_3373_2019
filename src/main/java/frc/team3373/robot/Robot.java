@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+//import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
   Solenoid armRelease;
 
   double rotateSpeedMod = .5;
-  private boolean cargoOpen;
+  //private boolean cargoOpen;
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
-    elevator = new Elevator(5, shooter);
+    elevator = new Elevator(5);
 
     object = ObjectType.HATCH;
 
@@ -240,7 +240,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     HABauto.update();
     driverControls();
-    elevator.refresh();
+    //elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("Left Distance", distl.getDistance());
@@ -273,7 +273,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Right Distance", distr.getDistance());
     swerve.printPositions();
     testControls();
-    elevator.refresh();
+    //elevator.refresh();
+    elevator.updatePID();
   }
 
   public void driverControls() {
@@ -285,7 +286,7 @@ public class Robot extends TimedRobot {
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
       HABauto.climb(10);
-        //auto get on HAB platform
+      //auto get on HAB platform
     }
 
     //################################################
@@ -297,20 +298,20 @@ public class Robot extends TimedRobot {
       control.lineup(Lineup.AlignDirection.RIGHT);
     }
 
-    if(driver.getRawAxis(2)>.5){//FieldCentric
-			swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
-		}else if(driver.getRawAxis(3)>.5){//RobotCentric
-			swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
-    } 
+    if (driver.getRawAxis(2) > .5) {//FieldCentric
+      swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+    } else if (driver.getRawAxis(3) > .5) {//RobotCentric
+      swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+    }
 
-    if(driver.isLBHeld()){//sniper
+    if (driver.isLBHeld()) {//sniper
       swerve.setDriveSpeed(0.2);
-      rotateSpeedMod=.5;
-		}else if(driver.isRBHeld() && elevator.getPosition()<20){//turbo
+      rotateSpeedMod = .5;
+    } else if (driver.isRBHeld() && elevator.getPosition() < 20) {//turbo
       swerve.setDriveSpeed(0.7);
-      rotateSpeedMod=.5;
+      rotateSpeedMod = .5;
     } else {//regular
-      if(elevator.getPosition()<40)
+      if (elevator.getPosition() < 40)
         swerve.setDriveSpeed(0.4);
       else {
         swerve.setDriveSpeed(0.2);
@@ -318,10 +319,8 @@ public class Robot extends TimedRobot {
       rotateSpeedMod = .5;
     }
 
-    
-    
-    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4)*rotateSpeedMod);
-    
+    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
+
     switch (driver.getPOV()) {
     case 0:
       swerve.changeFront(Side.WEST);
@@ -345,7 +344,7 @@ public class Robot extends TimedRobot {
     //####           Shooter Controls             ####
     //################################################
 
-    if(shooter.isYPushed() && object == ObjectType.HATCH) {
+    if (shooter.isYPushed() && object == ObjectType.HATCH) {
       claw.open();
     } else if (shooter.isAPushed() && object == ObjectType.HATCH) {
       claw.close();
@@ -367,7 +366,7 @@ public class Robot extends TimedRobot {
       claw.grab(object);
     }
 
-    if (shooter.getRawAxis(1) < -0.5){
+    if (shooter.getRawAxis(1) < -0.5) {
       claw.raise();
     } else if (shooter.getRawAxis(1) > 0.5) {
       claw.lower();
@@ -377,9 +376,9 @@ public class Robot extends TimedRobot {
       elevator.moveToPosition(0, object);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
       elevator.moveToPosition(1, object);
-    }  else if (shooter.isDPadUpPushed()) {
+    } else if (shooter.isDPadUpPushed()) {
       elevator.moveToPosition(2, object);
-    } else if(shooter.isBPushed()){
+    } else if (shooter.isBPushed()) {
       elevator.moveToHeight(19);
     }
 
@@ -389,6 +388,9 @@ public class Robot extends TimedRobot {
     shooter.clearDPad();
   }
 
+  //################################################
+  //####         Calibration Controls           ####
+  //################################################
   private void testControls() {
     if (RobotState.isTest() && Math.abs(shooter.getRawAxis(5)) > 0.05) {
       elevator.rawMovePID(-shooter.getRawAxis(5));

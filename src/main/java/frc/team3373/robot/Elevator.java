@@ -34,11 +34,14 @@ public class Elevator {
     private boolean zeroing;
     private boolean zeroed;
 
-    public Elevator(int motorID, SuperJoystick shooter) {
+    private Thread safetyThread;
+
+    public Elevator(int motorID) {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
         calibrating = false;
 
         motor.setIdleMode(IdleMode.kCoast);
+        motor.set(0);
 
         pid = motor.getPIDController();
         pid.setP(Constants.getNumber("elevatorP"));
@@ -54,11 +57,20 @@ public class Elevator {
         zeroing = false;
         zeroed = false;
 
-        motor.set(0);
         absoluteZero();
         reverseLimit.enableLimitSwitch(false);
-        // leftLimit = new AnalogInput(leftLimitPort);
-        // rightLimit = new AnalogInput(rightLimitPort);
+
+        safetyThread = new Thread(()->{
+            while (true) {
+                if (!RobotState.isDisabled()) {
+                    refresh();
+                }
+            }
+
+        });
+
+        safetyThread.start();
+
     }
 
     public void initPID() {
@@ -67,8 +79,14 @@ public class Elevator {
         SmartDashboard.putNumber("Set Position", position);
     }
 
-    public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
+    public void updatePID() {
+        pid.setP(Constants.getNumber("elevatorP"));
+        pid.setI(Constants.getNumber("elevatorI"));
+        pid.setD(Constants.getNumber("elevatorD"));
         pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
+    }
+
+    public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
         if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1 && RobotState.isTest()) {
             position += increment * 0.5;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
@@ -80,6 +98,7 @@ public class Elevator {
 
     public void refresh() { // Fail-safes and zero checks
         SmartDashboard.putBoolean("reverseLimit", reverseLimit.get());
+        goToPosition();
         if (motor.getEncoder().getPosition() >= Constants.getNumber("elevatorMaxRotations")) {
             motor.set(0);
         }
@@ -87,10 +106,6 @@ public class Elevator {
         if (motor.getEncoder().getPosition() < 0 && position < 0) {
             position = 0;
             pid.setReference(position, ControlType.kPosition);
-        }
-
-        if (motor.get() > 0.2) { // TODO: change to elevator speed
-            motor.set(0);
         }
 
         if (zeroing && !reverseLimit.get()) {
@@ -105,7 +120,22 @@ public class Elevator {
             zeroing = false;
             zeroed = true;
         } else if (!reverseLimit.get() && zeroed) {
+            absoluteZero();
             zeroed = false;
+        }
+    }
+
+    private void goToPosition() {
+        if (position >= Constants.getNumber("elevatorMaxRotations"))
+            position = Constants.getNumber("elevatorMaxRotations");
+        if (position < getRotations()) {
+            if (Math.abs(getPosition() - position) > Constants.getNumber("elevatorControlledTarget", 1)) {
+                motor.set(0);
+            } else{
+                pid.setReference(position, ControlType.kPosition);
+            } 
+        } else {
+            pid.setReference(position, ControlType.kPosition);
         }
     }
 
@@ -137,14 +167,9 @@ public class Elevator {
         if (inches < 0)
             inches = 0;
         if (inches >= 0 && inches <= Constants.getNumber("elevatorMaxHeight")) {
-            pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
             slope = Constants.getNumber("elevatorSlope", 3.12);
-            pid.setP(Constants.getNumber("elevatorP", 0.2)); // TODO: Remove
-            pid.setI(Constants.getNumber("elevatorI"));
-            pid.setD(Constants.getNumber("elevatorD"));
-            pid.setFF(Constants.getNumber("elevatorFF"));
             position = inches / slope;
-            pid.setReference(position, ControlType.kPosition);
+            //pid.setReference(position, ControlType.kPosition);
             SmartDashboard.putNumber("Set Position", position);
         }
     }
@@ -281,7 +306,7 @@ public class Elevator {
         svar0 = svar * sumx2 / (length * xxbar);
         System.out.println("std error of beta_0 = " + Math.sqrt(svar0));
 
-        System.out.println("SSTO = " + yybar);
+        System.out.println("SST = " + yybar);
         System.out.println("SSE  = " + rss);
         System.out.println("SSR  = " + ssr);
         return beta1;
