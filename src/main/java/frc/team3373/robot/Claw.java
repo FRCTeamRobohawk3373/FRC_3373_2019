@@ -16,26 +16,20 @@ public class Claw {
     }
 
     public void grab(Robot.ObjectType obj) {
-        if (obj == Robot.ObjectType.CARGO && grabbed) {
-            grabbed = false;
+        if (obj == Robot.ObjectType.CARGO) {
             grab.set(Value.kForward);
-        } else if (obj == ObjectType.CARGO && !grabbed) {
-            grabbed = true;
+        } else if (obj == Robot.ObjectType.HATCH) {
             grab.set(Value.kReverse);
-        } else if (obj == Robot.ObjectType.HATCH && grabbed) {
-            grabbed = false;
-            grab.set(Value.kReverse);
-        } else if (obj == ObjectType.HATCH && !grabbed) {
-            grabbed = true;
-            grab.set(Value.kForward);
         }
     }
 
     public void drop(Robot.ObjectType obj) {
         if (obj == Robot.ObjectType.CARGO) {
             grab.set(Value.kReverse);
+            threadDisable(grab, Value.kForward);
         } else if (obj == ObjectType.HATCH) {
             grab.set(Value.kForward);
+            threadDisable(grab, Value.kReverse);
         }
     }
 
@@ -45,5 +39,16 @@ public class Claw {
 
     public void lower() {
         lift.set(Value.kReverse);
+    }
+
+    private void threadDisable(DoubleSolenoid sol, Value value) {
+        new Thread(()-> {
+            try {
+                Thread.sleep(500);
+                sol.set(value);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

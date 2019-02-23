@@ -8,6 +8,7 @@ import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator {
@@ -67,7 +68,7 @@ public class Elevator {
 
     public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
         pid.setOutputRange(-0.1, 0.1);
-        if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1) {
+        if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1 && RobotState.isTest()) {
             position += increment * 0.075;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
                 position = Constants.getNumber("elevatorMaxRotations");
@@ -124,6 +125,11 @@ public class Elevator {
 
     public void zero() { // Initializes zeroing for Teleop
         zeroing = true;
+    }
+
+    public void cancel() {
+        motor.set(0);
+        position = 0;
     }
 
     public void moveToHeight(double inches) { // Moves elevator to a height after checking the position against the min and max heights
