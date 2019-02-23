@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.management.DescriptorKey;
+
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 //import edu.wpi.cscore.CvSink;
@@ -17,6 +19,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 //import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.RobotState;
+import jdk.jfr.Description;
 
 public class Vision {
 	NetworkTableInstance inst;
@@ -170,7 +173,7 @@ public class Vision {
 		return objects.get(closest);
 	}*/
 
-	// Gets any object that is closest
+	/** Gets any object that is closest*/
 	public VisionObject getClosestObject() {
 		int closest = -1;
 		double cdist = 100000.0;
@@ -202,7 +205,7 @@ public class Vision {
 		return inRange;
 	}*/
 
-	// Gets objects within a range of distance in inches
+	/** Gets objects within a range of distance in inches*/
 	public ArrayList<VisionObject> getObjectsInRange(double max, double min) {
 		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
 		for (int i = 0; i < objects.size(); i++) {
@@ -277,7 +280,8 @@ public class Vision {
 		return bestInRange;
 	}*/
 	
-	// Gets object with x absolute value closest to zero (center of screen)
+	
+	/**Gets object with x absolute value closest to zero (center of screen)*/
 	public VisionObject getObjectClosestToCenter() {
 		int closest = -1;
 		double cx = 2.0;
@@ -294,7 +298,7 @@ public class Vision {
 		return objects.get(closest);
 	}
 
-	// Used with getObjectsInRange
+	/** Used with getObjectsInRange*/
 	private VisionObject getObjectClosestToCenter(ArrayList<VisionObject> objectsIn) {
 		int closest = -1;
 		double cx = 2.0;

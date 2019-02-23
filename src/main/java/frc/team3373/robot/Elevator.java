@@ -61,7 +61,7 @@ public class Elevator {
         reverseLimit.enableLimitSwitch(false);
 
         safetyThread = new Thread(()->{
-            while (true) {
+            while (Thread.interrupted()) {
                 if (!RobotState.isDisabled()) {
                     refresh();
                 }
