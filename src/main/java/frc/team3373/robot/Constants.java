@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Filesystem;
 
 /**
  * Add your docs here.
@@ -30,13 +31,14 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 public class Constants {
     private static final String path = "/home/lvuser/config/constants.json";
     private static final String backupPath = "home/lvuser/config/backup-constants.json";
+    private static final String defaultsPath = Filesystem.getDeployDirectory() + "/defaults.json";
     // private static final Object JSONArray = null;
     private static JSONObject constantsObject;
 
     public static boolean initialized = false;
     private static boolean isBackup = false;
 
-    public static void loadConstants() throws IOException {
+    public static void loadConstants() throws IOException { // Reads constants.json and creates a JSON object
         BufferedReader br = new BufferedReader(new FileReader(new File(path)));
         String st = "";
         String bst = "";
@@ -51,7 +53,8 @@ public class Constants {
         display();
     }
 
-    public static void saveConstants() throws IOException {
+    public static void saveConstants() throws IOException { // Copies constants.json to backup-constants.json and copies
+                                                            // Json object to constants.json
         if (!isBackup) {
             copy(path, backupPath);
         } else {
@@ -63,13 +66,13 @@ public class Constants {
         bw.close();
     }
 
-    public static void restoreBackup() throws IOException {
+    public static void restoreBackup() throws IOException { // Copies backup-constants.json to constants.json
         copy(backupPath, path);
         loadConstants();
         isBackup = true;
     }
 
-    private static void copy(String sourcePath, String destPath) throws IOException {
+    private static void copy(String sourcePath, String destPath) throws IOException { // Method to copy files
         FileChannel sourceChannel = null;
         FileChannel destChannel = null;
         FileInputStream sourceStream = null;
@@ -88,14 +91,29 @@ public class Constants {
         }
     }
 
-    public static void writeNumber(String name, double value) {
+    public static void writeNumber(String name, double value) { // Writes a number to the JSON object and displays it
         constantsObject.put(name, value);
         NetworkTableInstance.getDefault().getTable("Constants").getEntry(name).setNumber(value);
     }
 
-    public static void removeValue(String name) {
+    public static void removeValue(String name) { // Removes a number from the JSON object
         constantsObject.remove(name);
         NetworkTableInstance.getDefault().getTable("Constants").delete(name);
+    }
+
+    public static void loadDefaults() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File(defaultsPath)));
+        String st = "";
+        String bst = "";
+        while ((bst = br.readLine()) != null) {
+            st = st + bst;
+        }
+        br.close();
+        constantsObject = new JSONObject(st);
+        if (constantsObject != null) {
+            initialized = true;
+        }
+        display();
     }
 
     /*
@@ -116,7 +134,7 @@ public class Constants {
      * array.getJSONArray(i).put(j, values[i][j]); } } }
      */
 
-    public static double getNumber(String name, double defaultValue) {
+    public static double getNumber(String name, double defaultValue) { // Returns a number from the JSON object
         try {
             return constantsObject.getDouble(name);
         } catch (JSONException e) {

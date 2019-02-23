@@ -91,6 +91,7 @@ public class Robot extends TimedRobot {
 
   ObjectType object;
   Elevator elevator;
+  Claw claw;
 
 
   /**
@@ -117,6 +118,8 @@ public class Robot extends TimedRobot {
     elevator = new Elevator(1, shooter);
 
     object = ObjectType.HATCH;
+
+    claw = new Claw(2, 0, 3, 2, 1);
 
     //count = 0;
 

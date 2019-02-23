@@ -10,9 +10,9 @@ public class Claw {
 
     private boolean grabbed;
 
-    public Claw(int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
-        lift = new DoubleSolenoid(liftForwardChannel, liftReverseChannel);
-        grab = new DoubleSolenoid(grabForwardChannel, grabReverseChannel);
+    public Claw(int PCM, int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
+        lift = new DoubleSolenoid(PCM, liftForwardChannel, liftReverseChannel);
+        grab = new DoubleSolenoid(PCM, grabForwardChannel, grabReverseChannel);
     }
 
     public void grab(Robot.ObjectType obj) {

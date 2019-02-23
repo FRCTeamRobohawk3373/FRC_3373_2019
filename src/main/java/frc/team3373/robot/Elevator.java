@@ -76,7 +76,7 @@ public class Elevator {
         }
     }
 
-    public void refresh() {
+    public void refresh() { // Fail-safes and zero checks
         SmartDashboard.putBoolean("reverseLimit", reverseLimit.get());
         if (motor.getEncoder().getPosition() >= Constants.getNumber("elevatorMaxRotations")
                 && position > Constants.getNumber("elevatorMaxRotations")) {
@@ -108,7 +108,7 @@ public class Elevator {
         }
     }
 
-    public double getPosition() {
+    public double getPosition() { // Returns position in inches
         return motor.getEncoder().getPosition() * slope;
     }
 
@@ -116,17 +116,17 @@ public class Elevator {
         return motor.getEncoder().getPosition();
     }
 
-    public void absoluteZero() {
-        motor.getEncoder().setPosition(0.19);
-        pid.setReference(0.19, ControlType.kPosition);
+    public void absoluteZero() { // Zeroes the elevator
+        motor.getEncoder().setPosition(0);
+        pid.setReference(0, ControlType.kPosition);
         position = 0;
     }
 
-    public void zero() {
+    public void zero() { // Initializes zeroing for Teleop
         zeroing = true;
     }
 
-    public void moveToHeight(double inches) {
+    public void moveToHeight(double inches) { // Moves elevator to a height after checking the position against the min and max heights
         inches -= Constants.getNumber("elevatorMinHeight");
         if (inches < 0)
             inches = 0;
@@ -226,7 +226,7 @@ public class Elevator {
         zeroing = false;
     }
 
-    private double linReg(double[] x, double[] y) {
+    private double linReg(double[] x, double[] y) { // Linear regression algorithm, returns slope
         if (!(x.length == y.length)) {
             System.out.println("x and y must be the same length!");
         }
