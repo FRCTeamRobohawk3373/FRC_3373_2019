@@ -35,19 +35,27 @@ public class DistanceSensor {
 
     public DistanceSensor(int port, int serial) {
         sensor = new AnalogInput(port);
-
+        
         JSONArray array = Constants.getArray("distanceSensorValues").getJSONArray(serial);
-
+        
         a = array.getDouble(0);
         b = array.getDouble(1);
         c = array.getDouble(2);
         d = array.getDouble(3);
         e = array.getDouble(4);
         f = array.getDouble(5);
-
+        
         useLookup = false;
+        
+        sensor.setAverageBits(10); // Sets how many readings should be averaged
+    }
+    
+    public double getVoltage() {
+        return sensor.getVoltage();
+    }
 
-        sensor.setAverageBits(8); // Sets how many readings should be averaged
+    public double getAverage() {
+        return sensor.getAverageVoltage();
     }
 
     public double getDistance() {
