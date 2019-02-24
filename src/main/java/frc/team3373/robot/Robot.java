@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
 
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    //claw = new Claw(2, 0, 3, 2, 1);
+    claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
@@ -150,8 +150,8 @@ public class Robot extends TimedRobot {
 
     object = ObjectType.HATCH;
 
-    //armRelease = new Solenoid(1, 7);
-    //armRelease.set(true);
+    armRelease = new Solenoid(1, 7);
+    armRelease.set(true);
     elevator.absoluteZero();
     SmartDashboard.putString("Object", "HATCH");
   }
@@ -253,7 +253,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //HABauto.update();
     driverControls();
-    //elevator.refresh();
+    elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("Left Distance", distl.getDistance());
@@ -333,10 +333,10 @@ public class Robot extends TimedRobot {
       }
 
       if (driver.isLBHeld()) {//sniper
-        swerve.setDriveSpeed(0.2);
+        swerve.setDriveSpeed(0.1);
         rotateSpeedMod = .5;
       } else if (driver.isRBHeld() && elevator.getPosition() < 20) {//turbo
-        swerve.setDriveSpeed(0.7);
+        swerve.setDriveSpeed(0.5);
         rotateSpeedMod = .5;
       } else {//regular
         if (elevator.getPosition() < 40) 
@@ -392,12 +392,10 @@ public class Robot extends TimedRobot {
 
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
-      elevator.moveToPosition(0, object);
       SmartDashboard.putString("Object", "HATCH");
       claw.release(object);
     } else if (shooter.isRBPushed()) {
       object = ObjectType.CARGO;
-      elevator.moveToPosition(0, object);
       SmartDashboard.putString("Object", "CARGO");
       claw.grab(object);
     }

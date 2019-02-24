@@ -61,10 +61,8 @@ public class Elevator {
         reverseLimit.enableLimitSwitch(false);
 
         safetyThread = new Thread(()->{
-            while (Thread.interrupted()) {
-                if (!RobotState.isDisabled()) {
-                    refresh();
-                }
+            while (!Thread.interrupted()) {
+                refresh();
             }
 
         });
@@ -86,9 +84,9 @@ public class Elevator {
         pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
     }
 
-    public void rawMovePID(double increment) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
-        if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1 && RobotState.isTest()) {
-            position += increment * 0.5;
+    public void rawMovePID(double increment, double rate) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
+        if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1) {
+            position += increment * rate;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
                 position = Constants.getNumber("elevatorMaxRotations");
             pid.setReference(position, ControlType.kPosition);
@@ -160,6 +158,11 @@ public class Elevator {
     public void cancel() {
         motor.set(0);
         position = 0;
+    }
+    
+    public void stop() {
+        position = motor.getEncoder().getPosition();
+        pid.setReference(position, ControlType.kPosition);
     }
 
     public void moveToHeight(double inches) { // Moves elevator to a height after checking the position against the min and max heights
