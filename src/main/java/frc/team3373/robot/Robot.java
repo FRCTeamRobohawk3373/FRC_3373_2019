@@ -99,6 +99,8 @@ public class Robot extends TimedRobot {
   double rotateSpeedMod = .5;
 
   boolean lockStraight = false;
+
+  int calInches=3;
   //private boolean cargoOpen;
   /**
    * This function is run when the robot is first started up and should be
@@ -273,6 +275,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Inches", 10);
     elevator.resetCal();
     elevator.initPID();
+    calInches=3;
   }
 
   /**
@@ -458,6 +461,11 @@ public class Robot extends TimedRobot {
       linup.align();
       lockStraight = true;
       //control.lineup(Lineup.AlignDirection.LEFT);
+    }
+
+    if (shooter.isAPushed()) {
+      System.out.println(calInches+" "+distl.getAverage());
+      calInches++;
     }
 
     if (driver.isXPushed()) {
