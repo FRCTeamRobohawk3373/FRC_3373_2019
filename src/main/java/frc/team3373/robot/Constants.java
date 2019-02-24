@@ -64,7 +64,11 @@ public class Constants {
         } else {
             isBackup = false;
         }
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path), false));
+        File f = new File(path);
+        if (!f.getParentFile().exists()) {
+            f.getParentFile().mkdirs();
+        }
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f, false));
         String jsonString = constantsObject.toString();
         bw.write(jsonString);
         bw.close();

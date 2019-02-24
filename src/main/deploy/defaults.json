@@ -144,8 +144,8 @@
     "lineUPDeadband":0.01,
     "lineUPDistanceSensorDeadband":0.01,
     "lineUPRotateDeadband":10,
-    "lineUPTargetDistance":40,
-    "lineUPTimeOut":100,
+    "lineUPTargetDistance":20,
+    "lineUPTimeOut":500,
 
     "angleP": 0.010575,
     "angleI": 1.42E-6,
@@ -161,5 +161,9 @@
     "elevatorMaxRotations": 530,
     "elevatorMaxHeight": 70,
     "elevatorMinHeight": 19.5,
-    "elevatorHeight": 40
+    "elevatorHeight": 40,
+
+    "HABPlatformDeadBand":0.5,
+    "HABPlatformCenterOffset":-1
+
 }

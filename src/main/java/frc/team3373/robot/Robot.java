@@ -9,6 +9,7 @@ package frc.team3373.robot;
 
 import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
+import frc.team3373.autonomous.VisionLinup;
 import frc.team3373.robot.SwerveControl.Side;
 
 import java.io.IOException;
@@ -93,7 +94,11 @@ public class Robot extends TimedRobot {
   AutonomousControl control;
   Solenoid armRelease;
 
+  VisionLinup linup;
+
   double rotateSpeedMod = .5;
+
+  boolean lockStraight = false;
   //private boolean cargoOpen;
   /**
    * This function is run when the robot is first started up and should be
@@ -109,14 +114,15 @@ public class Robot extends TimedRobot {
     try {
       Constants.loadConstants();
     } catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Failed to load Constants, loading defaults");
       try {
         Constants.loadDefaults();
+        Constants.saveConstants();
       } catch (IOException e1) {
         System.out.println("Catastrophic load");
         e1.printStackTrace();
       }
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
 
     driver = new SuperJoystick(0);
@@ -128,9 +134,10 @@ public class Robot extends TimedRobot {
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
         BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID, FRdriveMotorID, FREncMin, FREncMax, FREncHome,
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
+
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
-    claw = new Claw(2, 0, 3, 2, 1);
+    //claw = new Claw(2, 0, 3, 2, 1);
     
     distl = new DistanceSensor(0, 2);
     distr = new DistanceSensor(1, 3);
@@ -139,10 +146,12 @@ public class Robot extends TimedRobot {
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
     elevator = new Elevator(5);
 
+    linup = new VisionLinup(distl, distr, driver, swerve, vis);
+
     object = ObjectType.HATCH;
 
-    armRelease = new Solenoid(1, 7);
-    armRelease.set(true);
+    //armRelease = new Solenoid(1, 7);
+    //armRelease.set(true);
     elevator.absoluteZero();
     SmartDashboard.putString("Object", "HATCH");
   }
@@ -177,6 +186,7 @@ public class Robot extends TimedRobot {
     } else if (SmartDashboard.getBoolean("Restore Defaults", false)) {
       try {
         Constants.loadDefaults();
+        SmartDashboard.putBoolean("Restore Defaults", false);
       } catch (IOException e) {
         e.printStackTrace();
       }
@@ -187,7 +197,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("roll", ahrs.getRoll());
     SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
-    SmartDashboard.putBoolean("isCompressing", compressor.enabled());
+    vis.update();
+    //SmartDashboard.putBoolean("isCompressing", compressor.enabled());
     
   }
 
@@ -231,6 +242,8 @@ public class Robot extends TimedRobot {
     elevator.resetCal();
     //elevator.initPID();
     // elevator.zero();
+
+    lockStraight = false;
   }
 
   /**
@@ -238,7 +251,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    HABauto.update();
+    //HABauto.update();
     driverControls();
     //elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
@@ -271,10 +284,17 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("Left Distance", distl.getDistance());
     SmartDashboard.putNumber("Right Distance", distr.getDistance());
-    swerve.printPositions();
+    //swerve.printPositions();
     testControls();
-    //elevator.refresh();
+    elevator.refresh();
     elevator.updatePID();
+    //VisionObject obj = vis.getObjectClosestToCenter();
+    //if(obj!=null){
+    //  obj.print();
+    //} else {
+    //  System.out.println("None");
+    //}
+  
   }
 
   public void driverControls() {
@@ -292,52 +312,68 @@ public class Robot extends TimedRobot {
     //################################################
     //####          Driver Controls               ####
     //################################################
+    if (driver.isXPushed()) {
+      linup.cancel();
+      lockStraight = false;
+    }
+
     if (driver.isAPushed()) {
+      //linup.align();
+      lockStraight = true;
       control.lineup(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       control.lineup(Lineup.AlignDirection.RIGHT);
     }
 
-    if (driver.getRawAxis(2) > .5) {//FieldCentric
-      swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
-    } else if (driver.getRawAxis(3) > .5) {//RobotCentric
-      swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
-    }
-
-    if (driver.isLBHeld()) {//sniper
-      swerve.setDriveSpeed(0.2);
-      rotateSpeedMod = .5;
-    } else if (driver.isRBHeld() && elevator.getPosition() < 20) {//turbo
-      swerve.setDriveSpeed(0.7);
-      rotateSpeedMod = .5;
-    } else {//regular
-      if (elevator.getPosition() < 40)
-        swerve.setDriveSpeed(0.4);
-      else {
-        swerve.setDriveSpeed(0.2);
+    if (linup.isFinished()) {
+      if (driver.getRawAxis(2) > .5) {//FieldCentric
+        swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+      } else if (driver.getRawAxis(3) > .5) {//RobotCentric
+        swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
       }
-      rotateSpeedMod = .5;
+
+      if (driver.isLBHeld()) {//sniper
+        swerve.setDriveSpeed(0.2);
+        rotateSpeedMod = .5;
+      } else if (driver.isRBHeld() && elevator.getPosition() < 20) {//turbo
+        swerve.setDriveSpeed(0.7);
+        rotateSpeedMod = .5;
+      } else {//regular
+        if (elevator.getPosition() < 40) 
+          swerve.setDriveSpeed(0.4);
+        else {
+          swerve.setDriveSpeed(0.2);
+        }
+        rotateSpeedMod = .5;
+      }
+      
+      if (lockStraight) {
+        swerve.changeFront(Side.NORTH);
+        swerve.calculateAutoSwerveControl(90, -driver.getRawAxis(1), 0);
+        if(-driver.getRawAxis(1)<.5)
+          lockStraight = false;
+      } else {
+        swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
+      }
+      
+      switch (driver.getPOV()) {
+      case 0:
+        swerve.changeFront(Side.WEST);
+        break;
+      case 90:
+        swerve.changeFront(Side.NORTH);
+        break;
+      case 180:
+        swerve.changeFront(Side.EAST);
+        break;
+      case 270:
+        swerve.changeFront(Side.SOUTH);
+        break;
+      }
+
+      if (driver.isYPushed())
+        swerve.resetOrentation();
     }
-
-    swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
-
-    switch (driver.getPOV()) {
-    case 0:
-      swerve.changeFront(Side.WEST);
-      break;
-    case 90:
-      swerve.changeFront(Side.NORTH);
-      break;
-    case 180:
-      swerve.changeFront(Side.EAST);
-      break;
-    case 270:
-      swerve.changeFront(Side.SOUTH);
-      break;
-    }
-
-    if (driver.isYPushed())
-      swerve.resetOrentation();
     //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
 
     //################################################
@@ -366,6 +402,10 @@ public class Robot extends TimedRobot {
       claw.grab(object);
     }
 
+    if(shooter.isXHeld()){
+      elevator.stop();
+    }
+
     if (shooter.getRawAxis(1) < -0.5) {
       claw.raise();
     } else if (shooter.getRawAxis(1) > 0.5) {
@@ -382,6 +422,10 @@ public class Robot extends TimedRobot {
       elevator.moveToHeight(19);
     }
 
+    if (Math.abs(shooter.getRawAxis(5)) > 0.05) {
+      elevator.rawMovePID(-shooter.getRawAxis(5),0.25);
+    }
+
     driver.clearButtons();
     driver.clearDPad();
     shooter.clearButtons();
@@ -393,10 +437,10 @@ public class Robot extends TimedRobot {
   //################################################
   private void testControls() {
     if (RobotState.isTest() && Math.abs(shooter.getRawAxis(5)) > 0.05) {
-      elevator.rawMovePID(-shooter.getRawAxis(5));
+      elevator.rawMovePID(-shooter.getRawAxis(5),0.25);
     }
 
-    swerve.printPositions();
+    //swerve.printPositions();
 
     if (shooter.isAPushed()) {
       elevator.calibrate();
@@ -411,8 +455,25 @@ public class Robot extends TimedRobot {
     if (shooter.isYPushed()) {
       elevator.absoluteZero();
     }
-    
+
+    if (driver.isAPushed()) {
+      linup.align();
+      lockStraight = true;
+      //control.lineup(Lineup.AlignDirection.LEFT);
+    }
+
+    if (driver.isXPushed()) {
+      linup.cancel();
+      lockStraight = false;
+    }
+
+    if (driver.isStartHeld()) {
+      HABauto.climb(30);
+    }
+
     shooter.clearButtons();
     shooter.clearDPad();
+    driver.clearButtons();
+    driver.clearDPad();
   }
 }
