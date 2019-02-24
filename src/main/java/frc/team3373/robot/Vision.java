@@ -1,10 +1,9 @@
 package frc.team3373.robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.management.DescriptorKey;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
@@ -19,7 +18,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 //import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.RobotState;
-import jdk.jfr.Description;
 
 public class Vision {
 	NetworkTableInstance inst;
@@ -55,8 +53,8 @@ public class Vision {
 		Ventry = Vtable.getEntry("Objects");
 		Ventry.addListener((event) -> dataRefresh(event), EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 		
-		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setResolution(640, 480);
+		//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		//camera.setResolution(640, 480);
 
 		//cvsink1.setSource(VideoCam);
 		//cvsink1.setEnabled(false);
@@ -398,7 +396,10 @@ public class Vision {
 				objectData[i] = objectData[i].replace("[", "");
 				objectData[i] = objectData[i].replace("]", "");
 				String[] data = objectData[i].split(", ");
-				objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]), Double.parseDouble(data[4]), Double.parseDouble(data[5])));
+				if (Arrays.binarySearch(data, "None") < 0) {
+					objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]),
+							Double.parseDouble(data[4]), Double.parseDouble(data[5])));
+				}
 				// System.out.print(" : ");
 			}
 		} catch (Exception e) {

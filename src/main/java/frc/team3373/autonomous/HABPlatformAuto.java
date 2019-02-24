@@ -123,7 +123,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putString("Current Step", "lifting");
 
                 //if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
-                    leftSolenoid.set(Value.kForward);
+                    //leftSolenoid.set(Value.kForward);
                     //backAtHeight = false;
                 //} else {
                //    System.out.print("stoping left");
@@ -132,7 +132,7 @@ public class HABPlatformAuto {
                // }
 
                 //if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
-                    rightSolenoid.set(Value.kForward);
+                    //rightSolenoid.set(Value.kForward);
                     //frontAtHeight = false;
                 //} else {
                //     System.out.print("stoping right");
@@ -176,10 +176,14 @@ public class HABPlatformAuto {
                 } else if (!backAtHeight) {
                     leftSolenoid.set(Value.kForward);
                 }*/
-                /*diff = -(ahrs.getPitch() + offset);//rightSensor.getDistance()-leftSensor.getDistance();
+                diff = rightSensor.getDistance()-leftSensor.getDistance();//-(ahrs.getPitch() + offset);
                 SmartDashboard.putNumber("Differance", diff);
+                SmartDashboard.putNumber("AnalogeRight", rightSensor.getVoltage());
+                SmartDashboard.putNumber("AnalogeLeft", leftSensor.getVoltage());
+                SmartDashboard.putNumber("AverageAnalogeRight", rightSensor.getAverage());
+                SmartDashboard.putNumber("AverageAnalogeLeft", leftSensor.getAverage());
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
-                    if (diff > 1) {
+                    if (diff > .5) {
                         SmartDashboard.putBoolean("rightSolenoid", false);
                         rightSolenoid.set(Value.kOff);
                     } else {
@@ -194,7 +198,7 @@ public class HABPlatformAuto {
                 }
                 
                 if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
-                    if (diff < -1) {
+                    if (diff < -.5) {
                         SmartDashboard.putBoolean("leftSolenoid", false);
                         leftSolenoid.set(Value.kOff);
                     } else {
@@ -209,7 +213,7 @@ public class HABPlatformAuto {
                 }
 
                 if (frontAtHeight && backAtHeight) 
-                    state++;*/
+                    state++;
 
 
                 break;
