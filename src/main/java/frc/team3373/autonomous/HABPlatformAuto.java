@@ -63,8 +63,8 @@ public class HABPlatformAuto {
         rightHome = new DigitalInput(rightLimitSwitch);
         leftHome = new DigitalInput(leftLimitSwitch);
 
-        rightSensor = new DistanceSensor(rightDistanceSensor, 0);
-        leftSensor = new DistanceSensor(leftDistanceSensor, 1);
+        rightSensor = new DistanceSensor(rightDistanceSensor, 1);
+        leftSensor = new DistanceSensor(leftDistanceSensor, 0);
 
         SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
         SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
@@ -183,7 +183,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putNumber("AverageAnalogeRight", rightSensor.getAverage());
                 SmartDashboard.putNumber("AverageAnalogeLeft", leftSensor.getAverage());
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
-                    if (diff > .5) {
+                    if (diff > Constants.getNumber("HABPlatformDeadBand",0.5)+Constants.getNumber("HABPlatformCenterOffset",0)) {
                         SmartDashboard.putBoolean("rightSolenoid", false);
                         rightSolenoid.set(Value.kOff);
                     } else {
@@ -198,7 +198,7 @@ public class HABPlatformAuto {
                 }
                 
                 if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid
-                    if (diff < -.5) {
+                    if (diff < -Constants.getNumber("HABPlatformDeadBand",0.5)+Constants.getNumber("HABPlatformCenterOffset",0)) {
                         SmartDashboard.putBoolean("leftSolenoid", false);
                         leftSolenoid.set(Value.kOff);
                     } else {

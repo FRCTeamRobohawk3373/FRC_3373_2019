@@ -1,6 +1,7 @@
 package frc.team3373.robot;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 
@@ -35,9 +36,12 @@ public class DistanceSensor {
 
     public DistanceSensor(int port, int serial) {
         sensor = new AnalogInput(port);
-        
-        JSONArray array = Constants.getArray("distanceSensorValues").getJSONArray(serial);
-        
+        JSONArray array;
+        try{
+            array = Constants.getArray("distanceSensorValues").getJSONArray(serial);
+        }catch(JSONException e){
+            array = Constants.getArray("distanceSensorValues").getJSONArray(0);
+        }
         a = array.getDouble(0);
         b = array.getDouble(1);
         c = array.getDouble(2);

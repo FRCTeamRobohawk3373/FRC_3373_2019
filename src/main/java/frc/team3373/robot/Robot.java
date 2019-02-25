@@ -141,8 +141,8 @@ public class Robot extends TimedRobot {
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
     
-    distl = new DistanceSensor(0, 2);
-    distr = new DistanceSensor(1, 3);
+    distl = new DistanceSensor(0, 6);
+    distr = new DistanceSensor(1, 4);
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
@@ -199,7 +199,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("roll", ahrs.getRoll());
     SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
-    vis.update();
+    //vis.update();
     //SmartDashboard.putBoolean("isCompressing", compressor.enabled());
     
   }

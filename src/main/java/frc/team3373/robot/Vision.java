@@ -41,6 +41,8 @@ public class Vision {
 	private int numCam;
 	private int numCamCO;
 
+	private boolean lock = false;
+
 	private Map<String, Integer> cammap;
 	ArrayList<VisionObject> objects = new ArrayList<VisionObject>();
 
@@ -52,7 +54,8 @@ public class Vision {
 		Vtable = inst.getTable("VisionData");
 		Ventry = Vtable.getEntry("Objects");
 		Ventry.addListener((event) -> dataRefresh(event), EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-		
+		//Ventry.getStringArray();
+		update();
 		//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		//camera.setResolution(640, 480);
 
@@ -106,7 +109,7 @@ public class Vision {
 
 	// switch to a camera
 	public void switchCamera(int num, int stream) {
-		updatelights();
+		//updatelights();
 		if (num < numCam) {
 			if (preCam == num) {
 				preCam = -1;
@@ -140,7 +143,7 @@ public class Vision {
 
 	// preloads a camera for quicker switching overrides stream2
 	public void preLoadCamera(int num) {
-		updatelights();
+		//updatelights();
 		if (num < numCam && num != camera1 && num != camera2) {
 			if (num >= numCamCO) {
 				//cvsink1.setEnabled(true);
@@ -283,6 +286,9 @@ public class Vision {
 	public VisionObject getObjectClosestToCenter() {
 		int closest = -1;
 		double cx = 2.0;
+		//ArrayList<VisionObject> objs = new ArrayList<VisionObject>();
+		//objs.addAll(objects);
+		lock = true;
 		for (int i = 0; i < objects.size(); i++) {
 			VisionObject object = objects.get(i);
 			if (Math.abs(object.X) < cx) {
@@ -290,10 +296,15 @@ public class Vision {
 				cx = Math.abs(object.X);
 			}
 		}
+		lock = false;
 		if (closest == -1) {
 			return null;
 		}
-		return objects.get(closest);
+		try{
+			return objects.get(closest);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	/** Used with getObjectsInRange*/
@@ -383,8 +394,9 @@ public class Vision {
 
 	// loads in new Data
 	private void dataRefresh(EntryNotification event) {
-		updatelights();
-		try {
+		//updatelights();
+		update();
+		/*try {
 			String[] objectData = event.value.getStringArray();
 			if (objectData.length == 0) {
 				return;
@@ -404,14 +416,47 @@ public class Vision {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}*/
+	}
+
+	public void update() {
+		try {
+			String[] objectData = Ventry.getStringArray(new String[0]);
+			if (objectData.length == 0) {
+				return;
+			}
+			// System.out.print(objectData);
+			//int countToRemove = objects.size()-1;
+			while (lock) {
+				Thread.sleep(0, 100);
+			}
+
+			objects.clear();
+			for (int i = 0; i < objectData.length; i++) {
+				// System.out.print(objectData[i]);
+				objectData[i] = objectData[i].replace("[", "");
+				objectData[i] = objectData[i].replace("]", "");
+				String[] data = objectData[i].split(", ");
+				if (Arrays.binarySearch(data, "None") < 0) {
+					objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]),
+							Double.parseDouble(data[4]), Double.parseDouble(data[5])));
+				}
+				// System.out.print(" : ");
+			}
+			//for (int i = countToRemove; i > 0; i--) {
+			//	objects.remove(i);
+			//}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-	public void updatelights(){
+	/*public void updatelights(){
 		if (RobotState.isAutonomous() || RobotState.isTest()) {
 			lights.set(true);
 		} else {
 			lights.set(false);
 		}
-	}
+	}*/
 
 }

@@ -202,17 +202,17 @@ public class SwerveControl {
 		double rotateYComponent;
 
 		// Deadband
-		if (Math.abs(LX) < 0.1) {
+		if (Math.abs(LX) < 0.05) {
 			translationalXComponent = 0;
 			LX = 0;
 		}
 
-		if (Math.abs(LY) < 0.1) {
+		if (Math.abs(LY) < 0.05) {
 			translationalYComponent = 0;
 			LY = 0;
 		}
 
-		if (Math.abs(RX) < 0.1) {
+		if (Math.abs(RX) < 0.05) {
 			rAxis = 0;
 			RX = 0;
 		}
@@ -228,9 +228,9 @@ public class SwerveControl {
 		// magnitude of joystick
 		translationalMagnitude = Math.sqrt(Math.pow(translationalYComponent, 2) + Math.pow(translationalXComponent, 2));
 		// angle of joystick
-		translationalAngle = Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent));
+		translationalAngle = Math.round(Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent))/(360/8))*(360/8);
 
-		
+		//Math.floor(LX/(360/8))*(360/8);
 		/*if (RX == 0) {
 			if (stoppedRotating) {
 				targetRobotAngle = ahrs.getRotation();
