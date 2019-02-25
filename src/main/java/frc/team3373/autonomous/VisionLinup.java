@@ -82,11 +82,11 @@ public class VisionLinup {
                                 count = 0;
                                 if (target.distance > Constants.getNumber("lineUPTargetDistance")) {
                                     if (target.X > Constants.getNumber("lineUPDeadband")) {
-                                        SmartDashboard.putString("linupInstruction","driving forward and rotating left");
-                                        //rotate counter clockwise
-                                    } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
-                                        SmartDashboard.putString("linupInstruction","driving forward and rotating right");
+                                        SmartDashboard.putString("linupInstruction","driving forward and rotating clockwise");
                                         //rotate clockwise
+                                    } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
+                                        SmartDashboard.putString("linupInstruction","driving forward and rotating counter clockwise");
+                                        //rotate counter clockwise
                                     } else {
                                         SmartDashboard.putString("linupInstruction","driving forward");
                                         // drive strait
