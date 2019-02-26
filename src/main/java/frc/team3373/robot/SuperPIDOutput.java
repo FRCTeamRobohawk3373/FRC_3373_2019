@@ -7,10 +7,18 @@ public class SuperPIDOutput implements PIDOutput {
     private SwerveControl swerve;
     private double pOut;
 
+    /**
+     * The type of output to the swerve control: ROTATE, SWERVE
+     */
     public static enum OutputType {
         ROTATE, DRIVE
     }
 
+    /**
+     * Implements a class for interfacing with the swerve controller.
+     * @param type If the output should be rotational or forward/backward
+     * @param sw the swerve control for the robot
+     */
     public SuperPIDOutput(OutputType type, SwerveControl sw) {
         this.type = type;
         swerve = sw;
@@ -31,6 +39,9 @@ public class SuperPIDOutput implements PIDOutput {
         }
     }
 
+    /**
+     * @return The most recent output to the swerve control
+     */
     public double getPOutput() {
         return pOut;
     }

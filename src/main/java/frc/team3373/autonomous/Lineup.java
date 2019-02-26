@@ -22,10 +22,21 @@ public class Lineup {
     private DistanceSensor dleft;
     private DigitalInput line;
 
-    public static enum AlignDirection { // Stores the direction that the robot should search for the line
+    /**
+     * Stores the direction that the robot should search for the line: RIGHT, LEFT
+     */
+    public static enum AlignDirection {
         RIGHT, LEFT
     }
 
+    /**
+     * Initializes a class to control lining up the robot.
+     * @param dl Left distance sensor
+     * @param dr Right distance sensor
+     * @param driver Joystick for driver
+     * @param sw The SwerveControl for the robot
+     * @param line Line sensor input
+     */
     public Lineup(DistanceSensor dl, DistanceSensor dr, SuperJoystick driver, SwerveControl sw, DigitalInput line) {
         swerve = sw;
         joystick = driver;
@@ -42,6 +53,9 @@ public class Lineup {
         pid.setInputRange(3, 32);
     }
 
+    /**
+     * Uses PID to square the robot. Press X on the driver joystick to cancel.
+     */
     public void square() {
         boolean exit = false;
         pid.setAbsoluteTolerance(Constants.getNumber("lineupTolerance", 0.2)); // Sets deadband for PID
@@ -75,6 +89,10 @@ public class Lineup {
         swerve.setControlMode(mode);
     }
 
+    /**
+     * Aligns the robot to the rocket. Press X on the driver joystick to cancel.
+     * @param al The direction to search for the line
+     */
     public void rocketAlign(AlignDirection al) {
         SmartDashboard.putBoolean("Aligned", false);
 
@@ -179,6 +197,10 @@ public class Lineup {
         SmartDashboard.putBoolean("Aligned", true);
     }
 
+    /**
+     * Aligns the robot to the cargo ship. Press X on the driver joystick to cancel.
+     * @param al The direction to search for the line
+     */
     public void align(AlignDirection al) {
         SmartDashboard.putBoolean("Aligned", false);
 
