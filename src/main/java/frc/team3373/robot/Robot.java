@@ -352,7 +352,7 @@ public class Robot extends TimedRobot {
       
       if (lockStraight) {
         swerve.changeFront(Side.NORTH);
-        swerve.calculateAutoSwerveControl(90, -driver.getRawAxis(1), 0);
+        swerve.calculateAutoSwerveControl(90*Math.ceil(-driver.getRawAxis(1)), -driver.getRawAxis(1), 0);
         if(-driver.getRawAxis(1)<.5)
           lockStraight = false;
       } else {
@@ -384,12 +384,12 @@ public class Robot extends TimedRobot {
     //################################################
 
     if (shooter.isYPushed() && object == ObjectType.HATCH) {
-      claw.open();
+      claw.close();
     } else if (shooter.isAPushed() && object == ObjectType.HATCH) {
+      claw.open();
+    } else if ((!shooter.isAHeld() && !shooter.isYHeld()) && object == ObjectType.CARGO) {
       claw.close();
-    } else if (!shooter.isAHeld() && object == ObjectType.CARGO) {
-      claw.close();
-    } else if (shooter.isAHeld() && object == ObjectType.CARGO) {
+    } else if ((shooter.isAHeld() || shooter.isYHeld()) && object == ObjectType.CARGO) {
       claw.open();
     }
 
@@ -420,7 +420,7 @@ public class Robot extends TimedRobot {
     } else if (shooter.isDPadUpPushed()) {
       elevator.moveToPosition(2, object);
     } else if (shooter.isBPushed()) {
-      elevator.moveToHeight(19);
+      elevator.moveToHeight(Constants.getNumber("elevatorMinHeight",19));
     }
 
     if (Math.abs(shooter.getRawAxis(5)) > 0.05) {

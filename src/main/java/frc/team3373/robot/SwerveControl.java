@@ -77,7 +77,12 @@ public class SwerveControl {
 		wheelArray = new SwerveWheel[] { FLWheel, BLWheel, BRWheel, FRWheel };
 
 	}
-
+	/**
+	 * Autonomus control for the swerve drive
+	 * @param driveAngle the angle to drive at (0 - 359). 0 is to the right of the front, 90 is front, 180 is to the left of the front, 270 is back,
+	 * @param driveSpeed the speed to drive at the angle (0 - 1). 0 is stop and 1 is full speed.
+	 * @param rotateSpeed the speed to rotate around the center (-1 - 1). -1 is counter clockwise and 1 is clockwise.
+	 */
 	public void calculateAutoSwerveControl(double driveAngle, double driveSpeed, double rotateSpeed) {// Driving Angle,
 																										// Driving
 																										// Speed, rotate
