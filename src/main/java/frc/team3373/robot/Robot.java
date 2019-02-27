@@ -141,8 +141,8 @@ public class Robot extends TimedRobot {
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
     
-    distl = new DistanceSensor(0, 6);
-    distr = new DistanceSensor(1, 4);
+    distl = new DistanceSensor(0, 5);
+    distr = new DistanceSensor(1, 6);
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
@@ -156,6 +156,7 @@ public class Robot extends TimedRobot {
     armRelease.set(true);
     elevator.absoluteZero();
     SmartDashboard.putString("Object", "HATCH");
+    SmartDashboard.putBoolean("Restore Defaults", false);
   }
 
   /**
@@ -195,6 +196,7 @@ public class Robot extends TimedRobot {
     } else {
       SmartDashboard.putBoolean("Save Constants", false);
       SmartDashboard.putBoolean("Restore Backup", false);
+      
     }
     SmartDashboard.putNumber("roll", ahrs.getRoll());
     SmartDashboard.putNumber("Pitch", ahrs.getPitch());
@@ -325,6 +327,7 @@ public class Robot extends TimedRobot {
       lockStraight = true;
       control.lineup(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
+      lockStraight = true;
       control.lineup(Lineup.AlignDirection.RIGHT);
     }
 
@@ -415,10 +418,12 @@ public class Robot extends TimedRobot {
 
     if (shooter.isDPadDownPushed()) {
       elevator.moveToPosition(0, object);
-    } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
+    }else if(shooter.isDPadDownLeftPushed()){
       elevator.moveToPosition(1, object);
-    } else if (shooter.isDPadUpPushed()) {
+    } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
       elevator.moveToPosition(2, object);
+    } else if (shooter.isDPadUpPushed()) {
+      elevator.moveToPosition(3, object);
     } else if (shooter.isBPushed()) {
       elevator.moveToHeight(Constants.getNumber("elevatorMinHeight",19));
     }

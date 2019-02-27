@@ -179,7 +179,7 @@ public class Elevator {
 
     public void moveToPosition(int height, Robot.ObjectType obj) {
         switch (height) {
-        case 0:
+        case 0: //bottom
             switch (obj) {
             case CARGO:
                 moveToHeight(27.5);
@@ -192,7 +192,20 @@ public class Elevator {
                 return;
             }
             break;
-        case 1:
+        case 1://Cargo ship ball
+            switch (obj) {
+            case CARGO:
+                moveToHeight(38);
+                break;
+            case HATCH:
+                moveToHeight(19.0);
+                break;
+            default:
+                System.out.println("Object must be defined!");
+                return;
+            }
+            break;
+        case 2: // middle height
             switch (obj) {
             case CARGO:
                 moveToHeight(55.5);
@@ -205,7 +218,7 @@ public class Elevator {
                 return;
             }
             break;
-        case 2:
+        case 3: //top height
             switch (obj) {
             case CARGO:
                 moveToHeight(83.5);
