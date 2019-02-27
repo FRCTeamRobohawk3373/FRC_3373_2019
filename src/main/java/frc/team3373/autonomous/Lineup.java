@@ -188,6 +188,9 @@ public class Lineup {
         int state = 0; // Stores the step that the lineup is on
         int count = 0;
         boolean fin = false;
+        boolean lin = false;
+        boolean ali = false;
+        boolean dis = false;
 
         double distance;
 
@@ -265,16 +268,19 @@ public class Lineup {
             case 5:
                 fin = true;
                 distance = (dleft.getDistance() + dright.getDistance()) / 2;
-                if (!line.get()) {
+                if (!line.get() && !lin) {
+                    lin = true;
                     if (align == AlignDirection.LEFT) {
                         align = AlignDirection.RIGHT;
                     } else {
                         align = AlignDirection.LEFT;
                     }
                     state = 1;
-                } else if (!(distance < 14 && distance > 13)) {
+                } else if (!(distance < 14 && distance > 13) && !dis) {
+                    dis = true;
                     state = 0;
-                } else if (Math.abs(dist.pidGet()) > 0.1) {
+                } else if (Math.abs(dist.pidGet()) > 0.1 && !ali) {
+                    ali = true;
                     state = 0;
                 } else {
                     state++;
