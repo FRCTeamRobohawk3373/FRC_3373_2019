@@ -233,7 +233,8 @@ public class SwerveControl {
 		// magnitude of joystick
 		translationalMagnitude = Math.sqrt(Math.pow(translationalYComponent, 2) + Math.pow(translationalXComponent, 2));
 		// angle of joystick
-		translationalAngle = Math.round(Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent))/(360/8))*(360/8);
+		translationalAngle = Math.round(Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent)) / (360 / 8)) * (360 / 8);
+		//translationalAngle =Math.toDegrees(Math.atan2(translationalYComponent, translationalXComponent));
 
 		//Math.floor(LX/(360/8))*(360/8);
 		/*if (RX == 0) {

@@ -56,7 +56,8 @@ public class SwerveWheel {
 
 		
 		driveMotor.setIdleMode(IdleMode.kCoast);
-		driveMotor.setClosedLoopRampRate(4);
+		driveMotor.setClosedLoopRampRate(2);
+		driveMotor.setOpenLoopRampRate(2);
 	}
 	
 	public void setTargetAngle(double angle){
