@@ -37,7 +37,7 @@ public class DistanceSensorPID implements PIDSource {
             rdist = 32.0;
         }
 
-        return (rdist - ldist) + 2.8; // Returns the difference of the distance sensors plus an offset
+        return (rdist - ldist); // Returns the difference of the distance sensors plus an offset
     }
 
     public PIDSourceType getPIDSourceType() {
