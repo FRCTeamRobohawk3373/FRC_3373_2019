@@ -100,6 +100,8 @@ public class Robot extends TimedRobot {
 
   boolean lockStraight = false;
 
+  long startTime=0;
+
   int calInches=3;
   //private boolean cargoOpen;
   /**
@@ -425,7 +427,15 @@ public class Robot extends TimedRobot {
     } else if (shooter.isDPadUpPushed()) {
       elevator.moveToPosition(3, object);
     } else if (shooter.isBPushed()) {
-      elevator.moveToHeight(Constants.getNumber("elevatorMinHeight",19));
+      elevator.moveToHeight(Constants.getNumber("elevatorMinHeight", 19));
+      startTime = System.currentTimeMillis();
+    }
+
+    if (shooter.isBHeld()) {
+      if (System.currentTimeMillis() - startTime > 1000 && startTime!=-2) {
+        elevator.zero();
+        startTime = -2;
+      }
     }
 
     if (Math.abs(shooter.getRawAxis(5)) > 0.05) {

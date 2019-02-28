@@ -152,6 +152,7 @@ public class Elevator {
     }
 
     public void zero() { // Initializes zeroing for Teleop
+        position = 0;
         zeroing = true;
     }
 
@@ -161,6 +162,7 @@ public class Elevator {
     }
     
     public void stop() {
+        cancel();
         position = motor.getEncoder().getPosition();
         pid.setReference(position, ControlType.kPosition);
     }
