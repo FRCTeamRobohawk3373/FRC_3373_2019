@@ -90,7 +90,37 @@ public class HABPlatformAuto {
         SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
     }
 
+    public void liftFront(){
+        rightSolenoid.set(Value.kForward);
+    }
 
+    public void liftBack(){
+        leftSolenoid.set(Value.kForward);
+    }
+
+    public void lowerFront(){
+        rightSolenoid.set(Value.kReverse);
+    }
+
+    public void lowerBack(){
+        leftSolenoid.set(Value.kReverse);
+    }
+
+    public void stopFront(){
+        rightSolenoid.set(Value.kOff);
+    }
+
+    public void stopBack(){
+        leftSolenoid.set(Value.kOff);
+    }
+
+    public void drive(boolean on){
+        if(on){
+            driveMotor.set(Relay.Value.kForward);
+        }else{
+            driveMotor.set(Relay.Value.kOff);
+        }
+    }
 
     public boolean climb(double climbHeight) {
         boolean frontDown = false;

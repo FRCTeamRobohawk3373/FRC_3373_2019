@@ -100,6 +100,9 @@ public class Robot extends TimedRobot {
 
   boolean lockStraight = false;
 
+  boolean liftDirection = true;//1 is down, 0 is up
+  boolean startedlift = false;
+
   long startTime=0;
 
   int calInches=3;
@@ -291,6 +294,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("Left Distance", distl.getDistance());
     SmartDashboard.putNumber("Right Distance", distr.getDistance());
+    SmartDashboard.putBoolean("Lifting Up", liftDirection);
     //swerve.printPositions();
     testControls();
     elevator.refresh();
@@ -322,6 +326,8 @@ public class Robot extends TimedRobot {
     if (driver.isXPushed()) {
       linup.cancel();
       lockStraight = false;
+      liftDirection=!liftDirection;
+      startedlift=false;
     }
 
     if (driver.isAPushed()) {
@@ -354,6 +360,28 @@ public class Robot extends TimedRobot {
         }
         rotateSpeedMod = .5;
       }
+
+      if(driver.isStartHeld()){
+        if(liftDirection){
+          HABauto.liftFront();
+        }else{
+          HABauto.lowerFront();
+        }
+        startedlift=true;
+      }else{
+        HABauto.stopFront();
+      }
+
+      if(driver.isBackHeld()){
+        if(liftDirection){
+          HABauto.liftBack();
+        }else{
+          HABauto.lowerBack();
+        }
+        startedlift=true;
+      }else{
+        HABauto.stopBack();
+      }
       
       if (lockStraight) {
         swerve.changeFront(Side.NORTH);
@@ -362,6 +390,16 @@ public class Robot extends TimedRobot {
           lockStraight = false;
       } else {
         swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
+        if(driver.getRawAxis(0)>0.05 || driver.getRawAxis(1)>0.05){
+          if(startedlift){
+            HABauto.drive(true);
+          }else{
+            HABauto.drive(false);
+          }
+        }else{
+          HABauto.drive(false);
+        }
+
       }
       
       switch (driver.getPOV()) {
@@ -428,15 +466,15 @@ public class Robot extends TimedRobot {
       elevator.moveToPosition(3, object);
     } else if (shooter.isBPushed()) {
       elevator.moveToHeight(Constants.getNumber("elevatorMinHeight", 19));
-      startTime = System.currentTimeMillis();
+      //startTime = System.currentTimeMillis();
     }
 
-    if (shooter.isBHeld()) {
+    /*if (shooter.isBHeld()) {
       if (System.currentTimeMillis() - startTime > 1000 && startTime!=-2) {
         elevator.zero();
         startTime = -2;
       }
-    }
+    }*/
 
     if (Math.abs(shooter.getRawAxis(5)) > 0.05) {
       elevator.rawMovePID(-shooter.getRawAxis(5),0.25);
