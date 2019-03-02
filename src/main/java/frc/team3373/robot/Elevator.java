@@ -8,6 +8,7 @@ import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,7 +29,8 @@ public class Elevator {
     private int calLength;
     private int calInches;
 
-    private CANDigitalInput reverseLimit;
+    private DigitalInput reverseLimit;
+    //private CANDigitalInput reverseLimit;
     private CANDigitalInput forwardLimit;
 
     private boolean zeroing;
@@ -36,7 +38,7 @@ public class Elevator {
 
     private Thread safetyThread;
 
-    public Elevator(int motorID) {
+    public Elevator(int motorID, int switchPin) {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
         calibrating = false;
 
@@ -50,15 +52,14 @@ public class Elevator {
         pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2)); // TODO: Change speed for robot
         slope = Constants.getNumber("elevatorSlope");
 
-        reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen);
-
+        reverseLimit = new DigitalInput(switchPin);// motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen)
         calStep = 0;
 
         zeroing = false;
         zeroed = false;
 
         absoluteZero();
-        reverseLimit.enableLimitSwitch(false);
+        //reverseLimit.enableLimitSwitch(false);
 
         safetyThread = new Thread(()->{
             while (!Thread.interrupted()) {
@@ -95,7 +96,7 @@ public class Elevator {
     }
 
     public void refresh() { // Fail-safes and zero checks
-        SmartDashboard.putBoolean("reverseLimit", reverseLimit.get());
+        SmartDashboard.putBoolean("reverseLimit", !reverseLimit.get());
         goToPosition();
         if (motor.getEncoder().getPosition() >= Constants.getNumber("elevatorMaxRotations")) {
             motor.set(0);
@@ -106,18 +107,18 @@ public class Elevator {
             pid.setReference(position, ControlType.kPosition);
         }
 
-        if (zeroing && !reverseLimit.get()) {
+        if (zeroing && reverseLimit.get()) {
             motor.set(0);
-        } else if (zeroing && reverseLimit.get()) {
+        } else if (zeroing && !reverseLimit.get()) {
             zeroing = false;
             absoluteZero();
         }
 
-        if (reverseLimit.get() && !zeroed) {
+        if (!reverseLimit.get() && !zeroed) {
             absoluteZero();
             zeroing = false;
             zeroed = true;
-        } else if (!reverseLimit.get() && zeroed) {
+        } else if (reverseLimit.get() && zeroed) {
             absoluteZero();
             zeroed = false;
         }

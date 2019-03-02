@@ -117,6 +117,7 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
     compressor = new Compressor(1);
+    compressor.setClosedLoopControl(true);
 
     try {
       Constants.loadConstants();
@@ -151,7 +152,7 @@ public class Robot extends TimedRobot {
     line = new DigitalInput(2);
 
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
-    elevator = new Elevator(5);
+    elevator = new Elevator(5,4);
 
     linup = new VisionLinup(distl, distr, driver, swerve, vis);
 
@@ -227,6 +228,13 @@ public class Robot extends TimedRobot {
     m_autoSelected = m_chooser.getSelected();
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
+
+    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    elevator.resetCal();
+    //elevator.initPID();
+    // elevator.zero();
+
+    lockStraight = false;
   }
 
   /**
@@ -243,6 +251,12 @@ public class Robot extends TimedRobot {
         // Put default auto code here
         break;
     }
+    driverControls();
+    elevator.refresh();
+    SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition());
+    SmartDashboard.putNumber("Left Distance", distl.getDistance());
+    SmartDashboard.putNumber("Right Distance", distr.getDistance());
   }
 
   @Override

@@ -206,7 +206,7 @@
     "elevatorSlope": 0.1296420001272515,
     "elevatorMaxSpeed": 0.9,
     "elevatorMinSpeed": -0.4,
-    "elevatorMaxRotations": 530,
+    "elevatorMaxRotations": 520,
     "elevatorMaxHeight": 70,
     "elevatorMinHeight": 17.875,
     "elevatorHeight": 40,
