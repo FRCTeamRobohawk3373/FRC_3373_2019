@@ -204,14 +204,15 @@
     "elevatorD": 0,
     "elevatorFF": 0,
     "elevatorSlope": 0.1296420001272515,
-    "elevatorMaxSpeed": 0.9,
-    "elevatorMinSpeed": -0.4,
+    "elevatorMaxSpeed": 0.85,
+    "elevatorMinSpeed": -0.35,
     "elevatorMaxRotations": 520,
-    "elevatorMaxHeight": 70,
+    "elevatorMaxHeight": 68,
     "elevatorMinHeight": 17.875,
+    "elevatorControlledTarget":2,
     "elevatorHeight": 40,
 
     "HABPlatformDeadBand":0.5,
-    "HABPlatformCenterOffset":1
+    "HABPlatformCenterOffset":-0.5
 
 }

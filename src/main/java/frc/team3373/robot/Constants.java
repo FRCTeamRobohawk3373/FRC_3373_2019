@@ -180,7 +180,7 @@ public class Constants {
         for (String name : names) {
             if (!(constantsObject.get(name) instanceof JSONArray)) {
                 table.getEntry(name).setValue(constantsObject.get(name));
-            } else {
+            } /*else {
                 if (!(constantsObject.getJSONArray(name).get(0) instanceof JSONArray)) {
                     JSONArray array = constantsObject.getJSONArray(name);
                     NetworkTable subTable = table.getSubTable(name);
@@ -198,7 +198,7 @@ public class Constants {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 

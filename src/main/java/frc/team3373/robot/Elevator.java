@@ -61,14 +61,14 @@ public class Elevator {
         absoluteZero();
         //reverseLimit.enableLimitSwitch(false);
 
-        safetyThread = new Thread(()->{
+        /*safetyThread = new Thread(()->{
             while (!Thread.interrupted()) {
                 refresh();
             }
 
-        });
+        });*/
 
-        safetyThread.start();
+        //safetyThread.start();
 
     }
 
@@ -128,7 +128,7 @@ public class Elevator {
         if (position >= Constants.getNumber("elevatorMaxRotations"))
             position = Constants.getNumber("elevatorMaxRotations");
         if (position < getRotations()) {
-            if (Math.abs(getPosition() - position) > Constants.getNumber("elevatorControlledTarget", 1)) {
+            if (Math.abs(getPosition() - position) > Constants.getNumber("elevatorControlledTarget", 2)) {
                 motor.set(0);
             } else{
                 pid.setReference(position, ControlType.kPosition);

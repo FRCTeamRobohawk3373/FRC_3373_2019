@@ -178,7 +178,7 @@ public class Robot extends TimedRobot {
     if (SmartDashboard.getBoolean("Update Constants", false)) {
       Constants.updateValues();
       SmartDashboard.putBoolean("Update Constants", false);
-    } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
+    } else if (SmartDashboard.getBoolean("Save Constants", false)) {
       try {
         Constants.saveConstants();
         SmartDashboard.putBoolean("Save Constants", false);
@@ -362,10 +362,10 @@ public class Robot extends TimedRobot {
 
       if (driver.isLBHeld()) {//sniper
         swerve.setDriveSpeed(0.1);
-        rotateSpeedMod = .5;
-      } else if (driver.isRBHeld() && elevator.getPosition() < 20) {//turbo
+        rotateSpeedMod = 1;
+      } else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
         swerve.setDriveSpeed(0.5);
-        rotateSpeedMod = .5;
+        rotateSpeedMod = .9;
       } else {//regular
         if (elevator.getPosition() < 40) 
           swerve.setDriveSpeed(0.4);
