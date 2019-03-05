@@ -19,7 +19,7 @@ public class SwerveControl {
 
 	private SwerveWheel[] wheelArray;
 
-	private double rotateTarget;
+	// private double rotateTarget;
 	private double distanceToCenter;
 
 	double robotLength;
@@ -31,7 +31,7 @@ public class SwerveControl {
 	private boolean isObjectCentric = false;
 
 	private double maxTargetSpeed = 0;
-	private boolean stoppedRotating = true;
+	// private boolean stoppedRotating = true;
 	private float targetRobotAngle = 0;
 
 	private SuperAHRS ahrs;
@@ -451,13 +451,13 @@ public class SwerveControl {
 		targetRobotAngle = 0;
 	}
 
-	public void setRotationTarget(double distance) {
+	/* public void setRotationTarget(double distance) {
 		rotateTarget = distance;
 	}
 
 	public void clearRotationTarget() {
 		rotateTarget = 0;
-	}
+	} */
 
 	public void setDriveSpeed(double speed) {
 		speed = Math.abs(speed);

@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
+//import edu.wpi.first.cameraserver.CameraServer;
 //import edu.wpi.cscore.CvSink;
 //import edu.wpi.cscore.UsbCamera;
 //import edu.wpi.cscore.VideoSink;
@@ -17,7 +17,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 //import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.RobotState;
+//import edu.wpi.first.wpilibj.RobotState;
 
 public class Vision {
 	NetworkTableInstance inst;
@@ -308,7 +308,7 @@ public class Vision {
 	}
 
 	/** Used with getObjectsInRange*/
-	private VisionObject getObjectClosestToCenter(ArrayList<VisionObject> objectsIn) {
+	/* private VisionObject getObjectClosestToCenter(ArrayList<VisionObject> objectsIn) {
 		int closest = -1;
 		double cx = 2.0;
 		for (int i = 0; i < objectsIn.size(); i++) {
@@ -322,7 +322,7 @@ public class Vision {
 			return null;
 		}
 		return objects.get(closest);
-	}
+	} */
 	/*
 	// Gets object with absolute x value closest to zero with distance less than
 	// in parameters

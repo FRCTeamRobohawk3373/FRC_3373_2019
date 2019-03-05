@@ -23,7 +23,7 @@ import frc.team3373.robot.DistanceSensorPID;
  */
 public class VisionLinup {
 
-    private SuperJoystick joystick;
+    // private SuperJoystick joystick;
 
     private DistanceSensor ldist;
     private DistanceSensor rdist;
@@ -39,7 +39,7 @@ public class VisionLinup {
     
     private DistanceSensorPID disDif;
     public VisionLinup(DistanceSensor dl, DistanceSensor dr, SuperJoystick joy, SwerveControl sw, Vision vs) {
-        joystick = joy;
+        // joystick = joy;
         ldist = dl;
         rdist = dr;
         swerve = sw;
