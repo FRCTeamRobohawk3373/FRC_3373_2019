@@ -61,9 +61,12 @@ public class Lineup {
         pid.setAbsoluteTolerance(Constants.getNumber("lineupTolerance", 0.2)); // Sets deadband for PID
 
         int count = 0; // Stores how many values have been tested
-        pid.setP(Constants.getNumber("lineupP", 0.1)); // TODO: Remove
-        pid.setI(Constants.getNumber("lineupI", 0));
-        pid.setD(Constants.getNumber("lineupD", 0));
+
+        if (RobotState.isTest()) {
+            pid.setP(Constants.getNumber("lineupP", 0.1));
+            pid.setI(Constants.getNumber("lineupI", 0));
+            pid.setD(Constants.getNumber("lineupD", 0));
+        }
 
         DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
         swerve.setControlMode(DriveMode.ROBOTCENTRIC);

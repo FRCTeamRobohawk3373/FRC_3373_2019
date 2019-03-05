@@ -22,10 +22,12 @@ public class DistanceSensorPID implements PIDSource {
         double rdist = (double) Math.round(100 * dright.getDistance()) / 100; // Rounds values of distance sensors
         double ldist = (double) Math.round(100 * dleft.getDistance()) / 100;
 
-        SmartDashboard.putNumber("Left Distance", dleft.getDistance());// TODO: Remove debug
-        SmartDashboard.putNumber("Right Distance", dright.getDistance());
-        SmartDashboard.putNumber("Left Avg Dist", ldist);
-        SmartDashboard.putNumber("Right Avg Dist", rdist);
+        if (RobotState.isTest()) {
+            SmartDashboard.putNumber("Left Distance", dleft.getDistance());
+            SmartDashboard.putNumber("Right Distance", dright.getDistance());
+            SmartDashboard.putNumber("Left Avg Dist", ldist);
+            SmartDashboard.putNumber("Right Avg Dist", rdist);
+        }
 
         if (rdist == -2.0 && ldist == -2.0) { // If the sensors are out of range, do nothing
             rdist = 0;

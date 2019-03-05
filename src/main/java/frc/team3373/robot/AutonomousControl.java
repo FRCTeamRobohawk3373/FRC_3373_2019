@@ -18,7 +18,7 @@ public class AutonomousControl {
 	private Object auto;
 	private DistanceSensor distl;
 	private DistanceSensor distr;
-	private SuperJoystick shooter;
+	//private SuperJoystick shooter;
 	private SuperJoystick driver;
 	private DigitalInput line;
 
@@ -38,7 +38,7 @@ public class AutonomousControl {
 		this.swerve = swerve;
 		distl = dl;
 		distr = dr;
-		this.shooter = shooter;
+		//this.shooter = shooter;
 		this.driver = driver;
 		this.line = line;
 

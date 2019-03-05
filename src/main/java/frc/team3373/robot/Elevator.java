@@ -1,15 +1,15 @@
 package frc.team3373.robot;
 
-import com.revrobotics.CANDigitalInput;
+// import com.revrobotics.CANDigitalInput;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
+// import com.revrobotics.CANDigitalInput.LimitSwitchPolarity;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.RobotState;
+// import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator {
@@ -33,13 +33,13 @@ public class Elevator {
     private int calInches;
 
     private DigitalInput reverseLimit;
-    //private CANDigitalInput reverseLimit;
-    private CANDigitalInput forwardLimit;
+    // private CANDigitalInput reverseLimit;
+    // private CANDigitalInput forwardLimit;
 
     private boolean zeroing;
     private boolean zeroed;
 
-    private Thread safetyThread;
+    // private Thread safetyThread;
 
     /**
      * Initializes the elevator class.
@@ -57,7 +57,7 @@ public class Elevator {
         pid.setP(Constants.getNumber("elevatorP"));
         pid.setI(Constants.getNumber("elevatorI"));
         pid.setD(Constants.getNumber("elevatorD"));
-        pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2)); // TODO: Change speed for robot
+        pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
         slope = Constants.getNumber("elevatorSlope");
 
         reverseLimit = new DigitalInput(switchPin);// motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen)

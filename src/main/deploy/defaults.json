@@ -210,7 +210,6 @@
     "elevatorMaxHeight": 68,
     "elevatorMinHeight": 19,
     "elevatorControlledTarget":4,
-    "elevatorHeight": 40,
 
     "HABPlatformDeadBand":0.5,
     "HABPlatformCenterOffset":-0.5

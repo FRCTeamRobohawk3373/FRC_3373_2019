@@ -10,7 +10,7 @@ public class Claw {
 
     private Thread solThread;
 
-    private boolean grabbed;
+    // private boolean grabbed;
 
     public Claw(int PCM, int liftForwardChannel, int liftReverseChannel, int grabForwardChannel, int grabReverseChannel) {
         lift = new DoubleSolenoid(PCM, liftForwardChannel, liftReverseChannel);
