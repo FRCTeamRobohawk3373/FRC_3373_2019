@@ -6,10 +6,7 @@ public class SuperPIDOutput implements PIDOutput {
     private OutputType type;
     private SwerveControl swerve;
     private double pOut;
-
-    /**
-     * The type of output to the swerve control: ROTATE, SWERVEA
-     */
+    
     public static enum OutputType {
         ROTATE, DRIVE
     }

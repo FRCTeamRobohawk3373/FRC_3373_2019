@@ -105,7 +105,7 @@ public class Robot extends TimedRobot {
 
   //long startTime=0;
 
-  int calInches=3;
+  int calInches = 3;
   //private boolean cargoOpen;
   /**
    * This function is run when the robot is first started up and should be
@@ -301,7 +301,7 @@ public class Robot extends TimedRobot {
     elevator.resetCal();
     elevator.initPID();
     compressor.setClosedLoopControl(true);
-    calInches=3;
+    calInches = 3;
   }
 
   /**

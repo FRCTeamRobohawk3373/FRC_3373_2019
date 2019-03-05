@@ -22,6 +22,9 @@ public class Elevator {
     private double[] x;
     private double[] y;
 
+    /**
+     * The position to set the elevator.
+     */
     private double position;
 
     private double slope;
@@ -38,6 +41,11 @@ public class Elevator {
 
     private Thread safetyThread;
 
+    /**
+     * Initializes the elevator class.
+     * @param motorID The CAN ID of the motor controlling the elevator movement.
+     * @param switchPin The DIO port for the limit switch.
+     */
     public Elevator(int motorID, int switchPin) {
         motor = new CANSparkMax(motorID, MotorType.kBrushless);
         calibrating = false;
@@ -85,7 +93,12 @@ public class Elevator {
         pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
     }
 
-    public void rawMovePID(double increment, double rate) { // Moves motor by an increments, used for calibration; BE CAREFUL!!!
+    /**
+     * Moves motor by an increments, used for fine movement of the elevator when encoder becomes inaccurate.
+     * @param increment The increment to the position from the joystick, a double from -1 to 1.
+     * @param rate The rate at which the position of the elevator changes, multiplied by the increment.
+     */
+    public void rawMovePID(double increment, double rate) {
         if (Math.abs(increment) > 0.05 && Math.abs(increment) <= 1) {
             position += increment * rate;
             if (position >= Constants.getNumber("elevatorMaxRotations"))
@@ -95,6 +108,9 @@ public class Elevator {
         }
     }
 
+    /**
+     * Checks the elevator against the minimum and maximum rotations, speed, and limit switch.
+     */
     public void refresh() { // Fail-safes and zero checks
         SmartDashboard.putBoolean("reverseLimit", !reverseLimit.get());
         goToPosition();
@@ -124,6 +140,9 @@ public class Elevator {
         }
     }
 
+    /**
+     * Sets the position of the PID to the variable position.
+     */
     private void goToPosition() {
         if (position >= Constants.getNumber("elevatorMaxRotations"))
             position = Constants.getNumber("elevatorMaxRotations");
@@ -138,10 +157,16 @@ public class Elevator {
         }
     }
 
-    public double getPosition() { // Returns position in inches
+    /**
+     * @return The position that the elevator is set to.
+     */
+    public double getPosition() {
         return motor.getEncoder().getPosition() * slope;
     }
 
+    /**
+     * @return The current position of the elevator in rotations.
+     */
     public double getRotations() {
         return motor.getEncoder().getPosition();
     }
@@ -152,36 +177,54 @@ public class Elevator {
         position = 0;
     }
 
-    public void zero() { // Initializes zeroing for Teleop
+    /**
+     * Starts the zeroing sequence. Used at the beginning of Teleop.
+     */
+    public void zero() {
         position = 0;
         zeroing = true;
     }
 
+    /**
+     * Stops the elevator and sets the position to 0.
+     */
     public void cancel() {
         motor.set(0);
         position = 0;
     }
     
+    /**
+     * Calls {@link #cancel()} and sets the position to the current position.
+     */
     public void stop() {
         cancel();
         position = motor.getEncoder().getPosition();
         pid.setReference(position, ControlType.kPosition);
     }
 
-    public void moveToHeight(double inches) { // Moves elevator to a height after checking the position against the min and max heights
-        inches -= Constants.getNumber("elevatorMinHeight");
-        if (inches < 0)
-            inches = 0;
-        if (inches >= 0 && inches <= Constants.getNumber("elevatorMaxHeight")) {
+    /**
+     * Sets the position of the elevator.
+     * @param height The height to set the elevator to, in inches.
+     */
+    public void moveToHeight(double height) { // Moves elevator to a height after checking the position against the min and max heights
+        height -= Constants.getNumber("elevatorMinHeight");
+        if (height < 0)
+            height = 0;
+        if (height >= 0 && height <= Constants.getNumber("elevatorMaxHeight")) {
             slope = Constants.getNumber("elevatorSlope", 3.12);
-            position = inches / slope;
+            position = height / slope;
             //pid.setReference(position, ControlType.kPosition);
             SmartDashboard.putNumber("Set Position", position);
         }
     }
 
-    public void moveToPosition(int height, Robot.ObjectType obj) {
-        switch (height) {
+    /**
+     * Sets the height of the elevator, using {@link #moveToHeight(double) moveToHeight()}, to a level of the rocket/cargo ship.
+     * @param level The level of the rocket/cargo ship to set the elevator to.
+     * @param obj The object mode that the shooter is in.
+     */
+    public void moveToPosition(int level, Robot.ObjectType obj) {
+        switch (level) {
         case 0: //bottom
             switch (obj) {
             case CARGO:
@@ -239,6 +282,9 @@ public class Elevator {
         }
     }
 
+    /**
+     * Starts the calibration routine for the elevator.
+     */
     public void calibrate() {
         if (!calibrating) {
             SmartDashboard.putBoolean("Calibrating", true);
@@ -268,6 +314,9 @@ public class Elevator {
         SmartDashboard.putBoolean("Calibrating", false);
     }
 
+    /**
+     * Stops the calibration routine {@link #calibrate()}.
+     */
     public void resetCal() {
         calStep = 0;
         x = null;
