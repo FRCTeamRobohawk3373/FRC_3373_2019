@@ -208,8 +208,8 @@
     "elevatorMinSpeed": -0.35,
     "elevatorMaxRotations": 520,
     "elevatorMaxHeight": 68,
-    "elevatorMinHeight": 17.875,
-    "elevatorControlledTarget":2,
+    "elevatorMinHeight": 19,
+    "elevatorControlledTarget":4,
     "elevatorHeight": 40,
 
     "HABPlatformDeadBand":0.5,

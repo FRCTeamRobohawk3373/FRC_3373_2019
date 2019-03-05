@@ -48,6 +48,7 @@ public class DistanceSensor {
         d = array.getDouble(3);
         e = array.getDouble(4);
         f = array.getDouble(5);
+        System.out.println(a);
         
         useLookup = false;
         

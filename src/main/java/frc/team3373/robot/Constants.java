@@ -208,7 +208,7 @@ public class Constants {
         for (String key : keys) {
             if (!(constantsObject.get(key) instanceof JSONArray)) {
                 constantsObject.put(key, table.getEntry(key).getDouble(-1));
-            } else {
+            } /*else {
                 if (!(constantsObject.getJSONArray(key).get(0) instanceof JSONArray)) {
                     JSONArray array = constantsObject.getJSONArray(key);
                     NetworkTable subTable = table.getSubTable(key);
@@ -226,7 +226,7 @@ public class Constants {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }

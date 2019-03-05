@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
   boolean liftDirection = true;//1 is down, 0 is up
   boolean startedlift = false;
 
-  long startTime=0;
+  //long startTime=0;
 
   int calInches=3;
   //private boolean cargoOpen;
@@ -118,6 +118,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     compressor = new Compressor(1);
     compressor.setClosedLoopControl(true);
+    compressor.start();
 
     try {
       Constants.loadConstants();
@@ -178,7 +179,7 @@ public class Robot extends TimedRobot {
     if (SmartDashboard.getBoolean("Update Constants", false)) {
       Constants.updateValues();
       SmartDashboard.putBoolean("Update Constants", false);
-    } else if (SmartDashboard.getBoolean("Save Constants", false)) {
+    } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
       try {
         Constants.saveConstants();
         SmartDashboard.putBoolean("Save Constants", false);
@@ -235,6 +236,7 @@ public class Robot extends TimedRobot {
     // elevator.zero();
 
     lockStraight = false;
+    compressor.setClosedLoopControl(true);
   }
 
   /**
@@ -255,14 +257,15 @@ public class Robot extends TimedRobot {
     elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
-    SmartDashboard.putNumber("Left Distance", distl.getDistance());
-    SmartDashboard.putNumber("Right Distance", distr.getDistance());
+    SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
+    SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
   }
 
   @Override
   public void teleopInit() {
     SmartDashboard.setDefaultBoolean("Update Constants", false);
     elevator.resetCal();
+    compressor.setClosedLoopControl(true);
     //elevator.initPID();
     // elevator.zero();
 
@@ -279,8 +282,9 @@ public class Robot extends TimedRobot {
     elevator.refresh();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
-    SmartDashboard.putNumber("Left Distance", distl.getDistance());
-    SmartDashboard.putNumber("Right Distance", distr.getDistance());
+    SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
+    SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
+    SmartDashboard.putBoolean("Lifting Up", liftDirection);
   }
 
   /**
@@ -296,6 +300,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Inches", 10);
     elevator.resetCal();
     elevator.initPID();
+    compressor.setClosedLoopControl(true);
     calInches=3;
   }
 
@@ -306,13 +311,14 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
-    SmartDashboard.putNumber("Left Distance", distl.getDistance());
-    SmartDashboard.putNumber("Right Distance", distr.getDistance());
-    SmartDashboard.putBoolean("Lifting Up", liftDirection);
+    SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
+    SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
+   
     //swerve.printPositions();
     testControls();
     elevator.refresh();
     elevator.updatePID();
+    HABauto.update();
     //VisionObject obj = vis.getObjectClosestToCenter();
     //if(obj!=null){
     //  obj.print();

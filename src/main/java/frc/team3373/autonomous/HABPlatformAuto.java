@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.team3373.robot.AutonomousControl;
 import frc.team3373.robot.Constants;
 import frc.team3373.robot.DistanceSensor;
+import frc.team3373.robot.DistanceSensorPID;
 import frc.team3373.robot.SuperAHRS;
 import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SwerveControl;
@@ -38,6 +39,7 @@ public class HABPlatformAuto {
 
     DistanceSensor rightSensor;
     DistanceSensor leftSensor;
+    DistanceSensorPID distDif;
 
     DoubleSolenoid rightSolenoid;
     DoubleSolenoid leftSolenoid;
@@ -66,6 +68,8 @@ public class HABPlatformAuto {
         rightSensor = new DistanceSensor(rightDistanceSensor, 1);
         leftSensor = new DistanceSensor(leftDistanceSensor, 0);
 
+        distDif = new DistanceSensorPID(leftSensor, rightSensor);
+
         SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
         SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
 
@@ -86,8 +90,8 @@ public class HABPlatformAuto {
     public void update() {
         SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
         SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
-        SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
-        SmartDashboard.putNumber("leftDistance", leftSensor.getDistance());
+        SmartDashboard.putNumber("rightVoltage", rightSensor.getAverage());
+        SmartDashboard.putNumber("leftVoltage", leftSensor.getAverage());
     }
 
     public void liftFront(){
@@ -147,6 +151,7 @@ public class HABPlatformAuto {
                 swerve.setControlMode(DriveMode.ROBOTCENTRIC);
                 swerve.calculateAutoSwerveControl(0, 0, 0);
                 SmartDashboard.putString("Current Step", "park Arms");
+                System.out.println(Constants.getNumber("HABPlatformCenterOffset",0));
                 state++;
                 break;
             case 1:// climb
@@ -206,12 +211,8 @@ public class HABPlatformAuto {
                 } else if (!backAtHeight) {
                     leftSolenoid.set(Value.kForward);
                 }*/
-                diff = rightSensor.getDistance()-leftSensor.getDistance();//-(ahrs.getPitch() + offset);
-                SmartDashboard.putNumber("Differance", diff);
-                SmartDashboard.putNumber("AnalogeRight", rightSensor.getVoltage());
-                SmartDashboard.putNumber("AnalogeLeft", leftSensor.getVoltage());
-                SmartDashboard.putNumber("AverageAnalogeRight", rightSensor.getAverage());
-                SmartDashboard.putNumber("AverageAnalogeLeft", leftSensor.getAverage());
+                diff = distDif.pidGet();//-(ahrs.getPitch() + offset);
+                SmartDashboard.putNumber("Difference", diff);
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
                     if (diff > Constants.getNumber("HABPlatformDeadBand",0.5)+Constants.getNumber("HABPlatformCenterOffset",0)) {
                         SmartDashboard.putBoolean("rightSolenoid", false);
