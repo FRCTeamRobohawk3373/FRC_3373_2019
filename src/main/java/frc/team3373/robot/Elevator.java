@@ -60,7 +60,9 @@ public class Elevator {
         pid.setOutputRange(Constants.getNumber("elevatorMinSpeed", -0.2), Constants.getNumber("elevatorMaxSpeed", 0.2));
         slope = Constants.getNumber("elevatorSlope");
 
-        reverseLimit = new DigitalInput(switchPin);// motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen)
+        reverseLimit = new DigitalInput(switchPin);
+        //reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen)
+
         calStep = 0;
 
         zeroing = false;
