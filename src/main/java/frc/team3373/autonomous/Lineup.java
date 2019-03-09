@@ -11,6 +11,7 @@ import frc.team3373.robot.SuperJoystick;
 import frc.team3373.robot.SuperPIDOutput;
 import frc.team3373.robot.SwerveControl;
 import frc.team3373.robot.SwerveControl.DriveMode;
+import frc.team3373.robot.SwerveControl.Side;
 
 public class Lineup {
     private PIDController pid;
@@ -204,11 +205,12 @@ public class Lineup {
      * Aligns the robot to the cargo ship. Press X on the driver joystick to cancel.
      * @param al The direction to search for the line
      */
-    public void align(AlignDirection al) {
+    public boolean align(AlignDirection al) {
         SmartDashboard.putBoolean("Aligned", false);
 
         DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
         swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+        swerve.changeFront(Side.NORTH);
 
         int state = 0; // Stores the step that the lineup is on
         int count = 0;
@@ -270,11 +272,12 @@ public class Lineup {
                     System.out.println("AlignDirection must be defined");
                     swerve.setControlMode(mode);
                     SmartDashboard.putBoolean("Aligned", true);
-                    return;
+                    return false;
                 }
                 break;
             case 3: // When line is sensed for a certain number of times, go to case 5
                 if (line.get() && count == 3) {
+                    swerve.calculateAutoSwerveControl(90, 0, 0);
                     if (!fin) {
                         state++;
                     } else {
@@ -300,29 +303,30 @@ public class Lineup {
                     } else {
                         align = AlignDirection.LEFT;
                     }
-                    state = 1;
+                    state = 2;
                 } else if (!(distance < 14 && distance > 13) && !dis) {
                     dis = true;
                     state = 0;
                 } else if (Math.abs(dist.pidGet()) > 0.1 && !ali) {
                     ali = true;
-                    state = 0;
+                    state = 1;
                 } else {
                     state++;
                 }
             case 6:
                 swerve.setControlMode(mode);
                 SmartDashboard.putBoolean("Aligned", true);
-                break;
+                return true;
             default:
                 System.out.println("State must be 0-3");
                 pid.disable();
                 swerve.calculateAutoSwerveControl(0, 0, 0);
                 swerve.setControlMode(mode);
                 SmartDashboard.putBoolean("Aligned", true);
-                return;
+                return false;
             }
         }
         SmartDashboard.putBoolean("Aligned", true);
+        return false;
     }
 }

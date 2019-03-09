@@ -91,10 +91,11 @@ public class Robot extends TimedRobot {
   HABPlatformAuto HABauto;
 
   Compressor compressor;
-  AutonomousControl control;
+  //AutonomousControl control;
   Solenoid armRelease;
 
-  VisionLineup lineup;
+  Lineup lineup;
+  VisionLineup vlineup;
 
   double rotateSpeedMod = .5;
 
@@ -152,10 +153,10 @@ public class Robot extends TimedRobot {
     distr = new DistanceSensor(1, 6);
     line = new DigitalInput(2);
 
-    control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
+    //control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
     elevator = new Elevator(5,4);
-
-    lineup = new VisionLineup(distl, distr, driver, swerve, vis);
+    lineup = new Lineup(distl, distr, driver, swerve, line);
+    vlineup = new VisionLineup(distl, distr, driver, swerve, vis);
 
     object = ObjectType.HATCH;
 
@@ -344,7 +345,7 @@ public class Robot extends TimedRobot {
     //####          Driver Controls               ####
     //################################################
     if (driver.isXPushed()) {
-      lineup.cancel();
+      vlineup.cancel();
       lockStraight = false;
       liftDirection=!liftDirection;
       startedlift=false;
@@ -353,13 +354,13 @@ public class Robot extends TimedRobot {
     if (driver.isAPushed()) {
       //linup.align();
       lockStraight = true;
-      control.lineup(Lineup.AlignDirection.LEFT);
+      lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       lockStraight = true;
-      control.lineup(Lineup.AlignDirection.RIGHT);
+      lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
     }
 
-    if (lineup.isFinished()) {
+    if (vlineup.isFinished()) {
       if (driver.getRawAxis(2) > .5) {//FieldCentric
         swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
       } else if (driver.getRawAxis(3) > .5) {//RobotCentric
@@ -531,7 +532,7 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isAPushed()) {
-      lineup.align();
+      vlineup.align();
       lockStraight = true;
       //control.lineup(Lineup.AlignDirection.LEFT);
     }
@@ -542,7 +543,7 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isXPushed()) {
-      lineup.cancel();
+      vlineup.cancel();
       lockStraight = false;
     }
 
