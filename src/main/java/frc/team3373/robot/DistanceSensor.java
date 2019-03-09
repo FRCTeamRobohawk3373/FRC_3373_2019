@@ -45,9 +45,9 @@ public class DistanceSensor {
         a = array.getDouble(0);
         b = array.getDouble(1);
         c = array.getDouble(2);
-        d = array.getDouble(3);
+        /* d = array.getDouble(3);
         e = array.getDouble(4);
-        f = array.getDouble(5);
+        f = array.getDouble(5); */
         System.out.println(a);
         
         useLookup = false;
@@ -71,9 +71,10 @@ public class DistanceSensor {
         }
 
         if (!useLookup) {
-            return ((a * Math.pow(x, b)) + c) / ((d * Math.pow(x, e)) + f); // Curve fit equation:
-                                                                                  // y_1\sim\frac{ax_1^b+c}{dx_1^f+g}
+            //return ((a * Math.pow(x, b)) + c) / ((d * Math.pow(x, e)) + f); // Curve fit equation:
+                                                                                  // y\sim\frac{ax^b+c}{dx^f+g}
                                                                                   // (Desmos)
+            return (a * Math.pow(x, b) + c); // Curve fit equation: y\sim ax^b+c
         } else {
             return lookupTable(sensor.getAverageVoltage());
         }
