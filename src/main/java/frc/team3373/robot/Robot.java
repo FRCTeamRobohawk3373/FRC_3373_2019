@@ -9,7 +9,7 @@ package frc.team3373.robot;
 
 import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
-import frc.team3373.autonomous.VisionLinup;
+import frc.team3373.autonomous.VisionLineup;
 import frc.team3373.robot.SwerveControl.Side;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class Robot extends TimedRobot {
   AutonomousControl control;
   Solenoid armRelease;
 
-  VisionLinup linup;
+  VisionLineup lineup;
 
   double rotateSpeedMod = .5;
 
@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
     control = new AutonomousControl(ahrs, swerve, distl, distr, driver, shooter, line);
     elevator = new Elevator(5,4);
 
-    linup = new VisionLinup(distl, distr, driver, swerve, vis);
+    lineup = new VisionLineup(distl, distr, driver, swerve, vis);
 
     object = ObjectType.HATCH;
 
@@ -344,7 +344,7 @@ public class Robot extends TimedRobot {
     //####          Driver Controls               ####
     //################################################
     if (driver.isXPushed()) {
-      linup.cancel();
+      lineup.cancel();
       lockStraight = false;
       liftDirection=!liftDirection;
       startedlift=false;
@@ -359,7 +359,7 @@ public class Robot extends TimedRobot {
       control.lineup(Lineup.AlignDirection.RIGHT);
     }
 
-    if (linup.isFinished()) {
+    if (lineup.isFinished()) {
       if (driver.getRawAxis(2) > .5) {//FieldCentric
         swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
       } else if (driver.getRawAxis(3) > .5) {//RobotCentric
@@ -531,7 +531,7 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isAPushed()) {
-      linup.align();
+      lineup.align();
       lockStraight = true;
       //control.lineup(Lineup.AlignDirection.LEFT);
     }
@@ -542,7 +542,7 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isXPushed()) {
-      linup.cancel();
+      lineup.cancel();
       lockStraight = false;
     }
 
