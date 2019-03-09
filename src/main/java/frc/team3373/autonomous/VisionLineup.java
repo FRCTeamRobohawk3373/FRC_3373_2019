@@ -49,7 +49,7 @@ public class VisionLineup {
 
         disDif = new DistanceSensorPID(ldist, rdist);
 
-        SmartDashboard.putString("linupInstruction", "None");
+        SmartDashboard.putString("lineupInstruction", "None");
         SmartDashboard.putNumber("State", 0);
         SmartDashboard.putNumber("Timeout", 0);
     }
@@ -86,21 +86,21 @@ public class VisionLineup {
                                 count = 0;
                                 if (target.distance > Constants.getNumber("lineUPTargetDistance")) {
                                     if (target.X > Constants.getNumber("lineUPDeadband")) {
-                                        SmartDashboard.putString("linupInstruction",
+                                        SmartDashboard.putString("lineupInstruction",
                                                 "driving forward and rotating clockwise");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
                                                 1) * 0.4, target.X * .3);
                                         //rotate clockwise
                                     } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
-                                        SmartDashboard.putString("linupInstruction",
+                                        SmartDashboard.putString("lineupInstruction",
                                                 "driving forward and rotating counter clockwise");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
                                                 1) * 0.4, target.X * .3);
                                         //rotate counter clockwise
                                     } else {
-                                        SmartDashboard.putString("linupInstruction", "driving forward");
+                                        SmartDashboard.putString("lineupInstruction", "driving forward");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
                                                 1) * 0.4, 0);
@@ -125,20 +125,20 @@ public class VisionLineup {
                                 count = 0;
                                 if (target.X > Constants.getNumber("lineUPDeadband")) {
                                     //move to the Right
-                                    SmartDashboard.putString("linupInstruction", "move Right");
+                                    SmartDashboard.putString("lineupInstruction", "move Right");
                                     swerve.calculateAutoSwerveControl(0, target.X * 0.4, 0);
                                 } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
                                     //move to the left
-                                    SmartDashboard.putString("linupInstruction", "move Left");
+                                    SmartDashboard.putString("lineupInstruction", "move Left");
                                     swerve.calculateAutoSwerveControl(180, target.X * 0.4, 0);
                                 } else if (ldist.getDistance() == -2) {
-                                    SmartDashboard.putString("linupInstruction", "rotate clockwise around the object");
+                                    SmartDashboard.putString("lineupInstruction", "rotate clockwise around the object");
                                     swerve.setDistanceToObject(target.distance - 8);
                                     swerve.calculateObjectControl(0.1);
                                     
                                     //rotate clockwise around the object
                                 } else if (rdist.getDistance() == -2) {
-                                    SmartDashboard.putString("linupInstruction",
+                                    SmartDashboard.putString("lineupInstruction",
                                             "rotate counter clockwise around the object");
                                     swerve.setDistanceToObject(target.distance - 8);
                                     swerve.calculateObjectControl(-0.1);
@@ -168,14 +168,14 @@ public class VisionLineup {
                                     //rotate left
                                     //speed = 0.004 * Math.pow(diff, 2);
                                     swerve.calculateAutoSwerveControl(0, 0, -0.004 * Math.pow(diff, 2));
-                                    SmartDashboard.putString("linupInstruction", "rotating left");
+                                    SmartDashboard.putString("lineupInstruction", "rotating left");
                                 } else if (diff < -Constants.getNumber("lineUPDistanceSensorDeadband")) {
                                     //rotate right
                                     //speed = -0.004 * Math.pow(diff, 2);
                                     swerve.calculateAutoSwerveControl(0, 0, 0.004 * Math.pow(diff, 2));
-                                    SmartDashboard.putString("linupInstruction", "rotating right");
+                                    SmartDashboard.putString("lineupInstruction", "rotating right");
                                 } else {
-                                    SmartDashboard.putString("linupInstruction", "good");
+                                    SmartDashboard.putString("lineupInstruction", "good");
                                     step++;
                                 }
                             } else {
@@ -188,11 +188,11 @@ public class VisionLineup {
                             if (target != null) {
                                 if (target.X > Constants.getNumber("lineUPDeadband")) {
                                     //move to the Right
-                                    SmartDashboard.putString("linupInstruction", "move Right");
+                                    SmartDashboard.putString("lineupInstruction", "move Right");
                                     swerve.calculateAutoSwerveControl(0, target.X * 0.4, 0);
                                 } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
                                     //move to the left
-                                    SmartDashboard.putString("linupInstruction", "move Left");
+                                    SmartDashboard.putString("lineupInstruction", "move Left");
                                     swerve.calculateAutoSwerveControl(180, target.X * 0.4, 0);
                                 } else {
                                     count = 0;
@@ -210,26 +210,26 @@ public class VisionLineup {
                             break;
                         case 4:
                             swerve.calculateAutoSwerveControl(0, 0, 0);
-                            SmartDashboard.putString("linupInstruction", "done");
+                            SmartDashboard.putString("lineupInstruction", "done");
                             finished = true;
                             break;
                         }
                     }
                     swerve.setControlMode(mode);
                     swerve.calculateAutoSwerveControl(0, 0, 0);
-                    SmartDashboard.putString("linupInstruction", "done");
+                    SmartDashboard.putString("lineupInstruction", "done");
                     finished = true;
                 } else {
                     swerve.setControlMode(mode);
                     swerve.calculateAutoSwerveControl(0, 0, 0);
-                    SmartDashboard.putString("linupInstruction", "None");
+                    SmartDashboard.putString("lineupInstruction", "None");
                     System.out.println("no Targets");
                     finished = true;
                 }
                 finished = true;
                 swerve.setControlMode(mode);
                 swerve.calculateAutoSwerveControl(0, 0, 0);
-                SmartDashboard.putString("linupInstruction", "done");
+                SmartDashboard.putString("lineupInstruction", "done");
             });
 
             thread.start();
