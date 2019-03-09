@@ -74,7 +74,7 @@ public class DistanceSensor {
             //return ((a * Math.pow(x, b)) + c) / ((d * Math.pow(x, e)) + f); // Curve fit equation:
                                                                                   // y\sim\frac{ax^b+c}{dx^f+g}
                                                                                   // (Desmos)
-            return (a * Math.pow(x, b) + c); // Curve fit equation: y\sim ax^b+c
+            return ((a * Math.pow(x, b)) + c); // Curve fit equation: y\sim ax^b+c
         } else {
             return lookupTable(sensor.getAverageVoltage());
         }
