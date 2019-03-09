@@ -516,7 +516,7 @@ public class Robot extends TimedRobot {
 
     //swerve.printPositions();
 
-    if (shooter.isAPushed()) {
+    if (shooter.isStartPushed()) {
       elevator.calibrate();
     } else if (shooter.isXPushed()) {
       elevator.resetCal();
@@ -546,7 +546,7 @@ public class Robot extends TimedRobot {
       lockStraight = false;
     }
 
-    if (driver.isStartHeld()) {
+    if (driver.isBackHeld()) {
       HABauto.climb(30);
     }
 
