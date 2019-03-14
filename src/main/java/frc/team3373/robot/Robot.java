@@ -548,7 +548,7 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isBackHeld()) {
-      HABauto.climb(30);
+      HABauto.climb(25.5);
     }
 
     shooter.clearButtons();
