@@ -31,6 +31,7 @@
     "lineupP": 0.038,
     "lineupI": 0.0032,
     "lineupD": 0,
+    "lineupDistance": 12,
 
     "lineUPDeadband":0.05,
     "lineUPDistanceSensorDeadband":0.01,

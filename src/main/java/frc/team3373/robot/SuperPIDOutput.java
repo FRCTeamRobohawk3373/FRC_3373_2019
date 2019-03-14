@@ -8,7 +8,7 @@ public class SuperPIDOutput implements PIDOutput {
     private double pOut;
     
     public static enum OutputType {
-        ROTATE, DRIVE
+        ROTATE, DRIVE, OBJECT
     }
 
     /**
@@ -30,6 +30,9 @@ public class SuperPIDOutput implements PIDOutput {
             break;
         case DRIVE:
             swerve.calculateAutoSwerveControl(0, output, 0);
+            break;
+        case OBJECT:
+            swerve.calculateObjectControl(output);
             break;
         default:
             System.out.println("type must be initialized!");

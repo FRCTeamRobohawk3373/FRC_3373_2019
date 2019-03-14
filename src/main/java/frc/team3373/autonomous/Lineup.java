@@ -93,6 +93,42 @@ public class Lineup {
         swerve.setControlMode(mode);
     }
 
+    public void objectSquare() {
+        boolean exit = false;
+        pid.setAbsoluteTolerance(Constants.getNumber("lineupTolerance", 0.2)); // Sets deadband for PID
+
+        int count = 0; // Stores how many values have been tested
+
+        if (RobotState.isTest()) {
+            pid.setP(Constants.getNumber("lineupP", 0.1));
+            pid.setI(Constants.getNumber("lineupI", 0));
+            pid.setD(Constants.getNumber("lineupD", 0));
+        }
+
+        DriveMode mode = swerve.getControlMode(); // Gets swerve control mode
+        swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+
+        pid.enable(); // Enables PID loop
+
+        while (!joystick.isXHeld() && !RobotState.isDisabled() && !exit) {
+            if (pid.onTarget() && count >= Constants.getNumber("lineupCount", 10)) { // If 200 or more samples are within the deadband,
+                                                  // disable PID and return
+                pid.disable();
+                swerve.calculateAutoSwerveControl(0, 0, 0);
+                swerve.setControlMode(mode);
+                return;
+            } else if (pid.onTarget()) {
+                count++;
+                System.out.println(count);
+            } else if (count != 0 && !pid.onTarget()) {
+                count = 0;
+            }
+        }
+        pid.disable();
+        swerve.calculateAutoSwerveControl(0, 0, 0);
+        swerve.setControlMode(mode);
+    }
+
     /**
      * Aligns the robot to the rocket. Press X on the driver joystick to cancel.
      * @param al The direction to search for the line
@@ -225,17 +261,17 @@ public class Lineup {
 
         while (!joystick.isXHeld() && !RobotState.isDisabled()) {
             switch (state) {
-            case 0: // If line is sensed, return. Else, search in the specified direction
+            case 0:
                 distance = (dleft.getDistance() + dright.getDistance()) / 2;
-                if (distance < 12 && distance > 11) {
+                if (distance < Constants.getNumber("lineupDistance", 12) + 0.5 && distance > Constants.getNumber("lineupDistance", 12) - 0.5) {
                     if (!fin) {
                         state++;
                     } else {
                         state = 5;
                     }
-                } else if (distance > 12) {
+                } else if (distance > Constants.getNumber("lineupDistance", 12) - 0.5) {
                     swerve.calculateAutoSwerveControl(90, 0.1, 0);
-                } else if (distance < 11) {
+                } else if (distance < Constants.getNumber("lineupDistance", 12) + 0.5) {
                     swerve.calculateAutoSwerveControl(270, 0.1, 0);
                 }
                 break;
@@ -304,7 +340,7 @@ public class Lineup {
                         align = AlignDirection.LEFT;
                     }
                     state = 2;
-                } else if (!(distance < 14 && distance > 13) && !dis) {
+                } else if (!(distance < Constants.getNumber("lineupDistance", 12) + 0.5 && distance > Constants.getNumber("lineupDistance", 12) - 0.5) && !dis) {
                     dis = true;
                     state = 0;
                 } else if (Math.abs(dist.pidGet()) > 0.1 && !ali) {

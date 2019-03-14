@@ -354,7 +354,7 @@ public class Robot extends TimedRobot {
     if (driver.isAPushed()) {
       //linup.align();
       lockStraight = true;
-      lineup.align(Lineup.AlignDirection.LEFT);
+      lockStraight = lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       lockStraight = true;
       lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
