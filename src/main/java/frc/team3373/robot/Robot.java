@@ -148,6 +148,7 @@ public class Robot extends TimedRobot {
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
+    claw.open();
     
     distl = new DistanceSensor(0, 5);
     distr = new DistanceSensor(1, 6);
@@ -352,9 +353,9 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isAPushed()) {
-      //linup.align();
+      vlineup.align();
       lockStraight = true;
-      lockStraight = lineup.align(Lineup.AlignDirection.LEFT);
+      //lockStraight = lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       lockStraight = true;
       lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
@@ -548,7 +549,8 @@ public class Robot extends TimedRobot {
     }
 
     if (driver.isBackHeld()) {
-      HABauto.climb(25.5);
+      //HABauto.climb(28);
+      HABauto.climb(11);
     }
 
     shooter.clearButtons();

@@ -138,6 +138,9 @@ public class HABPlatformAuto {
 
         double offset = ahrs.getPitch();
 
+        swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+        swerve.calculateAutoSwerveControl(0, 0, 0);
+
         state = 0;
         while (!joystick.isXHeld() && !joystick2.isXHeld() && !RobotState.isDisabled()) {
             SmartDashboard.putNumber("rightDistance", rightSensor.getDistance());
@@ -148,11 +151,18 @@ public class HABPlatformAuto {
 
             switch (state) {
             case 0:// preclimb
-                swerve.setControlMode(DriveMode.ROBOTCENTRIC);
-                swerve.calculateAutoSwerveControl(0, 0, 0);
+                swerve.calculateAutoSwerveControl(180, driveSpeed, 0);
+                count++;
+
+                if (count > 20) {
+                    swerve.calculateAutoSwerveControl(0, 0, 0);
+                    count=0;
+                    state++;
+                }
+
                 SmartDashboard.putString("Current Step", "park Arms");
                 System.out.println(Constants.getNumber("HABPlatformCenterOffset",0));
-                state++;
+                //state++;
                 break;
             case 1:// climb
                 SmartDashboard.putString("Current Step", "lifting");
@@ -252,7 +262,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putString("Current Step", "driving 1st forward");
                 swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
                 driveMotor.set(Relay.Value.kForward);
-                if (rightSensor.getDistance() < 10 && rightSensor.getDistance() >=0) {
+                if (rightSensor.getDistance() < 8 && rightSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
                     driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");
@@ -272,7 +282,7 @@ public class HABPlatformAuto {
                 SmartDashboard.putString("Current Step", "driving 2nd forward");
                 swerve.calculateAutoSwerveControl(0, driveSpeed, 0);
                 driveMotor.set(Relay.Value.kForward);
-                if (leftSensor.getDistance() < 10 && leftSensor.getDistance() >=0) {
+                if (leftSensor.getDistance() < 8 && leftSensor.getDistance() >=0) {
                     swerve.calculateAutoSwerveControl(0, 0, 0);
                     driveMotor.set(Relay.Value.kOff);
                     System.out.println("stoping");

@@ -243,7 +243,7 @@ public class Elevator {
         case 1://Cargo ship ball
             switch (obj) {
             case CARGO:
-                moveToHeight(38);
+                moveToHeight(44);
                 break;
             case HATCH:
                 moveToHeight(19.0);

@@ -31,7 +31,7 @@
     "lineupP": 0.038,
     "lineupI": 0.0032,
     "lineupD": 0,
-    "lineupDistance": 12,
+    "lineupDistance": 24,
 
     "lineUPDeadband":0.05,
     "lineUPDistanceSensorDeadband":0.01,
@@ -48,14 +48,14 @@
     "elevatorD": 0,
     "elevatorFF": 0,
     "elevatorSlope": 0.1296420001272515,
-    "elevatorMaxSpeed": 0.85,
+    "elevatorMaxSpeed": 0.9,
     "elevatorMinSpeed": -0.35,
-    "elevatorMaxRotations": 520,
+    "elevatorMaxRotations": 515,
     "elevatorMaxHeight": 68,
-    "elevatorMinHeight": 19,
+    "elevatorMinHeight": 18.5,
     "elevatorControlledTarget":4,
 
     "HABPlatformDeadBand":0.5,
-    "HABPlatformCenterOffset":-0.5
+    "HABPlatformCenterOffset":0.25
 
 }
