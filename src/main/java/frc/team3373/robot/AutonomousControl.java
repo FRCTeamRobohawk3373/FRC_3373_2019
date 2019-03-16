@@ -44,7 +44,7 @@ public class AutonomousControl {
 
 		lineup = new Lineup(distl, distr, driver, swerve, line);
 
-		swerveOut = new SuperPIDOutput(SuperPIDOutput.Type.ROTATE, this.swerve);
+		swerveOut = new SuperPIDOutput(SuperPIDOutput.OutputType.ROTATE, this.swerve);
 		//distPID = new DistanceSensorPID(distl, distr);
 
 		//pidAngle = new PIDController(Constants.angleP, Constants.angleI, Constants.angleD, this.ahrs, swerveOut);

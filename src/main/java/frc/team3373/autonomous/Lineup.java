@@ -31,7 +31,7 @@ public class Lineup {
         joystick = driver;
         dleft = dl;
         dright = dr;
-        output = new SuperPIDOutput(SuperPIDOutput.Type.ROTATE, sw);
+        output = new SuperPIDOutput(SuperPIDOutput.OutputType.ROTATE, sw);
         dist = new DistanceSensorPID(dleft, dright);
         pid = new PIDController(Constants.lineupP, Constants.lineupI, Constants.lineupD, dist, output);
         this.line = line;

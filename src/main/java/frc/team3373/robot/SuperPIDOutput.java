@@ -3,15 +3,15 @@ package frc.team3373.robot;
 import edu.wpi.first.wpilibj.PIDOutput;
 
 public class SuperPIDOutput implements PIDOutput {
-    private Type type;
+    private OutputType type;
     private SwerveControl swerve;
     private double pOut;
 
-    public static enum Type {
+    public static enum OutputType {
         ROTATE, DRIVE
     }
 
-    public SuperPIDOutput(Type type, SwerveControl sw) {
+    public SuperPIDOutput(OutputType type, SwerveControl sw) {
         this.type = type;
         swerve = sw;
         pOut = 0;
