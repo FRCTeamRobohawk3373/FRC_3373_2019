@@ -55,7 +55,7 @@
     "elevatorMinHeight": 18.5,
     "elevatorControlledTarget":4,
 
-    "HABPlatformDeadBand":0.5,
-    "HABPlatformCenterOffset":0.25
+    "HABPlatformDeadBand":0.25,
+    "HABPlatformCenterOffset":0.1
 
 }

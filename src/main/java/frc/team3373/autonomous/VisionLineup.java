@@ -90,20 +90,20 @@ public class VisionLineup {
                                                 "driving forward and rotating clockwise");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
-                                                1) * 0.2, target.X * .3);
+                                                1) * 0.15, target.X * .1);
                                         //rotate clockwise
                                     } else if (target.X < -Constants.getNumber("lineUPDeadband")) {
                                         SmartDashboard.putString("lineupInstruction",
                                                 "driving forward and rotating counter clockwise");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
-                                                1) * 0.2, target.X * .3);
+                                                1) * 0.15, target.X * .1);
                                         //rotate counter clockwise
                                     } else {
                                         SmartDashboard.putString("lineupInstruction", "driving forward");
                                         swerve.calculateAutoSwerveControl(90, Math.min(Math.sqrt(
                                                 (target.distance - Constants.getNumber("lineUPTargetDistance")) / 10),
-                                                1) * 0.2, 0);
+                                                1) * 0.15, 0);
                                         // drive strait
                                     }
                                 } else {

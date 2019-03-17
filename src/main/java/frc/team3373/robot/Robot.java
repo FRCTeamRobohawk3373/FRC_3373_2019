@@ -338,7 +338,7 @@ public class Robot extends TimedRobot {
       System.out.println(HABauto.climb(25.5));
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
-      HABauto.climb(10);
+      System.out.println(HABauto.climb(11));
       //auto get on HAB platform
     }
 
@@ -358,7 +358,7 @@ public class Robot extends TimedRobot {
       //lockStraight = lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       lockStraight = true;
-      lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
+      //lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
     }
 
     if (vlineup.isFinished()) {
@@ -373,17 +373,17 @@ public class Robot extends TimedRobot {
         rotateSpeedMod = 1;
       } else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
         swerve.setDriveSpeed(0.5);
-        rotateSpeedMod = .9;
+        rotateSpeedMod = .7;
       } else {//regular
         if (elevator.getPosition() < 40) 
           swerve.setDriveSpeed(0.4);
         else {
           swerve.setDriveSpeed(0.2);
         }
-        rotateSpeedMod = .5;
+        rotateSpeedMod = .7;
       }
 
-      if(driver.isStartHeld()){
+      /*if(driver.isStartHeld()){
         if(liftDirection){
           HABauto.liftFront();
         }else{
@@ -403,16 +403,16 @@ public class Robot extends TimedRobot {
         startedlift=true;
       }else{
         HABauto.stopBack();
-      }
+      }*/
       
       if (lockStraight) {
         swerve.changeFront(Side.NORTH);
-        swerve.calculateAutoSwerveControl(90*Math.ceil(-driver.getRawAxis(1)), -driver.getRawAxis(1), 0);
-        if(-driver.getRawAxis(1)<.5)
+        swerve.calculateAutoSwerveControl(180-90*Math.ceil(-driver.getRawAxis(1)), Math.max(Math.abs(driver.getRawAxis(1)),0.05), 0);
+        if(driver.getRawAxis(1)>.5)
           lockStraight = false;
       } else {
         swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
-        if(driver.getRawAxis(0)>0.05 || driver.getRawAxis(1)>0.05){
+        /*if(driver.getRawAxis(0)>0.05 || driver.getRawAxis(1)>0.05){
           if(startedlift){
             HABauto.drive(true);
           }else{
@@ -420,7 +420,7 @@ public class Robot extends TimedRobot {
           }
         }else{
           HABauto.drive(false);
-        }
+        }*/
 
       }
       
@@ -548,9 +548,20 @@ public class Robot extends TimedRobot {
       lockStraight = false;
     }
 
+    if(driver.isLBHeld()){
+      HABauto.liftBack();
+      HABauto.liftFront();
+    }else if(driver.isRBHeld()){
+      HABauto.lowerBack();
+      HABauto.lowerFront();
+    }else{
+      HABauto.stopBack();
+      HABauto.stopFront();
+    }
+
     if (driver.isBackHeld()) {
       //HABauto.climb(28);
-      HABauto.climb(11);
+      HABauto.climb(14);
     }
 
     shooter.clearButtons();
