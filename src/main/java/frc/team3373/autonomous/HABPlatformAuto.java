@@ -148,6 +148,7 @@ public class HABPlatformAuto {
             SmartDashboard.putNumber("State", state);
             SmartDashboard.putBoolean("rightLimit", rightHome.get());
             SmartDashboard.putBoolean("leftLimit", leftHome.get());
+            SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
             switch (state) {
             case 0:// preclimb
@@ -221,7 +222,7 @@ public class HABPlatformAuto {
                 } else if (!backAtHeight) {
                     leftSolenoid.set(Value.kForward);
                 }*/
-                diff = distDif.pidGet();//-(ahrs.getPitch() + offset);
+                diff = distDif.pidGet();//-(ahrs.getPitch() - offset); //+right -left//
                 SmartDashboard.putNumber("Difference", diff);
                 if (rightSensor.getDistance() <= climbHeight) {//waits for the front sensor to reach the next height and stops the solenoid
                     if (diff > Constants.getNumber("HABPlatformDeadBand",0.5)+Constants.getNumber("HABPlatformCenterOffset",0)) {

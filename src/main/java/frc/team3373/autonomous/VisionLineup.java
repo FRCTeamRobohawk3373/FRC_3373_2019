@@ -163,7 +163,7 @@ public class VisionLineup {
                             
                             //if(rdist.getDistance()>0)
                             double diff = disDif.pidGet();//right-left
-                            if (diff > 0) {
+                            if (diff >= 0) {
                                 if (diff > Constants.getNumber("lineUPDistanceSensorDeadband")) {
                                     //rotate left
                                     //speed = 0.004 * Math.pow(diff, 2);
@@ -179,7 +179,7 @@ public class VisionLineup {
                                     step++;
                                 }
                             } else {
-                                swerve.calculateAutoSwerveControl(90, .08, 0);
+                                step++;//swerve.calculateAutoSwerveControl(90, .08, 0);
                             }
                             //step++; //temp
                             break;
