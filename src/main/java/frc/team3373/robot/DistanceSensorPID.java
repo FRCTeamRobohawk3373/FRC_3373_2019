@@ -5,12 +5,20 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * A class for calculating PID outputs for DistanceSensors
+ */
 public class DistanceSensorPID implements PIDSource {
     DistanceSensor dleft;
     DistanceSensor dright;
 
     PIDSourceType sourceType;
 
+    /**
+     * A class for calculating PID outputs for DistanceSensors
+     * @param dl The left distance sensor
+     * @param dr The right distance sensor
+     */
     public DistanceSensorPID(DistanceSensor dl, DistanceSensor dr) {
         dleft = dl;
         dright = dr;

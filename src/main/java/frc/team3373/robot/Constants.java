@@ -39,7 +39,29 @@ public class Constants {
     private static boolean isBackup = false;
 
     public static void loadConstants() throws IOException { // Reads constants.json and creates a JSON object
-        BufferedReader br = new BufferedReader(new FileReader(new File(path)));
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader(new File(path)));
+        } catch (IOException e) {
+            System.err.println("Failed to load constants, loading defaults");
+            loadDefaults();
+            return;
+        }
+        String st = "";
+        String bst = "";
+        while ((bst = br.readLine()) != null) {
+            st = st + bst;
+        }
+        br.close();
+        constantsObject = new JSONObject(st);
+        if (constantsObject != null) {
+            initialized = true;
+        }
+        display();
+    }
+
+    public static void loadDefaults() throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File(defaultsPath)));
         String st = "";
         String bst = "";
         while ((bst = br.readLine()) != null) {
@@ -107,21 +129,6 @@ public class Constants {
     public static void removeValue(String name) { // Removes a number from the JSON object
         constantsObject.remove(name);
         NetworkTableInstance.getDefault().getTable("Constants").delete(name);
-    }
-
-    public static void loadDefaults() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(new File(defaultsPath)));
-        String st = "";
-        String bst = "";
-        while ((bst = br.readLine()) != null) {
-            st = st + bst;
-        }
-        br.close();
-        constantsObject = new JSONObject(st);
-        if (constantsObject != null) {
-            initialized = true;
-        }
-        display();
     }
 
     /*

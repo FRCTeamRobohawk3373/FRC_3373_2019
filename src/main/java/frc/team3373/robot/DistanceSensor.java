@@ -16,12 +16,17 @@ public class DistanceSensor {
     private double a;
     private double b;
     private double c;
-    private double d;
+    /* private double d;
     private double e;
-    private double f;
+    private double f; */
 
     Constants con = new Constants();
 
+    /**
+     * Class for instantiating a distance sensor using a lookup table (Unused)
+     * @param port The analog port that the distance sensor is plugged into
+     * @param lookupTable A 2D double array, first value is the distance, second value is the analog value 
+     */
     public DistanceSensor(int port, double[][] lookupTable) {
         sensor = new AnalogInput(port);
 
@@ -34,6 +39,11 @@ public class DistanceSensor {
         sensor.setAverageBits(8); // Sets how many readings should be averaged, 2^bits
     }
 
+    /**
+     * Class for instantiating a distance sensor using an exponential fit equation
+     * @param port The analog port that the distance sensor is plugged into
+     * @param serial The serial number of the sensor, used to find the index of the array with the coefficients
+     */
     public DistanceSensor(int port, int serial) {
         sensor = new AnalogInput(port);
         JSONArray array;
@@ -55,10 +65,16 @@ public class DistanceSensor {
         sensor.setAverageBits(10); // Sets how many readings should be averaged
     }
     
+    /**
+     * @return The raw value for the voltage from the sensor
+     */
     public double getVoltage() {
         return sensor.getVoltage();
     }
 
+    /**
+     * @return 
+     */
     public double getAverage() {
         return sensor.getAverageVoltage();
     }

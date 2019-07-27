@@ -125,14 +125,7 @@ public class Robot extends TimedRobot {
       Constants.loadConstants();
     } catch (IOException e) {
       e.printStackTrace();
-      System.out.println("Failed to load Constants, loading defaults");
-      try {
-        Constants.loadDefaults();
-        Constants.saveConstants();
-      } catch (IOException e1) {
-        System.out.println("Catastrophic load");
-        e1.printStackTrace();
-      }
+      System.err.println("Catastrophic error tyring to load!");
     }
 
     driver = new SuperJoystick(0);
@@ -207,8 +200,8 @@ public class Robot extends TimedRobot {
       SmartDashboard.putBoolean("Restore Backup", false);
       
     }
-    SmartDashboard.putNumber("roll", ahrs.getRoll());
-    SmartDashboard.putNumber("Pitch", ahrs.getPitch());
+    //SmartDashboard.putNumber("roll", ahrs.getRoll());
+    //SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
     //vis.update();
     //SmartDashboard.putBoolean("isCompressing", compressor.enabled());
@@ -233,7 +226,7 @@ public class Robot extends TimedRobot {
     System.out.println("Auto selected: " + m_autoSelected);
 
     SmartDashboard.setDefaultBoolean("Update Constants", false);
-    elevator.resetCal();
+    //elevator.resetCal();
     //elevator.initPID();
     // elevator.zero();
 
@@ -280,8 +273,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //HABauto.update();
-    driverControls();
     elevator.refresh();
+    driverControls();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
@@ -335,10 +328,10 @@ public class Robot extends TimedRobot {
     //####          shared Controls               ####
     //################################################
     if (driver.isStartHeld() && shooter.isStartHeld()) {
-      System.out.println(HABauto.climb(25.5));
+      HABauto.climb(25.5);
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
-      System.out.println(HABauto.climb(11));
+      HABauto.climb(11);
       //auto get on HAB platform
     }
 
@@ -348,8 +341,6 @@ public class Robot extends TimedRobot {
     if (driver.isXPushed()) {
       vlineup.cancel();
       lockStraight = false;
-      liftDirection=!liftDirection;
-      startedlift=false;
     }
 
     if (driver.isAPushed()) {

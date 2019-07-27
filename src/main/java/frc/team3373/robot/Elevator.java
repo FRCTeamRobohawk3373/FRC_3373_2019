@@ -70,16 +70,6 @@ public class Elevator {
 
         absoluteZero();
         //reverseLimit.enableLimitSwitch(false);
-
-        /*safetyThread = new Thread(()->{
-            while (!Thread.interrupted()) {
-                refresh();
-            }
-
-        });*/
-
-        //safetyThread.start();
-
     }
 
     public void initPID() {
