@@ -20,17 +20,17 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 //import edu.wpi.first.wpilibj.RobotState;
 
 public class Vision {
-	NetworkTableInstance inst;
-	NetworkTable Vtable;
-	NetworkTableEntry Ventry;
+	private NetworkTableInstance inst;
+	private NetworkTable Vtable;
+	private NetworkTableEntry Ventry;
 
-	DigitalOutput lights;
+	private DigitalOutput lights;
 
-	NetworkTableEntry CamChoice1;
-	NetworkTableEntry CamChoice2;
-	NetworkTableEntry CamPreload;
+	private NetworkTableEntry CamChoice1;
+	private NetworkTableEntry CamChoice2;
+	private NetworkTableEntry CamPreload;
 
-	UsbCamera VideoCam;
+	private UsbCamera VideoCam;
 	//VideoSink server;
 	//CvSink cvsink1;
 
@@ -44,7 +44,7 @@ public class Vision {
 	private boolean lock = false;
 
 	private Map<String, Integer> cammap;
-	ArrayList<VisionObject> objects = new ArrayList<VisionObject>();
+	private ArrayList<VisionObject> objects = new ArrayList<VisionObject>();
 
 	// number of Cameras, new HashMap<String, Integer>();
 	public Vision() {// int NumberOfCameras,int
