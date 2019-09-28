@@ -42,7 +42,7 @@ public class SwerveWheel {
 		
 		name = Name;
 		
-		System.out.println(stepPerDegree);
+		System.out.println(Name + "'s Steps per Degree: " + stepPerDegree);
 		rotateMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 0);
 		rotateMotor.setSensorPhase(false);
 		rotateMotor.setSelectedSensorPosition(rotateMotor.getSensorCollection().getAnalogInRaw(), 0, 0);
@@ -145,7 +145,7 @@ public class SwerveWheel {
 			target+=EMin;
 		}
 		//System.out.println(target);
-		SmartDashboard.putNumber(name + "'s target angle'", target);
+		//SmartDashboard.putNumber(name + "'s target angle'", target);
 		rotateMotor.set(ControlMode.Position,target);
 	}
 	

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class SwerveControl {
 
 	public static enum Side {
-		NORTH, SOUTH, EAST, WEST;
+		NORTH, SOUTH, EAST, WEST, UNKNOWN;
 	}
 	
 	public static enum DriveMode {
@@ -79,9 +79,9 @@ public class SwerveControl {
 	}
 	/**
 	 * Autonomus control for the swerve drive
-	 * @param driveAngle the angle to drive at (0 - 359). 0 is to the right of the front, 90 is front, 180 is to the left of the front, 270 is back,
-	 * @param driveSpeed the speed to drive at the angle (0 - 1). 0 is stop and 1 is full speed.
-	 * @param rotateSpeed the speed to rotate around the center (-1 - 1). -1 is counter clockwise and 1 is clockwise.
+	 * @param driveAngle the angle to drive at (0 to 359). 0 is to the right of the front, 90 is front, 180 is to the left of the front, 270 is back,
+	 * @param driveSpeed the speed to drive at the angle (0 to 1). 0 is stop and 1 is full speed.
+	 * @param rotateSpeed the speed to rotate around the center (-1 to 1). -1 is counter clockwise and 1 is clockwise.
 	 */
 	public void calculateAutoSwerveControl(double driveAngle, double driveSpeed, double rotateSpeed) {// Driving Angle,
 																										// Driving
@@ -445,6 +445,22 @@ public class SwerveControl {
 		}
 	}
 
+	public Side getFront() {
+		// switch out of field centric
+		// set the robot front (N,E,S,W)
+		if(orientationOffset==0) {
+			return Side.NORTH;
+		}else if(orientationOffset==-90) {
+			return Side.EAST;
+		}else if(orientationOffset==180) {
+			return Side.SOUTH;
+		}else if(orientationOffset==90) {
+			return Side.WEST;
+		}else {
+			return Side.UNKNOWN;
+		}
+	}
+
 	public void resetOrentation() {
 		orientationOffset = 0;
 		ahrs.reset();
@@ -502,10 +518,22 @@ public class SwerveControl {
 					} else {
 						sameNumberCount = 0;
 					}
+					if (currentValue - previousValue > 4) {
+						speed -= 0.01;
+						wheel.rawRotate(speed);
+					}
+
 					if (currentValue > max)
 						max = currentValue;
 					if (currentValue < min)
 						min = currentValue;
+
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				System.out.println(wheel.name + " min: " + min + " max: " + max);
 			}
