@@ -10,6 +10,7 @@ package frc.team3373.robot;
 import frc.team3373.autonomous.HABPlatformAuto;
 import frc.team3373.autonomous.Lineup;
 import frc.team3373.autonomous.VisionLineup;
+import frc.team3373.robot.SwerveControl.DriveMode;
 import frc.team3373.robot.SwerveControl.Side;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class Robot extends TimedRobot {
 
   int FRdriveMotorID = 2;
 	int FRrotateMotorID = 1;
-	int FREncHome = 357; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
+	int FREncHome = 358; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
 	int FREncMin = 10;
 	int FREncMax = 897;
 	
@@ -118,18 +119,8 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    try {
-      Constants.loadConstants();
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.err.println("Catastrophic error tyring to load!");
-    }
 
-    distl = new DistanceSensor(2, 9);
-
-    /* compressor = new Compressor(1);
-    compressor.setClosedLoopControl(true);
-    compressor.start();
+    distl = new DistanceSensor(2, 9); // !Temp
 
     try {
       Constants.loadConstants();
@@ -142,6 +133,10 @@ public class Robot extends TimedRobot {
     shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
     
+    compressor = new Compressor(1);
+    compressor.setClosedLoopControl(true);
+    compressor.start();
+
     vis = new Vision();
 
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
@@ -166,9 +161,8 @@ public class Robot extends TimedRobot {
 
     armRelease = new Solenoid(1, 7);
     armRelease.set(true);
-    elevator.absoluteZero();
     SmartDashboard.putString("Object", "HATCH");
-    SmartDashboard.putBoolean("Restore Defaults", false); */
+    SmartDashboard.putBoolean("Restore Defaults", false);
   }
 
   /**
@@ -181,7 +175,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    /* if (SmartDashboard.getBoolean("Update Constants", false)) {
+    if (SmartDashboard.getBoolean("Update Constants", false)) {
       Constants.updateValues();
       SmartDashboard.putBoolean("Update Constants", false);
     } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
@@ -209,7 +203,7 @@ public class Robot extends TimedRobot {
       SmartDashboard.putBoolean("Save Constants", false);
       SmartDashboard.putBoolean("Restore Backup", false);
       
-    } */
+    }
     //SmartDashboard.putNumber("roll", ahrs.getRoll());
     //SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
@@ -268,13 +262,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    /* SmartDashboard.setDefaultBoolean("Update Constants", false);
+    // SmartDashboard.setDefaultBoolean("Update Constants", false);
     elevator.resetCal();
     compressor.setClosedLoopControl(true);
-    //elevator.initPID();
+    // elevator.initPID();
     // elevator.zero();
 
-    lockStraight = false; */
+    lockStraight = false;
   }
 
   /**
@@ -282,14 +276,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    /* //HABauto.update();
+    //HABauto.update();
     elevator.refresh();
     driverControls();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
     SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
-    SmartDashboard.putBoolean("Lifting Up", liftDirection); */
+    SmartDashboard.putBoolean("Lifting Up", liftDirection);
     SmartDashboard.putNumber("Smart Avg", distl.getSmartAverage());
     SmartDashboard.putNumber("Avg", distl.getAverage());
     SmartDashboard.putNumber("Raw", distl.getVoltage());
@@ -310,6 +304,9 @@ public class Robot extends TimedRobot {
     elevator.initPID();
     compressor.setClosedLoopControl(true);
     calInches = 3;
+    swerve.setControlMode(DriveMode.ROBOTCENTRIC);
+    swerve.printPositions();
+
   }
 
   /**
@@ -321,8 +318,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
     SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
-   
     //swerve.printPositions();
+    
     testControls();
     elevator.refresh();
     elevator.updatePID();
@@ -347,7 +344,7 @@ public class Robot extends TimedRobot {
       HABauto.climb(11);
       //auto get on HAB platform
     }
-
+    
     //################################################
     //####          Driver Controls               ####
     //################################################
@@ -355,7 +352,7 @@ public class Robot extends TimedRobot {
       vlineup.cancel();
       lockStraight = false;
     }
-
+    
     if (driver.isAPushed()) {
       vlineup.align();
       lockStraight = true;
@@ -364,14 +361,14 @@ public class Robot extends TimedRobot {
       lockStraight = true;
       //lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
     }
-
+    
     if (vlineup.isFinished()) {
       if (driver.getRawAxis(2) > .5) {//FieldCentric
         swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
       } else if (driver.getRawAxis(3) > .5) {//RobotCentric
         swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
       }
-
+      
       if (driver.isLBHeld()) {//sniper
         swerve.setDriveSpeed(0.1);
         rotateSpeedMod = 1;
@@ -386,7 +383,7 @@ public class Robot extends TimedRobot {
         }
         rotateSpeedMod = .7;
       }
-
+      
       /*if(driver.isStartHeld()){
         if(liftDirection){
           HABauto.liftFront();
@@ -397,7 +394,7 @@ public class Robot extends TimedRobot {
       }else{
         HABauto.stopFront();
       }
-
+      
       if(driver.isBackHeld()){
         if(liftDirection){
           HABauto.liftBack();
@@ -411,11 +408,12 @@ public class Robot extends TimedRobot {
       
       if (lockStraight) {
         swerve.changeFront(Side.NORTH);
-        swerve.calculateAutoSwerveControl(180-90*Math.ceil(-driver.getRawAxis(1)), Math.max(Math.abs(driver.getRawAxis(1)),0.05), 0);
-        if(driver.getRawAxis(1)>.5)
-          lockStraight = false;
+        swerve.calculateAutoSwerveControl(180 - 90 * Math.ceil(-driver.getRawAxis(1)),
+            Math.max(Math.abs(driver.getRawAxis(1)), 0.05), 0);
+        if (driver.getRawAxis(1) > .5) lockStraight = false;
       } else {
-        swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1), driver.getRawAxis(4) * rotateSpeedMod);
+        swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1),
+            driver.getRawAxis(4) * rotateSpeedMod);
         /*if(driver.getRawAxis(0)>0.05 || driver.getRawAxis(1)>0.05){
           if(startedlift){
             HABauto.drive(true);
@@ -425,7 +423,7 @@ public class Robot extends TimedRobot {
         }else{
           HABauto.drive(false);
         }*/
-
+        
       }
       
       switch (driver.getPOV()) {
@@ -442,16 +440,16 @@ public class Robot extends TimedRobot {
         swerve.changeFront(Side.SOUTH);
         break;
       }
-
-      if (driver.isYPushed())
+      
+      if (driver.isYPushed()) 
         swerve.resetOrentation();
     }
     //swerve.controlMode(SwerveControl.DriveMode.FieldCentric);
-
+    
     //################################################
     //####           Shooter Controls             ####
     //################################################
-
+    
     if (shooter.isYPushed() && object == ObjectType.HATCH) {
       claw.close();
     } else if (shooter.isAPushed() && object == ObjectType.HATCH) {
@@ -461,7 +459,7 @@ public class Robot extends TimedRobot {
     } else if ((shooter.isAHeld() || shooter.isYHeld()) && object == ObjectType.CARGO) {
       claw.open();
     }
-
+    
     if (shooter.isLBPushed()) {
       object = ObjectType.HATCH;
       SmartDashboard.putString("Object", "HATCH");
@@ -471,20 +469,20 @@ public class Robot extends TimedRobot {
       SmartDashboard.putString("Object", "CARGO");
       claw.grab(object);
     }
-
-    if(shooter.isXHeld()){
+    
+    if (shooter.isXHeld()) {
       elevator.stop();
     }
-
+    
     if (shooter.getRawAxis(1) < -0.5) {
       claw.raise();
     } else if (shooter.getRawAxis(1) > 0.5) {
       claw.lower();
     }
-
+    
     if (shooter.isDPadDownPushed()) {
       elevator.moveToPosition(0, object);
-    }else if(shooter.isDPadDownLeftPushed()){
+    } else if (shooter.isDPadDownLeftPushed()) {
       elevator.moveToPosition(1, object);
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
       elevator.moveToPosition(2, object);
@@ -494,18 +492,18 @@ public class Robot extends TimedRobot {
       elevator.moveToHeight(Constants.getNumber("elevatorMinHeight", 19));
       //startTime = System.currentTimeMillis();
     }
-
+    
     /*if (shooter.isBHeld()) {
       if (System.currentTimeMillis() - startTime > 1000 && startTime!=-2) {
         elevator.zero();
         startTime = -2;
       }
     }*/
-
+    
     if (Math.abs(shooter.getRawAxis(5)) > 0.05) {
-      elevator.rawMovePID(-shooter.getRawAxis(5),0.25);
+      elevator.rawMovePID(-shooter.getRawAxis(5), 0.25);
     }
-
+    
     driver.clearButtons();
     driver.clearDPad();
     shooter.clearButtons();
@@ -536,15 +534,15 @@ public class Robot extends TimedRobot {
       elevator.absoluteZero();
     }
 
+    if (shooter.isAPushed()) {
+      System.out.println(calInches+" "+distl.getAverage());
+      calInches++;
+    }
+
     if (driver.isAPushed()) {
       vlineup.align();
       lockStraight = true;
       //control.lineup(Lineup.AlignDirection.LEFT);
-    }
-
-    if (shooter.isAPushed()) {
-      System.out.println(calInches+" "+distl.getAverage());
-      calInches++;
     }
 
     if (driver.isXPushed()) {
@@ -552,7 +550,20 @@ public class Robot extends TimedRobot {
       lockStraight = false;
     }
 
-    if(driver.isLBHeld()){
+    if (lockStraight) {
+      
+    } else {
+      if (driver.getRawAxis(2) > .5) {//FieldCentric
+        swerve.setControlMode(SwerveControl.DriveMode.FIELDCENTRIC);
+      } else if (driver.getRawAxis(3) > .5) {//RobotCentric
+        swerve.setControlMode(SwerveControl.DriveMode.ROBOTCENTRIC);
+      }
+
+      //swerve.calculateSwerveControl(driver.getRawAxis(0), driver.getRawAxis(1),
+      //      driver.getRawAxis(4) * rotateSpeedMod);
+    }
+
+    /* if(driver.isLBHeld()){
       HABauto.liftBack();
       HABauto.liftFront();
     }else if(driver.isRBHeld()){
@@ -561,7 +572,7 @@ public class Robot extends TimedRobot {
     }else{
       HABauto.stopBack();
       HABauto.stopFront();
-    }
+    } */
 
     if (driver.isBackHeld()) {
       //HABauto.climb(28);
