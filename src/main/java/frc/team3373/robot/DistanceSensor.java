@@ -20,6 +20,9 @@ public class DistanceSensor {
     private double e;
     private double f; */
 
+    private double pDist;
+    private long lastUpdateMicros;
+
     Constants con = new Constants();
 
     /**
@@ -46,6 +49,7 @@ public class DistanceSensor {
      */
     public DistanceSensor(int port, int serial) {
         sensor = new AnalogInput(port);
+        pDist = 0;
         JSONArray array;
         try{
             array = Constants.getArray("distanceSensorValues").getJSONArray(serial);
@@ -77,6 +81,35 @@ public class DistanceSensor {
      */
     public double getAverage() {
         return sensor.getAverageVoltage();
+    }
+
+    public double getSmartAverage() {
+        long micros = System.nanoTime() / 1000;
+        int sample_wait_micros = 38000;
+        int burst_delay_micros = 1500;
+        int numBurstSamples = 8;
+
+        if (micros - lastUpdateMicros < sample_wait_micros)
+            return pDist;
+
+        lastUpdateMicros = micros;
+
+        double currReading;
+        double lowestReading = 5;
+        for (int i = 0; i < numBurstSamples; i++) {
+            currReading = sensor.getVoltage();
+
+            if (currReading < lowestReading)
+                lowestReading = currReading;
+
+            try {
+                Thread.sleep(burst_delay_micros / 1000, (int)(burst_delay_micros % 1000));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        pDist = lowestReading;
+        return lowestReading;
     }
 
     public double getDistance() {

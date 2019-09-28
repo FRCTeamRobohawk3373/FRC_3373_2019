@@ -163,9 +163,9 @@ public class HABPlatformAuto {
 
                 SmartDashboard.putString("Current Step", "park Arms");
                 System.out.println(Constants.getNumber("HABPlatformCenterOffset",0));
-                //state++;
+                // state++;
                 break;
-            case 1:// climb
+            case 1: // climb
                 SmartDashboard.putString("Current Step", "lifting");
 
                 //if (leftSensor.getDistance() <= climbHeight) {//waits for the back sensor to reach the next height and stops the solenoid

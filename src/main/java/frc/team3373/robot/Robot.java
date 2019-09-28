@@ -117,7 +117,17 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-    compressor = new Compressor(1);
+
+    try {
+      Constants.loadConstants();
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.err.println("Catastrophic error tyring to load!");
+    }
+
+    distl = new DistanceSensor(2, 9);
+
+    /* compressor = new Compressor(1);
     compressor.setClosedLoopControl(true);
     compressor.start();
 
@@ -158,7 +168,7 @@ public class Robot extends TimedRobot {
     armRelease.set(true);
     elevator.absoluteZero();
     SmartDashboard.putString("Object", "HATCH");
-    SmartDashboard.putBoolean("Restore Defaults", false);
+    SmartDashboard.putBoolean("Restore Defaults", false); */
   }
 
   /**
@@ -171,7 +181,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    if (SmartDashboard.getBoolean("Update Constants", false)) {
+    /* if (SmartDashboard.getBoolean("Update Constants", false)) {
       Constants.updateValues();
       SmartDashboard.putBoolean("Update Constants", false);
     } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
@@ -199,7 +209,7 @@ public class Robot extends TimedRobot {
       SmartDashboard.putBoolean("Save Constants", false);
       SmartDashboard.putBoolean("Restore Backup", false);
       
-    }
+    } */
     //SmartDashboard.putNumber("roll", ahrs.getRoll());
     //SmartDashboard.putNumber("Pitch", ahrs.getPitch());
 
@@ -258,13 +268,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    SmartDashboard.setDefaultBoolean("Update Constants", false);
+    /* SmartDashboard.setDefaultBoolean("Update Constants", false);
     elevator.resetCal();
     compressor.setClosedLoopControl(true);
     //elevator.initPID();
     // elevator.zero();
 
-    lockStraight = false;
+    lockStraight = false; */
   }
 
   /**
@@ -272,14 +282,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    //HABauto.update();
+    /* //HABauto.update();
     elevator.refresh();
     driverControls();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
     SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
-    SmartDashboard.putBoolean("Lifting Up", liftDirection);
+    SmartDashboard.putBoolean("Lifting Up", liftDirection); */
+    SmartDashboard.putNumber("Smart Avg", distl.getSmartAverage());
+    SmartDashboard.putNumber("Avg", distl.getAverage());
+    SmartDashboard.putNumber("Raw", distl.getVoltage());
   }
 
   /**
