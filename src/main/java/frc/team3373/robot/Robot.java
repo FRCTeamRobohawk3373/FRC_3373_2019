@@ -112,11 +112,11 @@ public class Robot extends TimedRobot {
     shooter = new SuperJoystick(0);
     // shooter = new SuperJoystick(1);
     
-    /* try {
+    try {
       Constants.loadConstants();
     } catch (IOException e) {
       e.printStackTrace();
-    } */
+    }
 
     /* elevator = new Elevator(1, shooter);
 
@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
 
     //dist = new DistanceSensor(0, 4);
     cal = new AnalogInput(0);
-    cal.setAverageBits(10);
+    // cal.setAverageBits(10);
 
     // dial = new Dial(0, 1, 2, 3);
 
@@ -292,7 +292,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Position", elevator.getPosition()); */
 
     if (shooter.isAPushed()) {
-      System.out.println(count+" "+cal.getAverageVoltage());
+      System.out.println(count+" "+getSmartAverage(cal));
       count--;
     }
     shooter.clearA();
@@ -325,6 +325,27 @@ public class Robot extends TimedRobot {
     shooter.clearButtons();
     shooter.clearDPad();
   }
+
+  private double getSmartAverage(AnalogInput input) {
+    int burst_delay_micros = 1500;
+    int numBurstSamples = 8;
+
+    double currReading;
+    double lowestReading = 5;
+    for (int i = 0; i < numBurstSamples; i++) {
+        currReading = input.getVoltage();
+
+        if (currReading < lowestReading)
+            lowestReading = currReading;
+
+        try {
+            Thread.sleep(burst_delay_micros / 1000, (int)(burst_delay_micros % 1000));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return lowestReading;
+}
 
   public void driverControls() {
     // ################################################
