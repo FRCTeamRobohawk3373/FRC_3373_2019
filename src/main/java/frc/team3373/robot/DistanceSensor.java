@@ -28,7 +28,7 @@ public class DistanceSensor {
 
         useLookup = true;
 
-        sensor.setAverageBits(8); // Sets how many readings should be averaged, 2^bits
+        sensor.setAverageBits(12); // Sets how many readings should be averaged, 2^bits
     }
 
     public DistanceSensor(int port, int serial) {

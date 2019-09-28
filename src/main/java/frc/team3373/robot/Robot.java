@@ -19,6 +19,8 @@ import java.io.IOException;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import org.json.JSONArray;
+
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotState;
@@ -81,16 +83,18 @@ public class Robot extends TimedRobot {
   AutonomousControl control;
   DigitalInput line;
 
-  Thread ahrsThread;
+  Thread ahrsThread;*/
 
   double[] voltages;
   int count;
   AnalogInput cal;
-  boolean disabled; */
+  boolean disabled; 
 
-  ObjectType object;
+  /* ObjectType object;
   Elevator elevator;
-  Claw claw;
+  Claw claw; */
+
+  DistanceSensor dist;
 
 
   /**
@@ -103,26 +107,34 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    //voltages = new double[21];
+    voltages = new double[23];
 
     shooter = new SuperJoystick(0);
-    //shooter = new SuperJoystick(1);
+    // shooter = new SuperJoystick(1);
     
-    try {
+    /* try {
       Constants.loadConstants();
     } catch (IOException e) {
       e.printStackTrace();
-    }
+    } */
 
-    elevator = new Elevator(1, shooter);
+    /* elevator = new Elevator(1, shooter);
 
     object = ObjectType.HATCH;
 
-    claw = new Claw(2, 0, 3, 2, 1);
+    claw = new Claw(2, 0, 3, 2, 1); */
 
-    //count = 0;
+    /* try {
+      Constants.loadDefaults();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } */
 
-    //cal = new AnalogInput(0);
+    count = 0;
+
+    //dist = new DistanceSensor(0, 4);
+    cal = new AnalogInput(0);
+    cal.setAverageBits(10);
 
     // dial = new Dial(0, 1, 2, 3);
 
@@ -161,7 +173,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    if (SmartDashboard.getBoolean("Update Constants", false)) {
+    /* if (SmartDashboard.getBoolean("Update Constants", false)) {
       Constants.updateValues();
       SmartDashboard.putBoolean("Update Constants", false);
     } else if (SmartDashboard.getBoolean("Save Constants", false) && RobotState.isTest()) {
@@ -178,7 +190,7 @@ public class Robot extends TimedRobot {
       } catch (IOException e) {
         e.printStackTrace();
       }
-    }
+    } */
   }
 
   /**
@@ -219,9 +231,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     SmartDashboard.setDefaultBoolean("Update Constants", false);
-    elevator.resetCal();
+    /* elevator.resetCal();
     //elevator.initPID();
-    elevator.zero();
+    elevator.zero(); */
   }
 
   /**
@@ -229,7 +241,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    SmartDashboard.putNumber("Position", elevator.getPosition());
+    /* SmartDashboard.putNumber("Position", elevator.getPosition());
     if (shooter.isDPadDownPushed()) {
       elevator.moveToHeight(10);
     } else if(shooter.isDPadLeftPushed()) {
@@ -248,7 +260,7 @@ public class Robot extends TimedRobot {
     elevator.refresh();
 
     shooter.clearButtons();
-    shooter.clearDPad();
+    shooter.clearDPad(); */
   }
 
   /**
@@ -256,14 +268,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    SmartDashboard.putBoolean("Calibrating", false);
+    count = 31;
+    disabled = false;
+    /* SmartDashboard.putBoolean("Calibrating", false);
     SmartDashboard.putNumber("Inches", 0);
     SmartDashboard.setDefaultBoolean("Update Constants", false);
     SmartDashboard.setDefaultBoolean("Save Constants", false);
     SmartDashboard.setDefaultBoolean("Restore Backup", false);
-    SmartDashboard.setDefaultNumber("Calibration Length", 1);
+    
     elevator.resetCal();
-    elevator.initPID();
+    elevator.initPID(); */
   }
 
   /**
@@ -271,29 +285,22 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    testControls();
+    //testControls();
+    //SmartDashboard.putNumber("Distance", dist.getDistance());
 
-    SmartDashboard.putNumber("Rotations", elevator.getRotations());
-    SmartDashboard.putNumber("Position", elevator.getPosition());
+    /* SmartDashboard.putNumber("Rotations", elevator.getRotations());
+    SmartDashboard.putNumber("Position", elevator.getPosition()); */
 
-    /* if (driver.isAPushed() && !disabled) {
-      voltages[count] = cal.getAverageVoltage();
-      count++;
+    if (shooter.isAPushed()) {
+      System.out.println(count+" "+cal.getAverageVoltage());
+      count--;
     }
-
-    if (count == 21 && !disabled) {
-      disabled = true;
-      for (int i = 0; i < 21; i++) {
-        System.out.println(voltages[i]);
-      }
-    }
-
-    driver.clearA(); */
+    shooter.clearA();
 
   }
 
   public void testControls() {
-    elevator.rawMovePID(-shooter.getRawAxis(1));
+    /* elevator.rawMovePID(-shooter.getRawAxis(1));
 
     if (shooter.isAPushed()) {
       elevator.calibrate();
@@ -313,7 +320,7 @@ public class Robot extends TimedRobot {
 
     if (!SmartDashboard.getBoolean("Calibrating", false)){
       elevator.refresh();
-    }
+    } */
 
     shooter.clearButtons();
     shooter.clearDPad();
@@ -330,21 +337,11 @@ public class Robot extends TimedRobot {
     // ################################################
     // #### Driver Controls ####
     // ################################################
-    /* if (driver.isAHeld() && driver.isBackPushed()) {
-      lineup.align(Lineup.AlignDirection.LEFT);
-    } else if (driver.isAHeld() && driver.isStartPushed()) {
-      lineup.align(Lineup.AlignDirection.RIGHT);
-    } */ 
 
     /* if (driver.isAHeld() && driver.isBackPushed()) {
       control.lineup(Lineup.AlignDirection.LEFT);
     } else if (driver.isAHeld() && driver.isStartPushed()) {
       control.lineup(Lineup.AlignDirection.RIGHT);
-    }
-
-    if (driver.isBPushed()) {
-      //control.rotateRelative((float)SmartDashboard.getNumber("Angle", 90), SmartDashboard.getNumber("Speed", 0.2));
-      control.driveSquare();
     }
 
     if (driver.getRawAxis(2) > .5) {// FieldCentric

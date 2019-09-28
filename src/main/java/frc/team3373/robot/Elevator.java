@@ -43,7 +43,7 @@ public class Elevator {
         pid.setP(Constants.getNumber("elevatorP"));
         pid.setI(Constants.getNumber("elevatorI"));
         pid.setD(Constants.getNumber("elevatorD"));
-        pid.setOutputRange(-0.05, 0.05); // TODO: Change speed for robot
+        pid.setOutputRange(Constants.getNumber("elevatorMinSpeed"), Constants.getNumber("elevatorMaxSpeed ")); // TODO: Change speed for robot
         slope = Constants.getNumber("elevatorSlope");
 
         reverseLimit = motor.getReverseLimitSwitch(LimitSwitchPolarity.kNormallyOpen);
