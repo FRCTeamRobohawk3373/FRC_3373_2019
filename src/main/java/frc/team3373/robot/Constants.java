@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.Filesystem;
  */
 public class Constants {
     private static final String path = "/home/lvuser/config/constants.json";
-    private static final String backupPath = "home/lvuser/config/backup-constants.json";
+    private static final String backupPath = "/home/lvuser/config/backup-constants.json";
     private static final String defaultsPath = Filesystem.getDeployDirectory() + "/defaults.json";
     // private static final Object JSONArray = null;
     private static JSONObject constantsObject;

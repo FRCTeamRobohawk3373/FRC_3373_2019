@@ -9,6 +9,7 @@ package frc.team3373.robot;
 
 import java.io.IOException;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.TimedRobot;
 //import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -34,7 +35,9 @@ public class Robot extends TimedRobot {
   DistanceSensor distl;
   DistanceSensor distr;
 
-  int calInches = 3;
+  AnalogInput cal;
+
+  int count;
 
   public enum ObjectType {
     CARGO, HATCH
@@ -54,14 +57,13 @@ public class Robot extends TimedRobot {
     try {
       Constants.loadConstants();
     } catch (IOException e) {
-      try {
-        Constants.loadDefaults();
-      } catch (IOException f) {
-        f.printStackTrace();
-      }
+      e.printStackTrace();
+      System.err.println("Catastrophic error tyring to load!");
     }
 
-    distl = new DistanceSensor(0, 9);
+    shooter = new SuperJoystick(0);
+    // cal = new AnalogInput(0); 
+    distl = new DistanceSensor(0, 9, true);
   }
 
   /**
@@ -147,7 +149,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
   }
 
   /**
@@ -155,7 +156,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-
+    SmartDashboard.putNumber("Voltage", distl.getAverage());
+    SmartDashboard.putNumber("Smart Voltage", distl.getSmartVoltage(8));
+    SmartDashboard.putNumber("Smart Average", distl.getSmartAverage(8));
   }
 
   /**
@@ -163,7 +166,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testInit() {
-    
+    count = 31;
   }
 
   /**
@@ -171,6 +174,62 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    
+    if (shooter.isAPushed()) {
+      System.out.println(count+" "+getSmartAverage(cal));
+      count--;
+    }
+    shooter.clearA();
+  }
+
+  private double getSmartCal(AnalogInput input) {
+    int burst_delay_micros = 1500;
+    int numBurstSamples = 16;
+
+    double[] readings = new double[4];
+
+    for (int j = 0; j < 4; j++) {
+      double currReading;
+      double lowestReading = 5;
+      for (int i = 0; i < numBurstSamples; i++) {
+          currReading = input.getVoltage();
+
+          if (currReading < lowestReading)
+              lowestReading = currReading;
+
+          try {
+              Thread.sleep(burst_delay_micros / 1000, (int)(burst_delay_micros % 1000));
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+      readings[j] = lowestReading;
+      try {
+        Thread.sleep(38);
+      } catch (Exception e) {
+        e.printStackTrace();
+      } 
+    }
+    return (readings[0] + readings[1] + readings[2] + readings[3]) / 4;
+  }
+
+  private double getSmartAverage(AnalogInput input) {
+    int burst_delay_micros = 1500;
+    int numBurstSamples = 8;
+
+    double currReading;
+    double lowestReading = 5;
+    for (int i = 0; i < numBurstSamples; i++) {
+        currReading = input.getVoltage();
+
+        if (currReading < lowestReading)
+            lowestReading = currReading;
+
+        try {
+            Thread.sleep(burst_delay_micros / 1000, (int)(burst_delay_micros % 1000));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    return lowestReading;
   }
 }

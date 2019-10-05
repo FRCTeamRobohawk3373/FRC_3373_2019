@@ -12,7 +12,19 @@
         [7.72099, -1.59401, 2.33257],
         [8.92472, -1.29385, 0.94569]
     ],
-    "distanceSensorValues-smart_cap" : [
+    "distanceSensorValues-smart": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [8.97519, -0.967415, 0.0290486]
+    ],
+    "distanceSensorValues-smart-cap": [
         [],
         [],
         [],
