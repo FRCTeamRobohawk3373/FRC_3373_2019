@@ -1,13 +1,8 @@
 {
     "fileName": "REVRobotics.json",
     "name": "REVRobotics",
-<<<<<<< HEAD
-    "version": "1.0.26",
-    "uuid": "c16ed09f-23df-4beb-87e8-460bd7fa9924",
-=======
-    "version": "1.1.9",
+    "version": "1.4.1",
     "uuid": "3f48eb8c-50fe-43a6-9cb7-44c86353c4cb",
->>>>>>> 1a8899823b560f5534eaa63d6110ae804eb62c2a
     "mavenUrls": [
         "http://www.revrobotics.com/content/sw/max/sdk/maven/"
     ],
@@ -16,59 +11,54 @@
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "SparkMax-java",
-<<<<<<< HEAD
-            "version": "1.0.26"
-        }
-    ],
-    "jniDependencies": [],
-=======
-            "version": "1.1.9"
+            "version": "1.4.1"
         }
     ],
     "jniDependencies": [
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "SparkMax-driver",
-            "version": "1.1.9",
+            "version": "1.4.1",
             "skipInvalidPlatforms": true,
             "isJar": false,
             "validPlatforms": [
-                "linuxathena"
+                "windowsx86-64",
+                "windowsx86",
+                "linuxathena",
+                "linuxraspbian"
             ]
         }
     ],
->>>>>>> 1a8899823b560f5534eaa63d6110ae804eb62c2a
     "cppDependencies": [
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "SparkMax-cpp",
-<<<<<<< HEAD
-            "version": "1.0.26",
-=======
-            "version": "1.1.9",
->>>>>>> 1a8899823b560f5534eaa63d6110ae804eb62c2a
+            "version": "1.4.1",
             "libName": "libSparkMax",
             "headerClassifier": "headers",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
             "binaryPlatforms": [
-                "linuxathena"
+                "windowsx86-64",
+                "windowsx86",
+                "linuxathena",
+                "linuxraspbian"
             ]
-<<<<<<< HEAD
-=======
         },
         {
             "groupId": "com.revrobotics.frc",
             "artifactId": "SparkMax-driver",
-            "version": "1.1.9",
+            "version": "1.4.1",
             "libName": "libSparkMaxDriver",
             "headerClassifier": "headers",
             "sharedLibrary": false,
             "skipInvalidPlatforms": true,
             "binaryPlatforms": [
-                "linuxathena"
+                "windowsx86-64",
+                "windowsx86",
+                "linuxathena",
+                "linuxraspbian"
             ]
->>>>>>> 1a8899823b560f5534eaa63d6110ae804eb62c2a
         }
     ]
 }
