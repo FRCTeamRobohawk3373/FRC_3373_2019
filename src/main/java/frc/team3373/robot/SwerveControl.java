@@ -197,27 +197,27 @@ public class SwerveControl {
 	// ######################################################
 	public void calculateSwerveControl(double LX, double LY, double RX) {
 		LY = -LY; // inverts joystick LY to match the Cartesian plane
-		double translationalXComponent = LX;
-		double translationalYComponent = LY;
+		double translationalXComponent = LX * Math.abs(LX);
+		double translationalYComponent = LY * Math.abs(LY);
 		double translationalMagnitude;
 		double translationalAngle;
 
-		double rAxis = RX;
+		double rAxis = RX * Math.abs(RX);
 		double rotateXComponent;
 		double rotateYComponent;
 
 		// Deadband
-		if (Math.abs(LX) < 0.05) {
+		if (Math.abs(translationalXComponent) < 0.0015) {
 			translationalXComponent = 0;
 			LX = 0;
 		}
 
-		if (Math.abs(LY) < 0.05) {
+		if (Math.abs(translationalYComponent) < 0.0015) {
 			translationalYComponent = 0;
 			LY = 0;
 		}
 
-		if (Math.abs(RX) < 0.05) {
+		if (Math.abs(rAxis) < 0.0015) {
 			rAxis = 0;
 			RX = 0;
 		}

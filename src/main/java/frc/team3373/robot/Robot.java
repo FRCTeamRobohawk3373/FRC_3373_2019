@@ -44,27 +44,27 @@ public class Robot extends TimedRobot {
 
   int FRdriveMotorID = 2;
 	int FRrotateMotorID = 1;
-	int FREncHome = 358; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
-	int FREncMin = 10;
-	int FREncMax = 897;
+	int FREncHome = 367; // Zero values (value when wheel is turned to default					// zero- bolt hole facing front.)
+	int FREncMin = 11;
+	int FREncMax = 870;
 	
 	int BLdriveMotorID = 4;
 	int BLrotateMotorID = 3;
-	int BLEncHome = 265;
-	int BLEncMin = 11;
+	int BLEncHome = 264;
+	int BLEncMin = 12;
 	int BLEncMax = 902;
 	
 	int FLdriveMotorID = 8;
 	int FLrotateMotorID = 7;
 	int FLEncHome = 426;
-	int FLEncMin = 10;
-	int FLEncMax = 898;
+	int FLEncMin = 11;
+	int FLEncMax = 903;
 	
 	int BRdriveMotorID = 6;
 	int BRrotateMotorID = 5;
-	int BREncHome = 99;
-	int BREncMin = 10;
-	int BREncMax = 899;
+	int BREncHome = 102;
+	int BREncMin = 11;
+	int BREncMax = 904;
 	
 	double robotWidth = 22.25; // TODO change robot dimensions to match this years robot
   double robotLength = 16.25;
@@ -120,13 +120,20 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
 
-    distl = new DistanceSensor(2, 9); // !Temp
+    //distl = new DistanceSensor(2, 9); // !Temp
 
     try {
       Constants.loadConstants();
     } catch (IOException e) {
+      System.out.println("Error loading constants, loading defualts!");
       e.printStackTrace();
-      System.err.println("Catastrophic error tyring to load!");
+      try {
+        Constants.loadDefaults();
+      } catch (IOException e1) {
+        System.out.println("Catastrophic error tyring to load!");
+        e1.printStackTrace();
+      }
+      
     }
 
     driver = new SuperJoystick(0);
@@ -277,6 +284,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //HABauto.update();
+    swerve.printPositions();
     elevator.refresh();
     driverControls();
     SmartDashboard.putNumber("Rotations", elevator.getRotations());
@@ -318,7 +326,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Position", elevator.getPosition());
     SmartDashboard.putNumber("FrontLeftDistance", distl.getDistance());
     SmartDashboard.putNumber("FrontRightDistance", distr.getDistance());
-    //swerve.printPositions();
+    
+    swerve.printPositions();
     
     testControls();
     elevator.refresh();
@@ -370,14 +379,14 @@ public class Robot extends TimedRobot {
       }
       
       if (driver.isLBHeld()) {//sniper
-        swerve.setDriveSpeed(0.1);
+        swerve.setDriveSpeed(0.2);
         rotateSpeedMod = 1;
       } else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
-        swerve.setDriveSpeed(0.5);
+        swerve.setDriveSpeed(0.7);
         rotateSpeedMod = .7;
       } else {//regular
         if (elevator.getPosition() < 40) 
-          swerve.setDriveSpeed(0.4);
+          swerve.setDriveSpeed(0.5);
         else {
           swerve.setDriveSpeed(0.2);
         }
