@@ -1,9 +1,12 @@
 package frc.team3373.robot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.cscore.UsbCamera;
+//import edu.wpi.first.cameraserver.CameraServer;
 //import edu.wpi.cscore.CvSink;
 //import edu.wpi.cscore.UsbCamera;
 //import edu.wpi.cscore.VideoSink;
@@ -14,20 +17,20 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 //import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DigitalOutput;
-import edu.wpi.first.wpilibj.RobotState;
+//import edu.wpi.first.wpilibj.RobotState;
 
 public class Vision {
-	NetworkTableInstance inst;
-	NetworkTable Vtable;
-	NetworkTableEntry Ventry;
+	private NetworkTableInstance inst;
+	private NetworkTable Vtable;
+	private NetworkTableEntry Ventry;
 
-	DigitalOutput lights;
+	private DigitalOutput lights;
 
-	NetworkTableEntry CamChoice1;
-	NetworkTableEntry CamChoice2;
-	NetworkTableEntry CamPreload;
+	private NetworkTableEntry CamChoice1;
+	private NetworkTableEntry CamChoice2;
+	private NetworkTableEntry CamPreload;
 
-	//UsbCamera VideoCam;
+	private UsbCamera VideoCam;
 	//VideoSink server;
 	//CvSink cvsink1;
 
@@ -38,8 +41,10 @@ public class Vision {
 	private int numCam;
 	private int numCamCO;
 
+	private boolean lock = false;
+
 	private Map<String, Integer> cammap;
-	ArrayList<VisionObject> objects = new ArrayList<VisionObject>();
+	private ArrayList<VisionObject> objects = new ArrayList<VisionObject>();
 
 	// number of Cameras, new HashMap<String, Integer>();
 	public Vision() {// int NumberOfCameras,int
@@ -49,9 +54,11 @@ public class Vision {
 		Vtable = inst.getTable("VisionData");
 		Ventry = Vtable.getEntry("Objects");
 		Ventry.addListener((event) -> dataRefresh(event), EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-		
-		//VideoCam = CameraServer.getInstance().startAutomaticCapture(0);
-		//cvsink1 = new CvSink("cam1cv");
+		//Ventry.getStringArray();
+		update();
+		//UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		//camera.setResolution(640, 480);
+
 		//cvsink1.setSource(VideoCam);
 		//cvsink1.setEnabled(false);
 		//server = CameraServer.getInstance().getServer();
@@ -102,7 +109,7 @@ public class Vision {
 
 	// switch to a camera
 	public void switchCamera(int num, int stream) {
-		updatelights();
+		//updatelights();
 		if (num < numCam) {
 			if (preCam == num) {
 				preCam = -1;
@@ -136,7 +143,7 @@ public class Vision {
 
 	// preloads a camera for quicker switching overrides stream2
 	public void preLoadCamera(int num) {
-		updatelights();
+		//updatelights();
 		if (num < numCam && num != camera1 && num != camera2) {
 			if (num >= numCamCO) {
 				//cvsink1.setEnabled(true);
@@ -150,7 +157,7 @@ public class Vision {
 	}
 
 	// Detection
-
+	/*
 	public VisionObject getClosestObject(int id) {
 		int closest = -1;
 		double cdist = 100000.0;
@@ -165,9 +172,9 @@ public class Vision {
 			return null;
 		}
 		return objects.get(closest);
-	}
+	}*/
 
-	// Gets any object that is closest
+	/** Gets any object that is closest*/
 	public VisionObject getClosestObject() {
 		int closest = -1;
 		double cdist = 100000.0;
@@ -183,7 +190,7 @@ public class Vision {
 		}
 		return objects.get(closest);
 	}
-
+	/*
 	// Gets objects with a lower distance and the same id as parameters
 	public ArrayList<VisionObject> getObjectsInRange(int id, double distance) {
 		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
@@ -197,14 +204,14 @@ public class Vision {
 			return null;
 		}
 		return inRange;
-	}
+	}*/
 
-	// Gets objects with a lower distance than parameter
-	public ArrayList<VisionObject> getObjectsInRange(double distance) {
+	/** Gets objects within a range of distance in inches*/
+	public ArrayList<VisionObject> getObjectsInRange(double max, double min) {
 		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
 		for (int i = 0; i < objects.size(); i++) {
 			VisionObject object = objects.get(i);
-			if (object.distance < distance) {
+			if (object.distance < max && object.distance > min) {
 				inRange.add(object);
 			}
 		}
@@ -214,6 +221,21 @@ public class Vision {
 		return inRange;
 	}
 
+	public ArrayList<VisionObject> getObjectsInRotation(double max, double min) {
+		ArrayList<VisionObject> inRange = new ArrayList<VisionObject>();
+		for (int i = 0; i < objects.size(); i++) {
+			VisionObject object = objects.get(i);
+			if (object.rotation < max && object.rotation > min) {
+				inRange.add(object);
+			}
+		}
+		if (inRange.size() == 0) {
+			return null;
+		}
+		return inRange;
+	}
+
+	/*
 	// Gets object with highest score for id
 	public VisionObject getBestObject(int id) {
 		int best = -1;
@@ -257,27 +279,36 @@ public class Vision {
 		}
 		VisionObject bestInRange = getBestObject(inRange);
 		return bestInRange;
-	}
-
-	// Gets object with x absolute value closest to zero (center of screen)
-	public VisionObject getObjectClosestToCenter(int id) {
+	}*/
+	
+	
+	/**Gets object with x absolute value closest to zero (center of screen)*/
+	public VisionObject getObjectClosestToCenter() {
 		int closest = -1;
 		double cx = 2.0;
+		//ArrayList<VisionObject> objs = new ArrayList<VisionObject>();
+		//objs.addAll(objects);
+		lock = true;
 		for (int i = 0; i < objects.size(); i++) {
 			VisionObject object = objects.get(i);
-			if (object.id == id && Math.abs(object.X) < cx) {
+			if (Math.abs(object.X) < cx) {
 				closest = i;
 				cx = Math.abs(object.X);
 			}
 		}
+		lock = false;
 		if (closest == -1) {
 			return null;
 		}
-		return objects.get(closest);
+		try{
+			return objects.get(closest);
+		} catch (IndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
-	// Used with getObjectsInRange
-	private VisionObject getObjectClosestToCenter(ArrayList<VisionObject> objectsIn) {
+	/** Used with getObjectsInRange*/
+	/* private VisionObject getObjectClosestToCenter(ArrayList<VisionObject> objectsIn) {
 		int closest = -1;
 		double cx = 2.0;
 		for (int i = 0; i < objectsIn.size(); i++) {
@@ -291,8 +322,8 @@ public class Vision {
 			return null;
 		}
 		return objects.get(closest);
-	}
-
+	} */
+	/*
 	// Gets object with absolute x value closest to zero with distance less than
 	// in parameters
 	public VisionObject getObjectClosestToCenterInRange(int id, double distance) {
@@ -313,7 +344,7 @@ public class Vision {
 		VisionObject closestInRange = getObjectClosestToCenter(inRange);
 		return closestInRange;
 	}
-
+	
 	// Gets objects with a score greater than parameters
 	public ArrayList<VisionObject> getObjectsInScore(int id, int score) {
 		ArrayList<VisionObject> inScore = new ArrayList<VisionObject>();
@@ -355,7 +386,7 @@ public class Vision {
 			return null;
 		}
 		return inScoreInRange;
-	}
+	}*/
 
 	public int size() {
 		return objects.size();
@@ -363,8 +394,9 @@ public class Vision {
 
 	// loads in new Data
 	private void dataRefresh(EntryNotification event) {
-		updatelights();
-		try {
+		//updatelights();
+		update();
+		/*try {
 			String[] objectData = event.value.getStringArray();
 			if (objectData.length == 0) {
 				return;
@@ -376,20 +408,55 @@ public class Vision {
 				objectData[i] = objectData[i].replace("[", "");
 				objectData[i] = objectData[i].replace("]", "");
 				String[] data = objectData[i].split(", ");
-				objects.add(new VisionObject(Integer.parseInt(data[0]), Integer.parseInt(data[1]),
-						Double.parseDouble(data[2]), Double.parseDouble(data[3]), Double.parseDouble(data[4])));
+				if (Arrays.binarySearch(data, "None") < 0) {
+					objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]),
+							Double.parseDouble(data[4]), Double.parseDouble(data[5])));
+				}
 				// System.out.print(" : ");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}*/
+	}
+
+	public void update() {
+		try {
+			String[] objectData = Ventry.getStringArray(new String[0]);
+			if (objectData.length == 0) {
+				return;
+			}
+			// System.out.print(objectData);
+			//int countToRemove = objects.size()-1;
+			while (lock) {
+				Thread.sleep(0, 100);
+			}
+
+			objects.clear();
+			for (int i = 0; i < objectData.length; i++) {
+				// System.out.print(objectData[i]);
+				objectData[i] = objectData[i].replace("[", "");
+				objectData[i] = objectData[i].replace("]", "");
+				String[] data = objectData[i].split(", ");
+				if (Arrays.binarySearch(data, "None") < 0) {
+					objects.add(new VisionObject(Double.parseDouble(data[0]), Double.parseDouble(data[1]),
+							Double.parseDouble(data[4]), Double.parseDouble(data[5])));
+				}
+				// System.out.print(" : ");
+			}
+			//for (int i = countToRemove; i > 0; i--) {
+			//	objects.remove(i);
+			//}
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-	public void updatelights(){
+	/*public void updatelights(){
 		if (RobotState.isAutonomous() || RobotState.isTest()) {
 			lights.set(true);
 		} else {
 			lights.set(false);
 		}
-	}
+	}*/
 
 }

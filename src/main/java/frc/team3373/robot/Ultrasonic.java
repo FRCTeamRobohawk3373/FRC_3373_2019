@@ -1,7 +1,7 @@
 package frc.team3373.robot;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
+// import edu.wpi.first.wpilibj.DigitalOutput;
 
 public class Ultrasonic {
 	AnalogInput sensor;

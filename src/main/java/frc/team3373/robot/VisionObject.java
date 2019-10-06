@@ -1,20 +1,18 @@
 package frc.team3373.robot;
 
 public class VisionObject {
-	public VisionObject(int id,int score, double positionX, double positionY,double distance){
-		this.id = id;
-		this.score=score;
+	public VisionObject(double positionX, double positionY,double distance,double rotation){
 		this.X=positionX;
 		this.Y=positionY;
-		this.distance=distance;
+		this.distance = distance;
+		this.rotation = rotation;
 	}
 	public void print(){
-		System.out.println(id+": "+score+"% at ("+X+","+Y+") "+distance+"in.");
+		System.out.println("Target at ("+X+","+Y+") "+distance+"in and "+rotation+" degrees.");
 	}
 	
-	public int id;
-	public int score;
 	public double X;
 	public double Y;
 	public double distance;
+	public double rotation;
 }

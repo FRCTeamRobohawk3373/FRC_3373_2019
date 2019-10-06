@@ -143,7 +143,7 @@ public class SuperJoystick extends Joystick{
         }
     }
     public boolean isDPadUpPushed(){
-    	if(getPOV() == 0){
+    	if(getPOV() == 0 && flagDPadUp){
     		flagDPadUp = false;
     		return true;
     	} else {
@@ -151,7 +151,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadDownPushed(){
-    	if(getPOV() == 180){
+    	if(getPOV() == 180 && flagDPadDown){
     		flagDPadDown = false;
     		return true;
     	} else {
@@ -159,7 +159,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadLeftPushed(){
-    	if(getPOV() == 270){
+    	if(getPOV() == 270 && flagDPadLeft){
     		flagDPadLeft = false;
     		return true;
     	} else {
@@ -167,15 +167,15 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadRightPushed(){
-    	if(getPOV() == 90){
-    		flagDPadUp = false;
+    	if(getPOV() == 90 && flagDPadRight){
+    		flagDPadRight = false;
     		return true;
     	} else {
     		return false;
     	}
     }
     public boolean isDPadUpRightPushed(){
-    	if(getPOV() == 45){
+    	if(getPOV() == 45 && flagDPadUpRight){
     		flagDPadUpRight = false;
     		return true;
     	} else {
@@ -183,7 +183,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadUpLeftPushed(){
-    	if(getPOV() == 315){
+    	if(getPOV() == 315 && flagDPadUpLeft){
     		flagDPadUpLeft = false;
     		return true;
     	} else {
@@ -191,7 +191,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadDownRightPushed(){
-    	if(getPOV() == 135){
+    	if(getPOV() == 135 && flagDPadDownRight){
     		flagDPadDownRight = false;
     		return true;
     	} else {
@@ -199,7 +199,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadDownLeftPushed(){
-    	if(getPOV() == 225){
+    	if(getPOV() == 225 && flagDPadDownLeft){
     		flagDPadDownLeft = false;
     		return true;
     	} else {
@@ -207,7 +207,7 @@ public class SuperJoystick extends Joystick{
     	}
     }
     public boolean isDPadNotPushed(){
-    	if(getPOV() == -1){
+    	if(getPOV() == -1 && flagDPadNotPushed){
     		flagDPadNotPushed = false;
     		return true;
     	} else {
@@ -430,7 +430,7 @@ public class SuperJoystick extends Joystick{
     	 if(!flagDPadLeft && getPOV() != 270){
     		 flagDPadLeft = true;
     	 }
-    	 if(!flagDPadRight && getPOV() != 0){
+    	 if(!flagDPadRight && getPOV() != 90){
     		 flagDPadRight = true;
     	 }
     	 if(!flagDPadNotPushed && getPOV() != -1){
