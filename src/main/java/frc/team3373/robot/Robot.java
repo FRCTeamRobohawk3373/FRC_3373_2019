@@ -66,6 +66,8 @@ public class Robot extends TimedRobot {
 
   HABPlatformAuto HABauto;
 
+  LidarSensor lidar;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any initialization code.
@@ -80,11 +82,12 @@ public class Robot extends TimedRobot {
     shooter = new SuperJoystick(1);
     ahrs = new SuperAHRS(SPI.Port.kMXP);
 
-    swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
+    /*swerve = new SwerveControl(LFrotateMotorID, LFdriveMotorID, LFEncMin, LFEncMax, LFEncHome, LBrotateMotorID,
         LBdriveMotorID, LBEncMin, LBEncMax, LBEncHome, RFrotateMotorID, RFdriveMotorID, RFEncMin, RFEncMax, RFEncHome,
-        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);
+        RBrotateMotorID, RBdriveMotorID, RBEncMin, RBEncMax, RBEncHome, ahrs, robotWidth, robotLength);*/
 
-    HABauto = new HABPlatformAuto(driver);
+    HABauto = new HABPlatformAuto(driver, swerve, 1, 1, 0, 3, 2, 1, 0, 0, 1);
+    lidar = new LidarSensor();
   }
 
   /**
@@ -145,10 +148,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    HABauto.printSensors();
     if (driver.isAPushed()) {
-      HABauto.climb(20);
+      HABauto.climb(22);
     }
-    driverControls();
+    if (driver.isYPushed()) {
+      HABauto.climb(11);
+    }
+    //driverControls();
 
   }
 
@@ -165,15 +172,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    SmartDashboard.putNumber("distance", lidar.getDistance());
+
     // System.out.println(ahrs.getFusedHeading());
     // swerve.calibrateHome();
-    if (driver.getRawButton(1) && !hold) {
+    /*if (driver.getRawButton(1) && !hold) {
       hold = true;
       System.out.println("pressed");
     }
     if (!driver.getRawButton(1) && hold) {
       hold = false;
-    }
+    }*/
   }
 
   public void driverControls() {
@@ -181,6 +190,7 @@ public class Robot extends TimedRobot {
     // #### shared Controls ####
     // ################################################
     if (driver.isStartPushed() && shooter.isStartPushed()) {
+      
       // auto get on HAB platform
     }
 
