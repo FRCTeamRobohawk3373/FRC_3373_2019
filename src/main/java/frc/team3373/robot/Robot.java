@@ -379,7 +379,7 @@ public class Robot extends TimedRobot {
       }
       
       if (driver.isLBHeld()) {//sniper
-        swerve.setDriveSpeed(0.2);
+        swerve.setDriveSpeed(0.175);
         rotateSpeedMod = 1;
       } else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
         swerve.setDriveSpeed(0.7);
