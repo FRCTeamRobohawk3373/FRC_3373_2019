@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
     swerve = new SwerveControl(FLrotateMotorID, FLdriveMotorID, FLEncMin, FLEncMax, FLEncHome, BLrotateMotorID,
         BLdriveMotorID, BLEncMin, BLEncMax, BLEncHome, FRrotateMotorID, FRdriveMotorID, FREncMin, FREncMax, FREncHome,
         BRrotateMotorID, BRdriveMotorID, BREncMin, BREncMax, BREncHome, ahrs, robotWidth, robotLength);
-
+    swerve.setControlMode(DriveMode.ROBOTCENTRIC);
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
@@ -346,13 +346,13 @@ public class Robot extends TimedRobot {
     //################################################
     //####          shared Controls               ####
     //################################################
-    if (driver.isStartHeld() && shooter.isStartHeld()) {
+    /* if (driver.isStartHeld() && shooter.isStartHeld()) {
       HABauto.climb(25.5);
       //auto get on HAB platform
     } else if (driver.isBackHeld() && shooter.isBackHeld()) {
       HABauto.climb(11);
       //auto get on HAB platform
-    }
+    } */
     
     //################################################
     //####          Driver Controls               ####
@@ -362,14 +362,14 @@ public class Robot extends TimedRobot {
       lockStraight = false;
     }
     
-    if (driver.isAPushed()) {
+    /* if (driver.isAPushed()) {
       vlineup.align();
       lockStraight = true;
       //lockStraight = lineup.align(Lineup.AlignDirection.LEFT);
     } else if (driver.isBPushed()) {
       lockStraight = true;
       //lockStraight = lineup.align(Lineup.AlignDirection.RIGHT);
-    }
+    } */
     
     if (vlineup.isFinished()) {
       if (driver.getRawAxis(2) > .5) {//FieldCentric
@@ -381,16 +381,18 @@ public class Robot extends TimedRobot {
       if (driver.isLBHeld()) {//sniper
         swerve.setDriveSpeed(0.175);
         rotateSpeedMod = 1;
-      } else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
+      } /* else if (driver.isRBHeld() && elevator.getPosition() < 21) {//turbo
         swerve.setDriveSpeed(0.7);
         rotateSpeedMod = .7;
-      } else {//regular
-        if (elevator.getPosition() < 40) 
+      }  */else {//regular
+        if (elevator.getPosition() < 40) {
           swerve.setDriveSpeed(0.5);
-        else {
+          rotateSpeedMod = .7;
+        } else {
           swerve.setDriveSpeed(0.2);
+          rotateSpeedMod = .9;
         }
-        rotateSpeedMod = .7;
+        
       }
       
       /*if(driver.isStartHeld()){
@@ -496,7 +498,7 @@ public class Robot extends TimedRobot {
     } else if (shooter.isDPadLeftPushed() || shooter.isDPadRightPushed()) {
       elevator.moveToPosition(2, object);
     } else if (shooter.isDPadUpPushed()) {
-      elevator.moveToPosition(3, object);
+      //elevator.moveToPosition(3, object);
     } else if (shooter.isBPushed()) {
       elevator.moveToHeight(Constants.getNumber("elevatorMinHeight", 19));
       //startTime = System.currentTimeMillis();
@@ -509,7 +511,7 @@ public class Robot extends TimedRobot {
       }
     }*/
     
-    if (Math.abs(shooter.getRawAxis(5)) > 0.05) {
+    if (shooter.getRawAxis(2) > .5 && Math.abs(shooter.getRawAxis(5)) > 0.05) {
       elevator.rawMovePID(-shooter.getRawAxis(5), 0.25);
     }
     
