@@ -385,14 +385,12 @@ public class Robot extends TimedRobot {
         swerve.setDriveSpeed(0.7);
         rotateSpeedMod = .7;
       }  */else {//regular
-        if (elevator.getPosition() < 40) {
+        if (elevator.getPosition() < 40) 
           swerve.setDriveSpeed(0.5);
-          rotateSpeedMod = .7;
-        } else {
+        else {
           swerve.setDriveSpeed(0.2);
-          rotateSpeedMod = .9;
         }
-        
+        rotateSpeedMod = 0.7;
       }
       
       /*if(driver.isStartHeld()){
