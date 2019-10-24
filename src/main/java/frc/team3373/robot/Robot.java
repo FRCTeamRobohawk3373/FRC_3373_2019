@@ -153,7 +153,7 @@ public class Robot extends TimedRobot {
     //joy1,joy2,swerve,relayid,PCMid,rightSolenoidFowardChannel,rightSolenoidReverseChannel,leftSolenoidFowardChannel,leftSolenoidReverseChannel,rightLimitSwitch,leftLimitSwitch,rightDistanceSensor,leftDistanceSensor
     HABauto = new HABPlatformAuto(driver, shooter, swerve, ahrs, 0, 1, 1, 2, 0, 3, 1, 0, 2, 3);
     claw = new Claw(2, 0, 3, 2, 1);
-    claw.open();
+    claw.close();
     
     distl = new DistanceSensor(0, 5);
     distr = new DistanceSensor(1, 6);
@@ -386,7 +386,7 @@ public class Robot extends TimedRobot {
         rotateSpeedMod = .7;
       }  */else {//regular
         if (elevator.getPosition() < 40) 
-          swerve.setDriveSpeed(0.5);
+          swerve.setDriveSpeed(0.2);
         else {
           swerve.setDriveSpeed(0.2);
         }
